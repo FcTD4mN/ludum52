@@ -33,7 +33,6 @@ public class GameManager : MonoBehaviour
         if (mUIManager != null)
             mUIManager.Initialize();
 
-        GameObject player = GameObject.Find("Character")?.gameObject;
         playerCtrler = GameObject.Find("Character")?.gameObject.GetComponent<PlayerController>();
     }
 
