@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class ResourceManager : MonoBehaviour
 {
-    private float mGold = 5000;
-    private float mIron = 0;
-    private float mArrows = 30;
+    [HideInInspector] public float mGoldF = 5000;
+    [HideInInspector] public float mIronF = 0;
+    [HideInInspector] public float mArrowsF = 30;
 
 
     [HideInInspector] public float mRateGold = 0f; // Just in case we wanna add gold harvesting
@@ -15,18 +15,27 @@ public class ResourceManager : MonoBehaviour
 
 
     // ===================================
+    // Building
+    // ===================================
+    public void Initialize()
+    {
+
+    }
+
+
+    // ===================================
     // Getters to get the proper int value
     // ===================================
     public int GetGold() {
-        return  (int)mGold;
+        return  (int)mGoldF;
     }
 
     public int GetIron() {
-        return  (int)mIron;
+        return  (int)mIronF;
     }
 
     public int GetArrows() {
-        return  (int)mArrows;
+        return  (int)mArrowsF;
     }
 
 
@@ -36,8 +45,8 @@ public class ResourceManager : MonoBehaviour
     public void UpdateResources()
     {
         float deltaTime = Time.deltaTime;
-        mGold += mRateGold * deltaTime;
-        mIron += mRateIron * deltaTime;
-        mArrows += mRateArrow * deltaTime;
+        mGoldF += mRateGold * deltaTime;
+        mIronF += mRateIron * deltaTime;
+        mArrowsF += mRateArrow * deltaTime;
     }
 }

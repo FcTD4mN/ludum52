@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
         // Singleton
     public static GameManager mInstance;
     public static ResourceManager mResourceManager;
+    public static UIManager mUIManager;
+    public static RTSManager mRTSManager;
 
 
     // Start is called before the first frame update
@@ -18,6 +20,13 @@ public class GameManager : MonoBehaviour
 
         mInstance = this;
         mResourceManager = GameObject.Find("ResourceManager")?.gameObject.GetComponent<ResourceManager>();
+        mResourceManager.Initialize();
+
+        mRTSManager = GameObject.Find("RTSManager")?.gameObject.GetComponent<RTSManager>();
+        mRTSManager.Initialize();
+
+        mUIManager = GameObject.Find("UIManager")?.gameObject.GetComponent<UIManager>();
+        mUIManager.Initialize();
     }
 
     // Update is called once per frame
@@ -25,5 +34,9 @@ public class GameManager : MonoBehaviour
     {
         // Faire les appels ici pour garantir l'ordre, les resources doivent être updaté avant le reste du jeu
         mResourceManager.UpdateResources();
+
+
+        // Surement en dernier, l'ui s'update
+        mUIManager.UpdateUI();
     }
 }
