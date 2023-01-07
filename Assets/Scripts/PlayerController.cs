@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D), typeof(TouchingDirections))]
 public class PlayerController : MonoBehaviour
 {
+    // Char Stats
     public float runSpeed = 4f;
     public float airWalkSpeed = 4f;
     public float airWallSpeed = 4f;
@@ -17,6 +18,14 @@ public class PlayerController : MonoBehaviour
     private float lastAttack;
     private float lastDash;
 
+    // References to GameObject or Scripts
+    GameObject aimAssist;
+    ArrowLauncher bow;
+
+    [HideInInspector]
+    public Interactable currentInteractable;
+
+    // Movements and actions
     Vector2 moveInput;
     TouchingDirections touchingDirections;
 
@@ -117,11 +126,13 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D rb;
     Animator animator;
 
-    private void Awake()
+    private void OnEnable()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         touchingDirections = GetComponent<TouchingDirections>();
+        bow = GetComponent<ArrowLauncher>();
+        aimAssist = GameObject.Find("AimAssist");
         lastAttack = -10f;
         lastDash = -10f;
     }
@@ -186,6 +197,9 @@ public class PlayerController : MonoBehaviour
         // @TODO: Throw Arrow + Hit vraiment un ennemi/collision
         if (context.started)
         {
+            SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
+            bow.targetPos = sr.transform.position;
+
             // Check cooldown
             if (Time.time - lastAttack < coolDownAttack)
             {
@@ -204,6 +218,23 @@ public class PlayerController : MonoBehaviour
             lastDash = Time.time;
             animator.SetTrigger("Dash");
             rb.velocity = new Vector2(moveInput.x * dashSpeed, rb.velocity.y);
+        }
+    }
+
+    public void OnTest(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            bow.ClearFiredArrows();
+        }
+    }
+
+    public void OnUse(InputAction.CallbackContext context)
+    {
+        if (context.started && currentInteractable != null)
+        {
+            currentInteractable.Interact();
+            currentInteractable.isActive = false;
         }
     }
 }
