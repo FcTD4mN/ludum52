@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 493794672015484696}
   - component: {fileID: 6904781462168992016}
+  - component: {fileID: -141271618492215301}
   m_Layer: 0
   m_Name: BuildingForge
   m_TagString: Untagged
@@ -84,3 +85,15 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &-141271618492215301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3524006987067996515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99fa764240cd4594f9796ec8c1b1f1a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

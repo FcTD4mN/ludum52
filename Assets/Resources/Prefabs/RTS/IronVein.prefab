@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7466879283548743104}
   - component: {fileID: 2434783853251482820}
+  - component: {fileID: 6943978962908650194}
   m_Layer: 0
   m_Name: IronVein
   m_TagString: Buildable
@@ -84,3 +85,15 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &6943978962908650194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7875693840734584846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 805d74d09218348459ef165ac5dfdd3e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

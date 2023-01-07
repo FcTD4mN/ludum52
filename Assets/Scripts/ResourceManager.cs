@@ -9,17 +9,20 @@ public class ResourceManager : MonoBehaviour
     [HideInInspector] public float mArrowsF = 30;
 
 
-    [HideInInspector] public float mRateGold = 0f; // Just in case we wanna add gold harvesting
-    [HideInInspector] public float mRateIron = 0f;
-    [HideInInspector] public float mRateArrow = 0f;
+    // [HideInInspector] public float mRateGold = 0f; // Just in case we wanna add gold harvesting
+    // [HideInInspector] public float mRateIron = 0f;
+    // [HideInInspector] public float mRateArrow = 0f;
+
+    private float mTime = 0f;
 
 
+    public List<ProductionBuilding> mAllProductionBuilding;
     // ===================================
     // Building
     // ===================================
     public void Initialize()
     {
-
+        mAllProductionBuilding = new List<ProductionBuilding>();
     }
 
 
@@ -44,9 +47,17 @@ public class ResourceManager : MonoBehaviour
     // ===================================
     public void UpdateResources()
     {
-        float deltaTime = Time.deltaTime;
-        mGoldF += mRateGold * deltaTime;
-        mIronF += mRateIron * deltaTime;
-        mArrowsF += mRateArrow * deltaTime;
+        mTime += Time.deltaTime;
+
+        if( mTime < 1.0 ) {
+            return;
+        }
+        mTime = 1 - mTime;
+
+        // Toutes les secondes
+        foreach( ProductionBuilding building in mAllProductionBuilding )
+        {
+            building.GenerateResource();
+        }
     }
 }
