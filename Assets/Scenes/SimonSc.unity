@@ -536,6 +536,11 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
+--- !u!4 &1210912660 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3721850691752255772, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+  m_PrefabInstance: {fileID: 8986150717250128477}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1247595805
 GameObject:
   m_ObjectHideFlags: 0
@@ -913,10 +918,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 8986150717280332387, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
-      propertyPath: coolDownAttack
-      value: 1.5
+    - target: {fileID: 3721850691752255772, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.336
       objectReference: {fileID: 0}
+    - target: {fileID: 3721850691752255772, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.111
+      objectReference: {fileID: 0}
+    - target: {fileID: 3721850691752255772, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6839967633972668668, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: arrowPrefab
+      value: 
+      objectReference: {fileID: 6270920307405493096, guid: c2c0c5a4baa5ca74896b1ff2d5bd006b, type: 3}
+    - target: {fileID: 6839967633972668668, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: launchPoint
+      value: 
+      objectReference: {fileID: 1210912660}
     - target: {fileID: 8986150717280332388, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
       propertyPath: m_RootOrder
       value: 1
