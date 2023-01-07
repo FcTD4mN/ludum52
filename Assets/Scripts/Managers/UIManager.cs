@@ -11,6 +11,16 @@ public class UIManager : MonoBehaviour
     private TextMeshProUGUI mLabelIron;
     private TextMeshProUGUI mLabelArrows;
 
+
+    private GameObject mBuildMenu;
+    private Button mButtonIronHarvester;
+    private Button mButtonForge;
+    private Button mButtonFireMaker;
+
+
+    private GameObject mObjectToBuildTo;
+    private GameObject mBuildButtonClicked;
+
     // ===================================
     // Building
     // ===================================
@@ -24,10 +34,14 @@ public class UIManager : MonoBehaviour
 
         mCanvas = GameObject.Find("UI-RTS")?.gameObject.GetComponent<Canvas>();
 
-        GameObject ironMineA = GameObject.Find("IronVein")?.gameObject;
-        GameObject ironMineB = GameObject.Find("IronVein2")?.gameObject;
-        CreateBuildButtonOverObject( ironMineA );
-        CreateBuildButtonOverObject( ironMineB );
+        // Build Menu
+        mBuildMenu = mCanvas.transform.Find("BuildMenu")?.gameObject;
+        mButtonIronHarvester = GameObject.Find("ButtonIronHarvester")?.gameObject.GetComponent<Button>();
+        mButtonForge = GameObject.Find("ButtonForge")?.gameObject.GetComponent<Button>();
+        mButtonFireMaker = GameObject.Find("ButtonFireMaker")?.gameObject.GetComponent<Button>();
+        BuildBuildMenu();
+
+        CreateBuildButtonOnEveryBuildableObject();
     }
 
 
@@ -39,6 +53,37 @@ public class UIManager : MonoBehaviour
         mLabelGold.text = mResourceManager.GetGold().ToString();
         mLabelIron.text = mResourceManager.GetIron().ToString();
         mLabelArrows.text = mResourceManager.GetArrows().ToString();
+
+        UpdateBuildMenu();
+    }
+
+    // ===================================
+    // UI Stuff
+    // ===================================
+
+
+    public void CreateBuildButtonOnEveryBuildableObject()
+    {
+        foreach( Transform child in GameManager.mRTSManager.mRTSWorld.transform )
+        {
+            if( child.name == "Tower" )
+            {
+                foreach( Transform buildingArea in child )
+                {
+                    if( buildingArea.tag != "Buildable" ) {
+                        continue;
+                    }
+
+                    CreateBuildButtonOverObject( buildingArea.gameObject );
+                }
+            }
+
+            if( child.tag != "Buildable" ) {
+                continue;
+            }
+
+            CreateBuildButtonOverObject( child.gameObject );
+        }
     }
 
 
@@ -55,13 +100,70 @@ public class UIManager : MonoBehaviour
 
         newButton.GetComponent<Button>().onClick.AddListener( () => {
 
-            ButtonBuildClicked(obj);
-            GameObject.Destroy( newButton );
+            mObjectToBuildTo = obj;
+            mBuildButtonClicked = newButton;
+            ShowBuildMenu();
+
         });
     }
 
-    public void ButtonBuildClicked( GameObject obj )
+
+
+    // ===================================
+    // Build Menu
+    // ===================================
+
+    public void ShowBuildMenu()
     {
-        GameManager.mRTSManager.BuildObjectAtLocation( "BuildingIronHarvester", obj.transform.position );
+        UpdateBuildMenu();
+        mBuildMenu.transform.SetAsLastSibling();
+        mBuildMenu.SetActive( true );
+    }
+
+
+    private void UpdateBuildMenu()
+    {
+        if( !mBuildMenu.activeSelf ) { return; }
+
+        bool isLocationAnIronMine = mObjectToBuildTo.gameObject.GetComponent<IronVein>() != null;
+
+        mButtonIronHarvester.interactable = GameManager.mResourceManager.mGoldF >= IronHarvester.mGoldCost && isLocationAnIronMine;
+        mButtonForge.interactable = GameManager.mResourceManager.mGoldF >= Forge.mGoldCost && !isLocationAnIronMine;
+        mButtonFireMaker.interactable = !isLocationAnIronMine;
+    }
+
+    private void BuildBuildMenu()
+    {
+        mBuildMenu.SetActive( false );
+
+        mBuildMenu.transform.Find("Close")?.gameObject.GetComponent<Button>().onClick.AddListener( () => {
+            mBuildMenu.SetActive( false );
+        });
+
+        TextMeshProUGUI labelIron = mButtonIronHarvester.gameObject.transform.Find("text")?.GetComponent<TextMeshProUGUI>();
+        labelIron.text = "Iron Harvester" +
+                        "\n" +
+                        "\nCost: " + IronHarvester.mGoldCost.ToString() +
+                        "\nProduction: " + IronHarvester.mRatePerSecond.ToString();
+
+        mButtonIronHarvester.onClick.AddListener( () => {
+            mBuildMenu.SetActive( false );
+            GameManager.mRTSManager.BuildObjectAtLocation( "BuildingIronHarvester", mObjectToBuildTo.transform.position );
+            GameObject.Destroy( mBuildButtonClicked );
+        });
+
+        TextMeshProUGUI labelForge = mButtonForge.gameObject.transform.Find("text")?.GetComponent<TextMeshProUGUI>();
+        labelForge.text = "Forge" +
+                        "\n" +
+                        "\nCost: " + Forge.mGoldCost.ToString() +
+                        "\nProduction: " + Forge.mRatePerSecond.ToString();
+
+        mButtonForge.onClick.AddListener( () => {
+            mBuildMenu.SetActive( false );
+            GameManager.mRTSManager.BuildObjectAtLocation( "BuildingForge", mObjectToBuildTo.transform.position );
+            GameObject.Destroy( mBuildButtonClicked );
+            GameObject.Destroy( mObjectToBuildTo );
+        });
+
     }
 }

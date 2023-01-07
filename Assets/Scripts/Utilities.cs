@@ -50,6 +50,13 @@ public class Utilities
         Vector2 center = obj.transform.position;
         Vector2 size = obj.transform.localScale;
 
+        Transform parent = obj.transform.parent;
+        while( parent )
+        {
+            size *= parent.localScale;
+            parent = parent.parent;
+        }
+
         Vector2 topLeft = center - size / 2;
 
         return new Rect(topLeft, size);

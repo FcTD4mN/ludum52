@@ -2,20 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IronHarvester : MonoBehaviour
+public class IronHarvester : ProductionBuilding
 {
-    public float mRatePerSecond = 5f;
-    public float mGoldCost = 500f;
+    public static float mRatePerSecond = 5f;
+    public static float mGoldCost = 500f;
 
 
-    void OnEnable()
+    override internal void Build()
     {
         GameManager.mResourceManager.mGoldF -= mGoldCost;
-        GameManager.mResourceManager.mRateIron += mRatePerSecond;
     }
 
-    void OnDisable()
+
+    override public void GenerateResource()
     {
-        GameManager.mResourceManager.mRateIron -= mRatePerSecond;
+        GameManager.mResourceManager.mIronF += mRatePerSecond;
     }
 }
