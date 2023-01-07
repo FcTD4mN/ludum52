@@ -183,16 +183,13 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        // @TODO: Hit vraiment un ennemi/collision
+        // @TODO: Throw Arrow + Hit vraiment un ennemi/collision
         if (context.started)
         {
-            if (CanMove)
+            // Check cooldown
+            if (Time.time - lastAttack < coolDownAttack)
             {
-                // Check cooldown
-                if (Time.time - lastAttack < coolDownAttack)
-                {
-                    return;
-                }
+                return;
             }
 
             lastAttack = Time.time;
@@ -202,7 +199,6 @@ public class PlayerController : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
-        // @TODO : Changer le collider size ?
         if (context.started && touchingDirections.IsGrounded && CanMove && !(Time.time - lastDash < coolDownDash))
         {
             lastDash = Time.time;
