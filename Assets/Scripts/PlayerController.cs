@@ -183,7 +183,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        // @TODO: Hit vraiment un ennemi/collision
+        // @TODO: Throw Arrow + Hit vraiment un ennemi/collision
         if (context.started)
         {
             if (CanMove)
