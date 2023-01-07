@@ -4,24 +4,33 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
-    public float damage = 10f;
-    public float speed = 5f;
+    public float destroyAfterDistance = 10f;
+    private float startingPos;
 
-    Rigidbody2D rb;
-
-    private void Awake()
+    void OnEnable()
     {
-        rb = GetComponent<Rigidbody2D>();
+        startingPos = transform.position.x;
     }
 
-    void Start()
+    void FixedUpdate()
     {
-        rb.velocity = new Vector2(speed * transform.localScale.x, 0f);
+        // Destroy arrow after certain distance if not hitting anything
+        if (Mathf.Abs(transform.position.x - startingPos) > destroyAfterDistance)
+            Destroy(gameObject);
     }
 
     private void OnTriggerEnter2D(Collider2D coll)
     {
-        // TODO : Hit 
-        Debug.Log("Arrow hit target");
+        Hitable hitable = coll.GetComponent<Hitable>();
+
+        if (hitable == null)
+            return;
+
+        // Hit the target
+        if (hitable.Hit())
+        {
+            Debug.Log("We hit the object named : " + coll.name);
+            Destroy(gameObject);
+        }
     }
 }
