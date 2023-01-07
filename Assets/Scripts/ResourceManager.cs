@@ -1,24 +1,28 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+using static cResourceDescriptor;
+
 public class ResourceManager : MonoBehaviour
 {
-    [HideInInspector] public float mGoldF;
-    [HideInInspector] public float mIronF;
-    [HideInInspector] public float mArrowsF;
+    [HideInInspector] public Dictionary<string, float> mResourcesAvailable;
 
-    public List<ProductionBuilding> mAllProductionBuilding;
     // ===================================
     // Building
     // ===================================
     public void Initialize()
     {
-        mAllProductionBuilding = new List<ProductionBuilding>();
+        mResourcesAvailable = new Dictionary<string, float>();
+        foreach( string resourceName in mAllResourceNames )
+        {
+            mResourcesAvailable[resourceName] = 0f;
+        }
 
-        mGoldF = 4000;
-        mIronF = 200;
-        mArrowsF = 30;
+        mResourcesAvailable[eResourceNames.Gold.ToString()] = 8000;
+        mResourcesAvailable[eResourceNames.Iron.ToString()] = 200;
+        mResourcesAvailable[eResourceNames.Arrows.ToString()] = 30;
     }
 
 
@@ -26,15 +30,23 @@ public class ResourceManager : MonoBehaviour
     // Getters to get the proper int value
     // ===================================
     public int GetGold() {
-        return  (int)mGoldF;
+        return  (int)mResourcesAvailable[eResourceNames.Gold.ToString()];
     }
 
     public int GetIron() {
-        return  (int)mIronF;
+        return  (int)mResourcesAvailable[eResourceNames.Iron.ToString()];
+    }
+
+    public int GetFire() {
+        return  (int)mResourcesAvailable[eResourceNames.Fire.ToString()];
     }
 
     public int GetArrows() {
-        return  (int)mArrowsF;
+        return  (int)mResourcesAvailable[eResourceNames.Arrows.ToString()];
+    }
+
+    public int GetBombs() {
+        return  (int)mResourcesAvailable[eResourceNames.Bombs.ToString()];
     }
 
 
@@ -46,9 +58,119 @@ public class ResourceManager : MonoBehaviour
         float deltaTime = Time.deltaTime;
 
         // Toutes les secondes
-        foreach( ProductionBuilding building in mAllProductionBuilding )
+        foreach( ProductionBuilding building in GameManager.mRTSManager.mAllProductionBuildings )
         {
             building.ProduceResource( deltaTime );
         }
+    }
+}
+
+
+
+
+
+public class cResourceDescriptor
+{
+    public static List<string> mAllResourceNames;
+    public enum eResourceNames {
+        Gold,
+        Iron,
+        Fire,
+        Arrows,
+        Bombs
+    }
+
+    public static void BuildResourceList()
+    {
+        mAllResourceNames = new List<string>();
+
+        foreach (string name in Enum.GetNames(typeof(eResourceNames)))
+        {
+            mAllResourceNames.Add( name );
+        }
+    }
+
+
+    public Dictionary<string, float> mBuildCosts;
+    public Dictionary<string, float> mInputRates;
+    public Dictionary<string, float> mOutputRates;
+
+    public cResourceDescriptor()
+    {
+        mBuildCosts = new Dictionary<string, float>();
+        mInputRates = new Dictionary<string, float>();
+        mOutputRates = new Dictionary<string, float>();
+
+        foreach( string resourceName in mAllResourceNames )
+        {
+            mBuildCosts[resourceName] = 0f;
+            mInputRates[resourceName] = 0f;
+            mOutputRates[resourceName] = 0f;
+        }
+    }
+
+
+    public string PrintProductionRates()
+    {
+        string outputString = "";
+        bool atLeastOne = false;
+
+        // Costs first
+        outputString += "Inputs: \n";
+        foreach( string resourceName in mAllResourceNames )
+        {
+            if( mInputRates[resourceName] == 0 ) { continue; }
+            atLeastOne = true;
+
+            outputString += "    " + resourceName + ": " + mInputRates[resourceName] + "\n";
+        }
+        if( !atLeastOne ) {
+            outputString += "    None\n";
+        }
+        atLeastOne = false;
+
+
+        // Then outputs
+        outputString += "Outputs: \n";
+        foreach( string resourceName in mAllResourceNames )
+        {
+            if( mOutputRates[resourceName] == 0 ) { continue; }
+            atLeastOne = true;
+
+            outputString += "    " + resourceName + ": " + mOutputRates[resourceName] + "\n";
+        }
+        if( !atLeastOne ) {
+            outputString += "    None\n";
+        }
+
+        return  outputString;
+    }
+
+
+    public string PrintCompleteDescription( string name, string description )
+    {
+        string outputString = "";
+
+        outputString = name + "\n" + description + "\n";
+
+        outputString += "\n";
+
+        outputString += "Build Cost: \n";
+        bool atLeastOne = false;
+        foreach( string resourceName in mAllResourceNames )
+        {
+            if( mBuildCosts[resourceName] == 0 ) { continue; }
+            atLeastOne = true;
+
+            outputString += "    " + resourceName + ": " + mBuildCosts[resourceName] + "\n";
+        }
+        if( !atLeastOne ) {
+            outputString += "    None\n";
+        }
+
+        outputString += "\n";
+        outputString += PrintProductionRates();
+
+        return  outputString;
     }
 }

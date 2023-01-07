@@ -2,21 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IronHarvester : ProductionBuilding
+public class IronHarvester : HarvestingBuilding
 {
-    public static float mRatePerSecond = 5f;
-    public static float mGoldCost = 500f;
-
-
-    override internal void Build()
+    public static cResourceDescriptor GetResourceDescriptor()
     {
-        mBuildCostGold = mGoldCost;
-        base.Build();
+        cResourceDescriptor output = new cResourceDescriptor();
+
+        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold.ToString() ] = 500;
+        output.mOutputRates[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 5;
+        return  output;
     }
 
 
-    override public void ProduceResource( float deltaTime )
+    public static bool IsBuildable()
     {
-        GameManager.mResourceManager.mIronF += mRatePerSecond * deltaTime;
+        cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
+        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+        {
+            if( resourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.mResourcesAvailable[resourceName] ) {
+                return  false;
+            }
+        }
+
+        return  true;
+    }
+
+
+    override internal void Initialize()
+    {
+        base.Initialize();
+        mResourceDescriptor = GetResourceDescriptor();
     }
 }

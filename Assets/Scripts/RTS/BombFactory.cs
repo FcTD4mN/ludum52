@@ -1,13 +1,15 @@
-public class Forge : ProductionBuilding
+public class BombFactory : ProductionBuilding
 {
     public static cResourceDescriptor GetResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold.ToString() ] = 2000;
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 100;
+        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold.ToString() ] = 3000;
+        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 500;
+
         output.mInputRates[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 2;
-        output.mOutputRates[ cResourceDescriptor.eResourceNames.Arrows.ToString() ] = 1;
+        output.mInputRates[ cResourceDescriptor.eResourceNames.Fire.ToString() ] = 2;
+        output.mOutputRates[ cResourceDescriptor.eResourceNames.Bombs.ToString() ] = 1;
 
         return  output;
     }
