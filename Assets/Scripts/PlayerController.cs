@@ -22,6 +22,9 @@ public class PlayerController : MonoBehaviour
     GameObject aimAssist;
     ArrowLauncher bow;
 
+    [HideInInspector]
+    public Interactable currentInteractable;
+
     // Movements and actions
     Vector2 moveInput;
     TouchingDirections touchingDirections;
@@ -223,6 +226,15 @@ public class PlayerController : MonoBehaviour
         if (context.started)
         {
             bow.ClearFiredArrows();
+        }
+    }
+
+    public void OnUse(InputAction.CallbackContext context)
+    {
+        if (context.started && currentInteractable != null)
+        {
+            currentInteractable.Interact();
+            currentInteractable.isActive = false;
         }
     }
 }
