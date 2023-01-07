@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RTSManager : MonoBehaviour
 {
-    private GameObject mRTSWorld;
+    public GameObject mRTSWorld;
 
     // ===================================
     // Building

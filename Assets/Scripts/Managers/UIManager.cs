@@ -24,10 +24,7 @@ public class UIManager : MonoBehaviour
 
         mCanvas = GameObject.Find("UI-RTS")?.gameObject.GetComponent<Canvas>();
 
-        GameObject ironMineA = GameObject.Find("IronVein")?.gameObject;
-        GameObject ironMineB = GameObject.Find("IronVein2")?.gameObject;
-        CreateBuildButtonOverObject( ironMineA );
-        CreateBuildButtonOverObject( ironMineB );
+        CreateBuildButtonOnEveryBuildableObject();
     }
 
 
@@ -39,6 +36,35 @@ public class UIManager : MonoBehaviour
         mLabelGold.text = mResourceManager.GetGold().ToString();
         mLabelIron.text = mResourceManager.GetIron().ToString();
         mLabelArrows.text = mResourceManager.GetArrows().ToString();
+    }
+
+    // ===================================
+    // UI Stuff
+    // ===================================
+
+
+    public void CreateBuildButtonOnEveryBuildableObject()
+    {
+        foreach( Transform child in GameManager.mRTSManager.mRTSWorld.transform )
+        {
+            if( child.name == "Tower" )
+            {
+                foreach( Transform buildingArea in child )
+                {
+                    if( buildingArea.tag != "Buildable" ) {
+                        continue;
+                    }
+
+                    CreateBuildButtonOverObject( buildingArea.gameObject );
+                }
+            }
+
+            if( child.tag != "Buildable" ) {
+                continue;
+            }
+
+            CreateBuildButtonOverObject( child.gameObject );
+        }
     }
 
 
