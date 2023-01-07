@@ -4,17 +4,9 @@ using UnityEngine;
 
 public class ResourceManager : MonoBehaviour
 {
-    [HideInInspector] public float mGoldF = 5000;
-    [HideInInspector] public float mIronF = 0;
-    [HideInInspector] public float mArrowsF = 30;
-
-
-    // [HideInInspector] public float mRateGold = 0f; // Just in case we wanna add gold harvesting
-    // [HideInInspector] public float mRateIron = 0f;
-    // [HideInInspector] public float mRateArrow = 0f;
-
-    private float mTime = 0f;
-
+    [HideInInspector] public float mGoldF;
+    [HideInInspector] public float mIronF;
+    [HideInInspector] public float mArrowsF;
 
     public List<ProductionBuilding> mAllProductionBuilding;
     // ===================================
@@ -23,6 +15,10 @@ public class ResourceManager : MonoBehaviour
     public void Initialize()
     {
         mAllProductionBuilding = new List<ProductionBuilding>();
+
+        mGoldF = 4000;
+        mIronF = 200;
+        mArrowsF = 30;
     }
 
 
@@ -47,17 +43,12 @@ public class ResourceManager : MonoBehaviour
     // ===================================
     public void UpdateResources()
     {
-        mTime += Time.deltaTime;
-
-        if( mTime < 1.0 ) {
-            return;
-        }
-        mTime = 1 - mTime;
+        float deltaTime = Time.deltaTime;
 
         // Toutes les secondes
         foreach( ProductionBuilding building in mAllProductionBuilding )
         {
-            building.GenerateResource();
+            building.ProduceResource( deltaTime );
         }
     }
 }

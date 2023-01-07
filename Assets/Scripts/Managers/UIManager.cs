@@ -91,12 +91,17 @@ public class UIManager : MonoBehaviour
     {
         GameObject buttonPrefab = Resources.Load<GameObject>("Prefabs/RTS/UI/ButtonBuild");
 
-        Rect screenOjbBBox = Utilities.WorldToScreenRect( Utilities.GetBBoxFromTransform(obj) );
+        Rect objectBBox = Utilities.GetBBoxFromTransform(obj);
+        Rect screenOjbBBox = Utilities.WorldToScreenRect( objectBBox );
+        CanvasScaler scaler = mCanvas.gameObject.GetComponent<CanvasScaler>();
+        Rect pixelBBox = mCanvas.pixelRect;
+        Vector2 proportionInv = scaler.referenceResolution / pixelBBox.size;
+
         GameObject newButton = Instantiate( buttonPrefab,
                                             new Vector3( screenOjbBBox.center.x, screenOjbBBox.center.y, 0 ),
                                             Quaternion.Euler(0, 0, 0) );
         newButton.transform.SetParent( mCanvas.transform );
-        newButton.GetComponent<RectTransform>().sizeDelta = new Vector2( screenOjbBBox.width, screenOjbBBox.height );
+        newButton.GetComponent<RectTransform>().sizeDelta = new Vector2( screenOjbBBox.width * proportionInv.x, screenOjbBBox.height * proportionInv.y );
 
         newButton.GetComponent<Button>().onClick.AddListener( () => {
 
@@ -127,8 +132,13 @@ public class UIManager : MonoBehaviour
 
         bool isLocationAnIronMine = mObjectToBuildTo.gameObject.GetComponent<IronVein>() != null;
 
-        mButtonIronHarvester.interactable = GameManager.mResourceManager.mGoldF >= IronHarvester.mGoldCost && isLocationAnIronMine;
-        mButtonForge.interactable = GameManager.mResourceManager.mGoldF >= Forge.mGoldCost && !isLocationAnIronMine;
+        mButtonIronHarvester.interactable = GameManager.mResourceManager.mGoldF >= IronHarvester.mGoldCost &&
+                                            isLocationAnIronMine;
+
+        mButtonForge.interactable = GameManager.mResourceManager.mGoldF >= Forge.mGoldCost &&
+                                    GameManager.mResourceManager.mIronF >= Forge.mIronCost &&
+                                    !isLocationAnIronMine;
+
         mButtonFireMaker.interactable = !isLocationAnIronMine;
     }
 

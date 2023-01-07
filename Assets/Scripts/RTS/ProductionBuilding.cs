@@ -4,6 +4,11 @@ using UnityEngine;
 
 public class ProductionBuilding : MonoBehaviour
 {
+
+    internal float mBuildCostGold = 0f;
+    internal float mBuildCostIron = 0f;
+
+
     public void OnEnable()
     {
         GameManager.mResourceManager.mAllProductionBuilding.Add( this );
@@ -19,12 +24,12 @@ public class ProductionBuilding : MonoBehaviour
 
     virtual internal void Build()
     {
-        // Implement
+        GameManager.mResourceManager.mGoldF -= mBuildCostGold;
+        GameManager.mResourceManager.mIronF -= mBuildCostIron;
     }
 
-    virtual public void GenerateResource()
+    virtual public void ProduceResource( float deltaTime )
     {
         // Implement
     }
-
 }

@@ -5,21 +5,28 @@ using UnityEngine;
 public class Forge : ProductionBuilding
 {
     public static float mGoldCost = 2000f;
-    public static float mIronCost = 2f;
+    public static float mIronCost = 100f;
+
+    public static float mIronCostRate = 2f;
     public static float mRatePerSecond = 1f;
 
     override internal void Build()
     {
-        GameManager.mResourceManager.mGoldF -= mGoldCost;
+        mBuildCostGold = mGoldCost;
+        mBuildCostIron = mIronCost;
+        base.Build();
     }
 
 
-    override public void GenerateResource()
+    override public void ProduceResource( float deltaTime )
     {
-        if( GameManager.mResourceManager.mIronF > mIronCost )
+        float deltaIronAvailable = GameManager.mResourceManager.mIronF * deltaTime;
+        float deltaIronCost = mIronCostRate * deltaTime;
+
+        if( deltaIronAvailable >= deltaIronCost )
         {
-            GameManager.mResourceManager.mArrowsF += mRatePerSecond;
-            GameManager.mResourceManager.mIronF -= mIronCost;
+            GameManager.mResourceManager.mArrowsF += mRatePerSecond * deltaTime;
+            GameManager.mResourceManager.mIronF -= deltaIronCost;
         }
     }
 }

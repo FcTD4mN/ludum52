@@ -10,12 +10,13 @@ public class IronHarvester : ProductionBuilding
 
     override internal void Build()
     {
-        GameManager.mResourceManager.mGoldF -= mGoldCost;
+        mBuildCostGold = mGoldCost;
+        base.Build();
     }
 
 
-    override public void GenerateResource()
+    override public void ProduceResource( float deltaTime )
     {
-        GameManager.mResourceManager.mIronF += mRatePerSecond;
+        GameManager.mResourceManager.mIronF += mRatePerSecond * deltaTime;
     }
 }
