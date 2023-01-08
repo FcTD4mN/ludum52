@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using Cinemachine;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,6 +11,8 @@ public class GameManager : MonoBehaviour
     public static ResourceManager mResourceManager;
     public static UIManager mUIManager;
     public static RTSManager mRTSManager;
+
+    private bool mIsInRTSMode = false;
 
     // PlayerController Ref
     [HideInInspector]
@@ -48,5 +52,30 @@ public class GameManager : MonoBehaviour
         // Surement en dernier, l'ui s'update
         if (mUIManager != null)
             mUIManager.UpdateUI();
+    }
+
+
+    public void OnSwitch(InputAction.CallbackContext context)
+    {
+        if (context.started )
+        {
+            mIsInRTSMode = !mIsInRTSMode;
+
+            CinemachineBrain cervoCamera = Camera.main.GetComponent<CinemachineBrain>();
+            cervoCamera.enabled = !mIsInRTSMode;
+
+            if( mIsInRTSMode )
+            {
+                Vector3 positionDeLaTour = mRTSManager.mTowers[0].transform.position;
+                Camera.main.transform.position = new Vector3( positionDeLaTour.x, positionDeLaTour.y, Camera.main.transform.position.z ) ;
+                mUIManager.CreateBuildButtonOnEveryBuildableObject();
+            }
+            else
+            {
+                mUIManager.DeleteAllUIFloatingButtons();
+                mUIManager.mBuildMenu.SetActive( false );
+                mUIManager.mInfoPanel.SetActive( false );
+            }
+        }
     }
 }

@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
     private TextMeshProUGUI mLabelBombs;
 
     // BuildMenu
-    private GameObject mBuildMenu;
+    public GameObject mBuildMenu;
 
     private Button mButtonIronHarvester;
     private Button mButtonFireMaker;
@@ -24,7 +24,7 @@ public class UIManager : MonoBehaviour
     private Button mButtonBombFactory;
 
     // Info panel
-    private GameObject mInfoPanel;
+    public GameObject mInfoPanel;
     private TextMeshProUGUI mInfoPanelText;
 
 
@@ -35,6 +35,7 @@ public class UIManager : MonoBehaviour
     private GameObject mHoveredObject; // The object the mouse is currently hovering
     public List<GameObject> mBuildableObjects;
     private List<GameObject> mBuildButtons; // All UI buttons to click to build buildings
+    private List<GameObject> mAllUIFloatingButtons; // All UI buttons to click to open build menu
 
 
     private bool BuildButtonsCreated = false; // Required so this can be done in update once, because canvas
@@ -72,6 +73,8 @@ public class UIManager : MonoBehaviour
         mBuildButtons.Add( mButtonFireMaker.gameObject );
         mBuildButtons.Add( mButtonForge.gameObject );
         mBuildButtons.Add( mButtonBombFactory.gameObject );
+
+        mAllUIFloatingButtons = new List<GameObject>();
     }
 
 
@@ -114,12 +117,6 @@ public class UIManager : MonoBehaviour
 
         UpdateBuildMenu();
         UpdateMousePosition();
-
-        if( !BuildButtonsCreated )
-        {
-            CreateBuildButtonOnEveryBuildableObject();
-            BuildButtonsCreated = true;
-        }
     }
 
 
@@ -167,7 +164,7 @@ public class UIManager : MonoBehaviour
         }
 
         if( mHoverButton != null ) {
-            GameObject.Destroy( mHoverButton );
+            DeleteUIButton( mHoverButton );
         }
 
         mInfoPanel.SetActive( false );
@@ -189,7 +186,7 @@ public class UIManager : MonoBehaviour
     public void CreateBuildButtonOverObject( GameObject obj )
     {
         GameObject newButton = CreateButtonOverObject( "ButtonBuild", obj );
-
+        mAllUIFloatingButtons.Add( newButton );
         newButton.GetComponent<Button>().onClick.AddListener( () => {
 
             mObjectToBuildTo = obj;
@@ -220,7 +217,7 @@ public class UIManager : MonoBehaviour
                 }
             }
             GameManager.mRTSManager.DestroyBuilding( building.gameObject );
-            GameObject.Destroy( mHoverButton );
+            DeleteUIButton( mHoverButton );
 
         });
 
@@ -252,6 +249,23 @@ public class UIManager : MonoBehaviour
     }
 
 
+    public void DeleteAllUIFloatingButtons()
+    {
+        foreach( GameObject button in mAllUIFloatingButtons )
+        {
+            GameObject.Destroy( button );
+        }
+
+        mAllUIFloatingButtons.Clear();
+    }
+
+
+    public void DeleteUIButton( GameObject obj )
+    {
+        mAllUIFloatingButtons.Remove( obj );
+        GameObject.Destroy( obj );
+    }
+
 
     // ===================================
     // Mouse Hovering
@@ -263,7 +277,7 @@ public class UIManager : MonoBehaviour
         }
 
         if( mHoveredObject == building.gameObject ) {
-            GameObject.Destroy( mHoverButton );
+            DeleteUIButton(mHoverButton);
         }
 
         mHoveredObject = building.gameObject;
@@ -277,7 +291,7 @@ public class UIManager : MonoBehaviour
         }
 
         if( mHoveredObject != resource ) {
-            GameObject.Destroy( mHoverButton );
+            DeleteUIButton(mHoverButton);
         }
 
         mHoveredObject = resource;
@@ -289,7 +303,7 @@ public class UIManager : MonoBehaviour
         }
 
         if( mHoveredObject != button ) {
-            GameObject.Destroy( mHoverButton );
+            DeleteUIButton(mHoverButton);
         }
 
         mHoveredObject = button;
@@ -334,26 +348,26 @@ public class UIManager : MonoBehaviour
         mButtonIronHarvester.onClick.AddListener( () => {
             mBuildMenu.SetActive( false );
             GameManager.mRTSManager.BuildObjectAtLocation( "BuildingIronHarvester", mObjectToBuildTo );
-            GameObject.Destroy( mBuildButtonClicked );
+            DeleteUIButton(mBuildButtonClicked);
         });
 
         mButtonFireMaker.onClick.AddListener( () => {
             mBuildMenu.SetActive( false );
             GameManager.mRTSManager.BuildObjectAtLocation( "BuildingFireMine", mObjectToBuildTo );
-            GameObject.Destroy( mBuildButtonClicked );
+            DeleteUIButton(mBuildButtonClicked);
         });
 
         mButtonForge.onClick.AddListener( () => {
             mBuildMenu.SetActive( false );
             GameManager.mRTSManager.BuildObjectAtLocation( "BuildingForge", mObjectToBuildTo );
-            GameObject.Destroy( mBuildButtonClicked );
+            DeleteUIButton(mBuildButtonClicked);
             mObjectToBuildTo.SetActive( false );
         });
 
         mButtonBombFactory.onClick.AddListener( () => {
             mBuildMenu.SetActive( false );
             GameManager.mRTSManager.BuildObjectAtLocation( "BuildingBombFactory", mObjectToBuildTo );
-            GameObject.Destroy( mBuildButtonClicked );
+            DeleteUIButton(mBuildButtonClicked);
             mObjectToBuildTo.SetActive( false );
         });
 

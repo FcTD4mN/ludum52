@@ -1,0 +1,34 @@
+{
+    "name": "GameController",
+    "maps": [
+        {
+            "name": "Main",
+            "id": "5466a056-a884-4c7e-8620-7b640f3152d4",
+            "actions": [
+                {
+                    "name": "Switch",
+                    "type": "Button",
+                    "id": "d9a16b6a-22d1-4c66-98c7-d52e3fe796b9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "8b8c76a6-5fcf-415f-a09b-2f36d5081320",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Switch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}
