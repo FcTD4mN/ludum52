@@ -322,7 +322,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        if (mHoveredObject == building.gameObject)
+        if (mHoveredObject != building.gameObject)
         {
             DeleteUIButton(mHoverButton);
         }
@@ -341,7 +341,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        if (mHoveredObject == associatedReceiverObject)
+        if (mHoveredObject != associatedReceiverObject)
         {
             DeleteUIButton(mHoverButton);
         }
