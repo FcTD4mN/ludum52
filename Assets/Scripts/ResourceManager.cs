@@ -139,6 +139,11 @@ public class cResourceDescriptor
         mInputRates = new Dictionary<string, float>();
         mOutputRates = new Dictionary<string, float>();
 
+        if( mAllResourceNames == null )
+        {
+            BuildResourceList();
+        }
+
         foreach( string resourceName in mAllResourceNames )
         {
             mBuildCosts[resourceName] = 0f;

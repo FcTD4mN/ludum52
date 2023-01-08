@@ -96,6 +96,7 @@ public class WeaponLauncher : MonoBehaviour
         );
 
         firedArrows.Add(arrow);
+        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Arrows.ToString(), -1, false);
     }
 
     public void LaunchBomb(bool facingRight)
@@ -111,6 +112,8 @@ public class WeaponLauncher : MonoBehaviour
         Rigidbody2D rb = bomb.GetComponent<Rigidbody2D>();
         rb.AddForce(direction * bombSpeed, ForceMode2D.Impulse);
         bomb.transform.Translate(launchOffset);
+
+        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Bombs.ToString(), -1, false);
     }
 
     public void AimLaunchBomb(bool facingRight, Vector2 force)

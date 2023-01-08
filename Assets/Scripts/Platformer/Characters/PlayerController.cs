@@ -211,17 +211,20 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
-            bow.targetPos = sr.transform.position;
-
-            // Check cooldown
-            if (Time.time - lastAttack < mStatsFinalCached.mStatValues[eStatsNames.CoolDownAttack.ToString()])
+            if( (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0 )
             {
-                return;
-            }
+                SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
+                bow.targetPos = sr.transform.position;
 
-            lastAttack = Time.time;
-            animator.SetTrigger("Attack");
+                // Check cooldown
+                if (Time.time - lastAttack < mStatsFinalCached.mStatValues[eStatsNames.CoolDownAttack.ToString()])
+                {
+                    return;
+                }
+
+                lastAttack = Time.time;
+                animator.SetTrigger("Attack");
+            }
         }
     }
 
@@ -229,7 +232,10 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            bow.LaunchBomb(IsFacingRight ? true : false);
+            if( (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) > 0 )
+            {
+                bow.LaunchBomb(IsFacingRight ? true : false);
+            }
         }
     }
 

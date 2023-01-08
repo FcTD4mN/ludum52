@@ -34,6 +34,11 @@ public class cStatsDescriptor
     {
         mStatValues = new Dictionary<string, float>();
 
+        if (mAllStatsName == null)
+        {
+            BuildStatsList();
+        }
+
         foreach (string statName in mAllStatsName)
         {
             mStatValues[statName] = 0f;
