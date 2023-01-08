@@ -65,4 +65,14 @@ public class Bomb : MonoBehaviour
             //Draw a cube where the OverlapBox is (positioned where your GameObject is as well as a size)
             Gizmos.DrawWireCube(transform.position, transform.localScale);
     }
+
+    private void OnTriggerEnter2D(Collider2D coll)
+    {
+        if (coll.tag == "Blocking")
+        {
+            // Prevent from going through floor
+            GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+        }
+
+    }
 }
