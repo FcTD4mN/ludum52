@@ -4,32 +4,78 @@ using UnityEngine;
 
 public class ProductionBuilding : MonoBehaviour
 {
+    internal cResourceDescriptor mResourceDescriptor;
 
-    internal float mBuildCostGold = 0f;
-    internal float mBuildCostIron = 0f;
+    public bool mIsPaused = false;
 
 
+    // ===================================
+    // Internal Setup
+    // ===================================
     public void OnEnable()
     {
-        GameManager.mResourceManager.mAllProductionBuilding.Add( this );
-        Build();
+        GameManager.mRTSManager.mAllProductionBuildings.Add( this );
+        Initialize();
+        BuildBuilding();
     }
 
 
-    void OnDisable()
+    public void OnDisable()
     {
-        GameManager.mResourceManager.mAllProductionBuilding.Remove( this );
+        GameManager.mRTSManager.mAllProductionBuildings.Remove( this );
     }
 
 
-    virtual internal void Build()
+    virtual internal void Initialize()
     {
-        GameManager.mResourceManager.mGoldF -= mBuildCostGold;
-        GameManager.mResourceManager.mIronF -= mBuildCostIron;
+        mResourceDescriptor = new cResourceDescriptor();
     }
 
-    virtual public void ProduceResource( float deltaTime )
+
+    // ===================================
+    // Resource Handling
+    // ===================================
+    public void BuildBuilding()
     {
-        // Implement
+        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+        {
+            GameManager.mResourceManager.mResourcesAvailable[resourceName] -= mResourceDescriptor.mBuildCosts[resourceName];
+        }
+    }
+
+
+    public void ProduceResource( float deltaTime )
+    {
+        if( mIsPaused ) { return; }
+
+        // Checking enough input resources are available
+        bool enoughResources = true;
+        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+        {
+            if( mResourceDescriptor.mInputRates[resourceName] == 0f ) {
+                continue;
+            }
+
+            float deltaAvailable = GameManager.mResourceManager.mResourcesAvailable[resourceName] * deltaTime;
+            float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime;
+            if( deltaAvailable < deltaInputCost ) {
+                enoughResources = false;
+                break;
+            }
+        }
+
+        if( enoughResources )
+        {
+            foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+            {
+                // Remove what building consumes
+                float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime;
+                GameManager.mResourceManager.mResourcesAvailable[resourceName] -= deltaInputCost;
+
+                // Add what building produces
+                float deltaOutputCost = mResourceDescriptor.mOutputRates[resourceName] * deltaTime;
+                GameManager.mResourceManager.mResourcesAvailable[resourceName] += deltaOutputCost;
+            }
+        }
     }
 }

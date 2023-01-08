@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
         // If there is already an gamemanager instance
         if (GameManager.mInstance != null) { return; }
 
+        cResourceDescriptor.BuildResourceList();
+
         mInstance = this;
         mResourceManager = GameObject.Find("ResourceManager")?.gameObject.GetComponent<ResourceManager>();
         if (mResourceManager != null)

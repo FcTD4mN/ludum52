@@ -1,13 +1,13 @@
-public class Forge : ProductionBuilding
+public class FireMaker : HarvestingBuilding
 {
     public static cResourceDescriptor GetResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold.ToString() ] = 2000;
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 100;
-        output.mInputRates[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 2;
-        output.mOutputRates[ cResourceDescriptor.eResourceNames.Arrows.ToString() ] = 1;
+        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold.ToString() ] = 1000;
+        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 50;
+
+        output.mOutputRates[ cResourceDescriptor.eResourceNames.Fire.ToString() ] = 5;
 
         return  output;
     }
