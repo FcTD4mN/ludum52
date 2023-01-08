@@ -19,7 +19,7 @@ public class IronHarvester : HarvestingBuilding
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
         foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
         {
-            if( resourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.mResourcesAvailable[resourceName] ) {
+            if( resourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName) ) {
                 return  false;
             }
         }

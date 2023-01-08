@@ -108,11 +108,11 @@ public class UIManager : MonoBehaviour
     // ===================================
     public void UpdateUI()
     {
-        mLabelGold.text = mResourceManager.GetGold().ToString();
-        mLabelIron.text = mResourceManager.GetIron().ToString();
-        mLabelFire.text = mResourceManager.GetFire().ToString();
-        mLabelArrows.text = mResourceManager.GetArrows().ToString();
-        mLabelBombs.text = mResourceManager.GetBombs().ToString();
+        mLabelGold.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Gold)).ToString();
+        mLabelIron.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Iron)).ToString();
+        mLabelFire.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Fire)).ToString();
+        mLabelArrows.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows)).ToString();
+        mLabelBombs.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs)).ToString();
 
         UpdateBuildMenu();
         UpdateMousePosition();
@@ -322,7 +322,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        if (mHoveredObject == building.gameObject)
+        if (mHoveredObject != building.gameObject)
         {
             DeleteUIButton(mHoverButton);
         }
@@ -341,7 +341,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        if (mHoveredObject == associatedReceiverObject)
+        if (mHoveredObject != associatedReceiverObject)
         {
             DeleteUIButton(mHoverButton);
         }

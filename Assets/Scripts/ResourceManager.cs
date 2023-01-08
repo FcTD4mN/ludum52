@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,7 +8,11 @@ using static cResourceDescriptor;
 
 public class ResourceManager : MonoBehaviour
 {
-    [HideInInspector] public Dictionary<string, float> mResourcesAvailable;
+    [HideInInspector] private Dictionary<string, float> mResourcesAvailable;
+
+    private Coroutine mCurrentlyRunningAnimation;
+    private float mAnimationFinalValue;
+    private string mAnimationResourceName;
 
     // ===================================
     // Building
@@ -29,26 +34,59 @@ public class ResourceManager : MonoBehaviour
     // ===================================
     // Getters to get the proper int value
     // ===================================
-    public int GetGold() {
-        return  (int)mResourcesAvailable[eResourceNames.Gold.ToString()];
+    public float GetRessource( eResourceNames type )
+    {
+        return GetRessource( type.ToString() );
+    }
+    public float GetRessource( string name )
+    {
+        return mResourcesAvailable[name];
     }
 
-    public int GetIron() {
-        return  (int)mResourcesAvailable[eResourceNames.Iron.ToString()];
+    public void AddResource( string name, float deltaValue, bool animated )
+    {
+        if (deltaValue == 0)
+        {
+            return;
+        }
+
+        if (mCurrentlyRunningAnimation != null && name == mAnimationResourceName)
+        {
+            StopCoroutine(mCurrentlyRunningAnimation);
+            mCurrentlyRunningAnimation = null;
+            mResourcesAvailable[mAnimationResourceName] = mAnimationFinalValue;
+        }
+
+        if (animated)
+        {
+            mAnimationFinalValue = mResourcesAvailable[name] + deltaValue;
+            mAnimationResourceName = name;
+            mCurrentlyRunningAnimation = StartCoroutine(Animation(name, mAnimationFinalValue, 1f));
+        }
+        else
+        {
+            mResourcesAvailable[name] += deltaValue;
+        }
     }
 
-    public int GetFire() {
-        return  (int)mResourcesAvailable[eResourceNames.Fire.ToString()];
-    }
+    IEnumerator Animation( string name, float newValue, float time )
+    {
+        float originalValue = mResourcesAvailable[name];
+        float deltaValue = newValue - originalValue;
 
-    public int GetArrows() {
-        return  (int)mResourcesAvailable[eResourceNames.Arrows.ToString()];
-    }
+        float timer = time;
+        while( timer > 0 )
+        {
+            float deltaTime = Time.deltaTime;
+            timer -= deltaTime;
+            mResourcesAvailable[name] += deltaValue * deltaTime;
 
-    public int GetBombs() {
-        return  (int)mResourcesAvailable[eResourceNames.Bombs.ToString()];
-    }
+            yield return null;
+        }
 
+        mResourcesAvailable[name] = newValue;
+        mCurrentlyRunningAnimation = null;
+    }
 
     // ===================================
     // Update

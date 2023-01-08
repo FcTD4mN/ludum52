@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+using static cStatsDescriptor;
+
 [RequireComponent(typeof(Rigidbody2D), typeof(TouchingDirections))]
 public class PlayerController : MonoBehaviour
 {
     // Char Stats
-    public float runSpeed = 4f;
-    public float airWalkSpeed = 4f;
-    public float airWallSpeed = 4f;
-    public float dashSpeed = 6f;
-    public float jumpImpulse = 7f;
-    public float coolDownAttack = 0.5f;
-    public float coolDownDash = 2f;
+    public cStatsDescriptor mStatsBase;         // Changing requires to update finalStatsCached
+    private cStatsDescriptor mStatsBonusAdd;    // Changing requires to update finalStatsCached
+    private cStatsDescriptor mStatsBonusMult;   // Changing requires to update finalStatsCached
+    private cStatsDescriptor mStatsFinalCached;
+
     private float lastAttack;
     private float lastDash;
 
@@ -39,11 +39,11 @@ public class PlayerController : MonoBehaviour
                 {
                     if (touchingDirections.IsGrounded)
                     {
-                        return runSpeed;
+                        return mStatsFinalCached.mStatValues[eStatsNames.RunSpeed.ToString()];
                     }
                     else
                     {
-                        return airWalkSpeed;
+                        return mStatsFinalCached.mStatValues[eStatsNames.AirWalkSpeed.ToString()];
                     }
                 }
                 else
@@ -143,6 +143,7 @@ public class PlayerController : MonoBehaviour
         aimAssist = GameObject.Find("AimAssist");
         lastAttack = -10f;
         lastDash = -10f;
+        BuildStats();
     }
 
     private void FixedUpdate()
@@ -189,18 +190,19 @@ public class PlayerController : MonoBehaviour
             if (touchingDirections.IsGrounded)
             {
                 animator.SetTrigger("Jump");
-                rb.velocity = new Vector2(rb.velocity.x, jumpImpulse);
+                rb.velocity = new Vector2(rb.velocity.x, mStatsFinalCached.mStatValues[eStatsNames.JumpImpulse.ToString()]);
             }
             else if (touchingDirections.IsOnWall)
             {
                 // @TODO : jump direction based on wall direction ?
                 animator.SetTrigger("WallJump");
-                rb.velocity = new Vector2(-(moveInput.x * airWallSpeed), jumpImpulse);
+                rb.velocity = new Vector2(-(moveInput.x * mStatsFinalCached.mStatValues[eStatsNames.AirWallSpeed.ToString()]),
+                                            mStatsFinalCached.mStatValues[eStatsNames.JumpImpulse.ToString()]);
             }
             else if (CanDoubleJump)
             {
                 animator.SetTrigger("DoubleJump");
-                rb.velocity = new Vector2(rb.velocity.x, jumpImpulse);
+                rb.velocity = new Vector2(rb.velocity.x, mStatsFinalCached.mStatValues[eStatsNames.JumpImpulse.ToString()]);
             }
         }
     }
@@ -213,7 +215,7 @@ public class PlayerController : MonoBehaviour
             bow.targetPos = sr.transform.position;
 
             // Check cooldown
-            if (Time.time - lastAttack < coolDownAttack)
+            if (Time.time - lastAttack < mStatsFinalCached.mStatValues[eStatsNames.CoolDownAttack.ToString()])
             {
                 return;
             }
@@ -233,11 +235,11 @@ public class PlayerController : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
-        if (context.started && touchingDirections.IsGrounded && CanMove && !(Time.time - lastDash < coolDownDash))
+        if (context.started && touchingDirections.IsGrounded && CanMove && !(Time.time - lastDash < mStatsFinalCached.mStatValues[eStatsNames.CoolDownDash.ToString()]))
         {
             lastDash = Time.time;
             animator.SetTrigger("Dash");
-            rb.velocity = new Vector2(moveInput.x * dashSpeed, rb.velocity.y);
+            rb.velocity = new Vector2(moveInput.x * mStatsFinalCached.mStatValues[eStatsNames.DashSpeed.ToString()], rb.velocity.y);
         }
     }
 
@@ -256,5 +258,63 @@ public class PlayerController : MonoBehaviour
             currentInteractable.Interact();
             currentInteractable.isActive = false;
         }
+    }
+
+
+
+    // ===================================
+    // Stats
+    // ===================================
+
+    // Adds values in stats into mStatsBonusAdd
+    public void AddStatsAddition(cStatsDescriptor stats)
+    {
+        mStatsBonusAdd.CombineByAddition(stats);
+        UpdateStats();
+    }
+
+    // Adds values in stats into mStatsBonusMult
+    public void AddStatsMultipliers(cStatsDescriptor stats)
+    {
+        mStatsBonusMult.CombineByAddition(stats);
+        UpdateStats();
+    }
+
+
+    private void BuildStats()
+    {
+        mStatsBase = new cStatsDescriptor();
+        mStatsBonusAdd = new cStatsDescriptor();
+        mStatsBonusMult = new cStatsDescriptor();
+
+        mStatsBonusAdd.ApplyOnEveryStat( val => 0 ); // (val) => {return  0}. Sets all values to 0
+        mStatsBonusMult.ApplyOnEveryStat( val => 1 ); // All to 1
+
+        mStatsBase.mStatValues[ eStatsNames.RunSpeed.ToString() ] = 4f;
+        mStatsBase.mStatValues[ eStatsNames.AirWalkSpeed.ToString() ] = 4f;
+        mStatsBase.mStatValues[ eStatsNames.AirWallSpeed.ToString() ] = 4f;
+        mStatsBase.mStatValues[ eStatsNames.DashSpeed.ToString() ] = 6f;
+        mStatsBase.mStatValues[ eStatsNames.JumpImpulse.ToString() ] = 7f;
+        mStatsBase.mStatValues[ eStatsNames.CoolDownAttack.ToString() ] = 0.5f;
+        mStatsBase.mStatValues[ eStatsNames.CoolDownDash.ToString() ] = 2f;
+
+        UpdateStats();
+    }
+
+
+    public cStatsDescriptor GetFinalStats()
+    {
+        cStatsDescriptor output = new cStatsDescriptor();
+        output.CombineByAddition( mStatsBase );
+        output.CombineByAddition( mStatsBonusAdd );
+        output.CombineByMultiplication( mStatsBonusMult );
+
+        return  output;
+    }
+
+
+    private void UpdateStats()
+    {
+        mStatsFinalCached = GetFinalStats();
     }
 }
