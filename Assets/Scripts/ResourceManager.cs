@@ -190,13 +190,20 @@ public class cResourceDescriptor
     }
 
 
-    public string PrintCompleteDescription( string name, string description )
+    public string PrintCompleteDescription( string name, string description, string error )
     {
         string outputString = "";
 
         outputString = name + "\n" + description + "\n";
 
         outputString += "\n";
+        if( error != "" )
+        {
+            outputString += "    Issue: " + error;
+            outputString += "\n";
+            outputString += "\n";
+            outputString += "\n";
+        }
 
         outputString += "Build Cost: \n";
         bool atLeastOne = false;
