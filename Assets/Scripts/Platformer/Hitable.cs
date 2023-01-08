@@ -53,8 +53,6 @@ public class Hitable : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    float lastHit = 0f;
-
     void Update()
     {
         if (isInvincible)
