@@ -216,6 +216,57 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8986150717280332388, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
   m_PrefabInstance: {fileID: 8986150717250128477}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &285523228
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 285523229}
+  - component: {fileID: 285523230}
+  m_Layer: 0
+  m_Name: BombTrajectory
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &285523229
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 285523228}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 2.7230148, y: -1.1349823, z: -0.6338268}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 577007123}
+  m_Father: {fileID: 1296002644}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &285523230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 285523228}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ebaa8297f6b04043a85f0a54746a28b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  numberOfDots: 30
+  dotsParent: {fileID: 577007122}
+  dotPrefab: {fileID: 8283058081290933981, guid: 04e13814aea5ffa4dac0ce3eee8ad946, type: 3}
+  dotSpacing: 0.03
+  dotMinScale: 0.08
+  dotMaxScale: 0.216
 --- !u!1 &401936722
 GameObject:
   m_ObjectHideFlags: 0
@@ -624,6 +675,37 @@ TilemapCollider2D:
   m_Offset: {x: 0, y: 0}
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
+--- !u!1 &577007122
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 577007123}
+  m_Layer: 0
+  m_Name: Dots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &577007123
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 577007122}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 285523229}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705847243
 GameObject:
   m_ObjectHideFlags: 0
@@ -926,9 +1008,15 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1011664210}
+  - {fileID: 285523229}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1646607551 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3721850691752255772, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+  m_PrefabInstance: {fileID: 8986150717250128477}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1761747700
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1305,6 +1393,34 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3561193817193138336, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: traj
+      value: 
+      objectReference: {fileID: 285523230}
+    - target: {fileID: 3561193817193138336, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: bombPrefab
+      value: 
+      objectReference: {fileID: 277352446469954537, guid: 29f3a366c4c8fde4abab7c18678798a0, type: 3}
+    - target: {fileID: 3561193817193138336, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: arrowPrefab
+      value: 
+      objectReference: {fileID: 6270920307405493096, guid: c2c0c5a4baa5ca74896b1ff2d5bd006b, type: 3}
+    - target: {fileID: 3561193817193138336, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: launchPoint
+      value: 
+      objectReference: {fileID: 1646607551}
+    - target: {fileID: 3561193817193138336, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: launchOffset.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3561193817193138336, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: launchOffset.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3561193817193138336, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: launchOffset.z
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 3721850691752255772, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1397,6 +1513,14 @@ PrefabInstance:
       propertyPath: m_ActionEvents.Array.data[17].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
+    - target: {fileID: 8986150717280332387, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: ball
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8986150717280332387, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
+      propertyPath: traj
+      value: 
+      objectReference: {fileID: 285523230}
     - target: {fileID: 8986150717280332388, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1449,5 +1573,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Character
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6839967633972668668, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}

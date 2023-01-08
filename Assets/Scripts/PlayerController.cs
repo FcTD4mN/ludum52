@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
 
     // References to GameObject or Scripts
     GameObject aimAssist;
-    ArrowLauncher bow;
+    WeaponLauncher bow;
 
     [HideInInspector]
     public Interactable currentInteractable;
@@ -131,7 +131,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         touchingDirections = GetComponent<TouchingDirections>();
-        bow = GetComponent<ArrowLauncher>();
+        bow = GetComponent<WeaponLauncher>();
         aimAssist = GameObject.Find("AimAssist");
         lastAttack = -10f;
         lastDash = -10f;
@@ -232,7 +232,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            bow.ClearFiredArrows();
+            // Test si besoin 'T' keyboard
         }
     }
 
