@@ -14,7 +14,9 @@ public class cStatsDescriptor
         JumpImpulse,
         CoolDownAttack,
         CoolDownDash,
-        Damage
+        Damage,
+        Health,
+        MaxHealth
     }
 
     public static void BuildStatsList()
