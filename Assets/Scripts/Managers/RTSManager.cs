@@ -15,12 +15,12 @@ public class RTSManager : MonoBehaviour
 
 
     public List<GameObject> mProductionBuildingSpots;
-    public List<(GameObject, int)> mIronReceivers;
+    public List<(GameObject, int)> mIronReceivers; // TODO => Join les 2 listes, ca sert a R den avoir 2
     public List<(GameObject, int)> mFireReceivers;
     public List<GameObject> mBuffBuildingSpots;
 
 
-
+    public List<(GameObject, GameObject)> mBuildingToBuildableRelations;
 
 
     // ===================================
@@ -40,6 +40,7 @@ public class RTSManager : MonoBehaviour
 
         mIronReceivers = new List<(GameObject, int)>();
         mFireReceivers = new List<(GameObject, int)>();
+        mBuildingToBuildableRelations = new List<(GameObject, GameObject)>();
     }
 
 
@@ -61,16 +62,24 @@ public class RTSManager : MonoBehaviour
 
         if( newBuilding.gameObject.GetComponent<HarvestingBuilding>() != null )
         {
+            GameObject createdReceiver = null;
             if (newBuilding.gameObject.GetComponent<IronHarvester>() != null)
             {
-                BuildReceiver("IronReceiver");
+                createdReceiver = BuildReceiver("IronReceiver", newBuilding);
             }
             else if (newBuilding.gameObject.GetComponent<FireMaker>() != null)
             {
-                BuildReceiver("FireReceiver");
+                createdReceiver = BuildReceiver("FireReceiver", newBuilding);
             }
+
+            mBuildingToBuildableRelations.Add( (createdReceiver, objectToBuildOver) );
+        }
+        else
+        {
+            mBuildingToBuildableRelations.Add((newBuilding, objectToBuildOver));
         }
 
+        objectToBuildOver.SetActive( false );
         if( CanLevelUp() )
         {
             LevelUp();
@@ -78,7 +87,7 @@ public class RTSManager : MonoBehaviour
     }
 
 
-    private void BuildReceiver( string type )
+    private GameObject BuildReceiver( string type, GameObject associatedHarvester )
     {
         int spawnIndex = GetAvailableSlotIndex();
         int towerFloorIndex = spawnIndex / 2;
@@ -121,6 +130,10 @@ public class RTSManager : MonoBehaviour
         {
             mFireReceivers.Add((newBuilding, spawnIndex));
         }
+
+        newBuilding.GetComponent<Receiver>().mAssociatedHarvester = associatedHarvester.GetComponent<ProductionBuilding>();
+
+        return  newBuilding;
     }
 
 
@@ -167,26 +180,26 @@ public class RTSManager : MonoBehaviour
 
     public void DestroyBuilding( GameObject building )
     {
-        ProductionBuilding prod = building.GetComponent<ProductionBuilding>();
-        if( prod != null )
+        List<(GameObject, GameObject)> relations = mBuildingToBuildableRelations.FindAll((element) => { return element.Item1 == building; });
+        foreach ((GameObject, GameObject) relation in relations)
         {
-            mAllProductionBuildings.Remove( prod );
-            if( building.GetComponent<HarvestingBuilding>() != null )
-            {
-                mAllHarvesters.Remove( building.GetComponent<HarvestingBuilding>() );
+            relation.Item2.SetActive(true);
+            mBuildingToBuildableRelations.Remove(relation);
+        }
 
-                if (building.GetComponent<IronHarvester>() != null)
-                {
-                    (GameObject, int) lastIronReceiver = mIronReceivers.FindLast( (element)=>{ return  element.Item1.GetComponent<IronReceiver>() != null; } );
-                    mIronReceivers.Remove( lastIronReceiver );
-                    GameObject.Destroy( lastIronReceiver.Item1 );
-                }
-                else if (building.GetComponent<FireMaker>() != null)
-                {
-                    (GameObject, int) lastFireReceiver = mFireReceivers.FindLast((element) => { return element.Item1.GetComponent<FireReceiver>() != null; });
-                    mFireReceivers.Remove(lastFireReceiver);
-                    GameObject.Destroy(lastFireReceiver.Item1);
-                }
+        if (building.GetComponent<Receiver>() != null)
+        {
+            DestroyBuilding(building.GetComponent<Receiver>().mAssociatedHarvester.gameObject);
+
+            if (building.GetComponent<IronReceiver>() != null)
+            {
+                (GameObject, int) lastIronReceiver = mIronReceivers.Find((element) => { return element.Item1 == building; });
+                mIronReceivers.Remove(lastIronReceiver);
+            }
+            else if (building.GetComponent<FireReceiver>() != null)
+            {
+                (GameObject, int) lastFireReceiver = mFireReceivers.Find((element) => { return element.Item1 == building; });
+                mFireReceivers.Remove(lastFireReceiver);
             }
         }
 

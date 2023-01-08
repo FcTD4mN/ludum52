@@ -72,9 +72,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                mUIManager.DeleteAllUIFloatingButtons();
-                mUIManager.mBuildMenu.SetActive( false );
-                mUIManager.mInfoPanel.SetActive( false );
+                mUIManager.ClearUIForSwitchingView();
             }
         }
     }
