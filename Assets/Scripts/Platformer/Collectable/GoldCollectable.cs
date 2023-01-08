@@ -8,7 +8,7 @@ public class GoldCollectable : Collectable
     {
         Initialize();
         label = "Gold";
-        value = Random.Range(0f, 100f);
+        value = Random.Range(10f, 100f);
     }
 
 
@@ -16,6 +16,6 @@ public class GoldCollectable : Collectable
     {
         base.Collect();
 
-        GameManager.mResourceManager.mResourcesAvailable[cResourceDescriptor.eResourceNames.Gold.ToString()] += value;
+        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Gold.ToString(), value, true );
     }
 }

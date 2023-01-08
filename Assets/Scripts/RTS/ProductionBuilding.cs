@@ -39,7 +39,8 @@ public class ProductionBuilding : MonoBehaviour
     {
         foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
         {
-            GameManager.mResourceManager.mResourcesAvailable[resourceName] -= mResourceDescriptor.mBuildCosts[resourceName];
+            GameManager.mResourceManager.AddResource( resourceName, -mResourceDescriptor.mBuildCosts[resourceName], false );
+
         }
     }
 
@@ -56,7 +57,7 @@ public class ProductionBuilding : MonoBehaviour
                 continue;
             }
 
-            float deltaAvailable = GameManager.mResourceManager.mResourcesAvailable[resourceName] * deltaTime;
+            float deltaAvailable = GameManager.mResourceManager.GetRessource(resourceName) * deltaTime;
             float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime;
             if( deltaAvailable < deltaInputCost ) {
                 enoughResources = false;
@@ -70,11 +71,11 @@ public class ProductionBuilding : MonoBehaviour
             {
                 // Remove what building consumes
                 float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime;
-                GameManager.mResourceManager.mResourcesAvailable[resourceName] -= deltaInputCost;
+                GameManager.mResourceManager.AddResource( resourceName, -deltaInputCost, false );
 
                 // Add what building produces
                 float deltaOutputCost = mResourceDescriptor.mOutputRates[resourceName] * deltaTime;
-                GameManager.mResourceManager.mResourcesAvailable[resourceName] += deltaOutputCost;
+                GameManager.mResourceManager.AddResource( resourceName, deltaOutputCost, false );
             }
         }
     }
