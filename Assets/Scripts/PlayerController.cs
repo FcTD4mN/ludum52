@@ -194,7 +194,6 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        // @TODO: Throw Arrow + Hit vraiment un ennemi/collision
         if (context.started)
         {
             SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
@@ -208,6 +207,14 @@ public class PlayerController : MonoBehaviour
 
             lastAttack = Time.time;
             animator.SetTrigger("Attack");
+        }
+    }
+
+    public void OnThrowBomb(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            bow.LaunchBomb(IsFacingRight ? true : false);
         }
     }
 
