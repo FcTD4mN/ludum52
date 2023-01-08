@@ -22,6 +22,7 @@ public class Collectable : MonoBehaviour
     {
         if (coll.name == "Character")
         {
+            Collect();
             Destroy(gameObject);
         }
         else if (coll.tag == "Blocking")
@@ -30,5 +31,10 @@ public class Collectable : MonoBehaviour
             rb.bodyType = RigidbodyType2D.Static;
         }
 
+    }
+
+    virtual public void Collect()
+    {
+        // Implement
     }
 }

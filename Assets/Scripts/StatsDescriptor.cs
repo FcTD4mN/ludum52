@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class cStatsDescriptor
 {
@@ -37,5 +38,43 @@ public class cStatsDescriptor
         {
             mStatValues[statName] = 0f;
         }
+    }
+
+
+    // ===================================
+    // Manipulation
+    // ===================================
+    public void CombineByAddition( cStatsDescriptor rhs )
+    {
+        foreach (string statName in mAllStatsName)
+        {
+            mStatValues[statName] += rhs.mStatValues[statName];
+        }
+    }
+
+    public void CombineByMultiplication( cStatsDescriptor rhs )
+    {
+        foreach (string statName in mAllStatsName)
+        {
+            mStatValues[statName] *= rhs.mStatValues[statName];
+        }
+    }
+
+    public void ApplyOnEveryStat( Func<float, float> action )
+    {
+        foreach (string statName in mAllStatsName)
+        {
+            mStatValues[statName] = action( mStatValues[statName] );
+        }
+    }
+
+
+    public void DEBUGLog()
+    {
+        foreach (string statName in mAllStatsName)
+        {
+            Debug.Log( statName + ": " + mStatValues[statName] );
+        }
+
     }
 }

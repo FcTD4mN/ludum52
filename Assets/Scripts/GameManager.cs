@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
         if (GameManager.mInstance != null) { return; }
 
         cResourceDescriptor.BuildResourceList();
+        cStatsDescriptor.BuildStatsList();
 
         mInstance = this;
         mResourceManager = GameObject.Find("ResourceManager")?.gameObject.GetComponent<ResourceManager>();
