@@ -324,7 +324,7 @@
                 {
                     "name": "",
                     "id": "27c8889f-a470-4cd8-af09-e2350635fd3f",
-                    "path": "<Keyboard>/e",
+                    "path": "<Keyboard>/t",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
@@ -346,10 +346,10 @@
                 {
                     "name": "",
                     "id": "87833469-8151-400c-a6de-70f0df02faa2",
-                    "path": "<Mouse>/rightButton",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": "Keyboard&Mouse",
                     "action": "Throw",
                     "isComposite": false,
                     "isPartOfComposite": false

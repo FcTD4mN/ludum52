@@ -176,7 +176,7 @@ GameObject:
   - component: {fileID: 8986150717280332384}
   - component: {fileID: 8986150717280332387}
   - component: {fileID: 8986150717280332386}
-  - component: {fileID: 6839967633972668668}
+  - component: {fileID: 3561193817193138336}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -459,6 +459,14 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 050bf38f-1651-4576-b42f-f75dc1f36e82
     m_ActionName: Player/Test[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: e99724a8-0780-497f-a578-847bccf4db8d
+    m_ActionName: Player/Interact[/Keyboard/f]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 00af8f22-5222-47dc-96c3-1d601b75cd55
+    m_ActionName: Player/Throw[/Mouse/rightButton]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -483,6 +491,7 @@ MonoBehaviour:
   jumpImpulse: 7
   coolDownAttack: 1.5
   coolDownDash: 2
+  currentInteractable: {fileID: 0}
   _isFacingRight: 1
 --- !u!114 &8986150717280332386
 MonoBehaviour:
@@ -516,7 +525,7 @@ MonoBehaviour:
   _isGrounded: 0
   _isOnWall: 0
   _isOnCeiling: 0
---- !u!114 &6839967633972668668
+--- !u!114 &3561193817193138336
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -530,6 +539,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowDamage: 10
   arrowSpeed: 15
-  arrowPrefab: {fileID: 6270920307405493096, guid: c2c0c5a4baa5ca74896b1ff2d5bd006b, type: 3}
-  launchPoint: {fileID: 3721850691752255772}
+  bombDamage: 10
+  bombSpeed: 5
+  bombPushForce: 4
+  traj: {fileID: 0}
+  arrowPrefab: {fileID: 0}
+  bombPrefab: {fileID: 0}
+  launchPoint: {fileID: 0}
+  launchOffset: {x: 0, y: 0, z: 0}
   targetPos: {x: 0, y: 0, z: 0}

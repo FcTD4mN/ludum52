@@ -2,16 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ArrowLauncher : MonoBehaviour
+public class WeaponLauncher : MonoBehaviour
 {
-    // Arrow stats :
+    // Arrow :
     public float arrowDamage = 10f;
     public float arrowSpeed = 15f;
     private List<GameObject> firedArrows;
 
-    // Bomb stats :
+    // Bomb :
     public float bombDamage = 10f;
     public float bombSpeed = 5f;
+    public float bombPushForce = 4f;
+
+    // Bomb aim assist
+    public BombTrajectory traj;
+    bool isDragging = false;
+    Vector2 startPoint;
+    Vector2 endPoint;
+    Vector2 direction;
+    Vector2 force;
+    float distance;
 
     // Prefabs :
     public GameObject arrowPrefab;
@@ -25,6 +35,25 @@ public class ArrowLauncher : MonoBehaviour
     public void OnEnable()
     {
         firedArrows = new List<GameObject>();
+    }
+
+    void Update()
+    {
+        // Throw bomb aim assist
+        // @TODO : Foutre ça dans un InputAction
+        if (Input.GetMouseButtonDown(1))
+        {
+            isDragging = true;
+            OnDragStart();
+        }
+        if (Input.GetMouseButtonUp(1))
+        {
+            isDragging = false;
+            OnDragEnd();
+        }
+
+        if (isDragging)
+            OnDrag();
     }
 
     public void ClearFiredArrows()
@@ -82,6 +111,41 @@ public class ArrowLauncher : MonoBehaviour
         Rigidbody2D rb = bomb.GetComponent<Rigidbody2D>();
         rb.AddForce(direction * bombSpeed, ForceMode2D.Impulse);
         bomb.transform.Translate(launchOffset);
+    }
+
+    public void AimLaunchBomb(bool facingRight, Vector2 force)
+    {
+        // Instantiate bomb and push it forward
+        GameObject bomb = Instantiate(bombPrefab, launchPoint.position, transform.rotation);
+        Rigidbody2D rb = bomb.GetComponent<Rigidbody2D>();
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = 0f;
+        rb.isKinematic = false;
+        rb.AddForce(force, ForceMode2D.Impulse);
+    }
+
+    // Handle Aim draw for bomb :
+    void OnDragStart()
+    {
+        startPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        traj.Show();
+    }
+
+    void OnDrag()
+    {
+        endPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        distance = Vector2.Distance(startPoint, endPoint);
+        direction = (startPoint - endPoint).normalized;
+        force = direction * distance * bombPushForce;
+
+        traj.UpdateDots(transform.position, force);
+    }
+
+    void OnDragEnd()
+    {
+        // Throw the bomb
+        AimLaunchBomb(GameManager.mInstance.playerCtrler.IsFacingRight ? true : false, force);
+        traj.Hide();
     }
 
 }
