@@ -34,10 +34,8 @@ public class Arrow : MonoBehaviour
             return;
 
         // Hit the target
-        if (hitable.Hit())
-        {
-            Debug.Log("We hit the object named : " + coll.name);
-            Destroy(gameObject);
-        }
+        // Todo: read damage from weaponStatManager
+        hitable.Hit(30);
+        Destroy(gameObject);
     }
 }

@@ -4,21 +4,95 @@ using UnityEngine;
 
 public class Hitable : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
+    [SerializeField]
+    private float maxHealth = 100f;
+    [SerializeField]
+    private float health = 100f;
 
+    public float Health
+    {
+        get
+        {
+            return health;
+        }
+        set
+        {
+            health = value;
+            if (health <= 0)
+            {
+                IsAlive = false;
+            }
+        }
     }
 
-    // Update is called once per frame
+    private bool isAlive = true;
+    public bool IsAlive
+    {
+        get
+        {
+            return isAlive;
+        }
+        set
+        {
+            isAlive = value;
+            animator.SetBool("isAlive", value);
+            Debug.Log("Alive valute : " + IsAlive);
+        }
+    }
+
+    [SerializeField]
+    private bool isInvincible = false;
+    public float invincibilityCooldown = 0.25f;
+    float timeSinceHit = 0;
+
+    Animator animator;
+
+    // Start is called before the first frame update
+    void OnEnable()
+    {
+        animator = GetComponent<Animator>();
+    }
+
+    float lastHit = 0f;
+
     void Update()
     {
+        if (isInvincible)
+        {
+            // Remove invincibility after a time
+            if (timeSinceHit > invincibilityCooldown)
+            {
+                isInvincible = false;
+                timeSinceHit = 0;
+            }
 
+            timeSinceHit += Time.deltaTime;
+        }
+
+        // Test part : to remove
+        if (lastHit > invincibilityCooldown * 4)
+        {
+            lastHit = 0;
+            // Hit(10);
+        }
+
+        lastHit += Time.deltaTime;
     }
 
-    public bool Hit()
+    public void Hit(int damage)
     {
-        //TODO
-        return true;
+        // Debug.Log("We hit the object named : " + gameObject.name);
+        if (IsAlive && !isInvincible)
+        {
+            Health -= damage;
+            isInvincible = true;
+            animator.SetTrigger("Hurt");
+            // Debug.Log("health = " + Health);
+        }
+    }
+
+    void RemoveFromScene()
+    {
+        Destroy(gameObject);
     }
 }

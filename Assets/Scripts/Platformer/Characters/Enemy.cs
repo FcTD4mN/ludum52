@@ -108,11 +108,4 @@ public class Enemy : MonoBehaviour
             Debug.LogError("Current walkable direction is not set properly");
         }
     }
-
-    private void OnTriggerEnter2D(Collider2D coll)
-    {
-        if (coll.name == "Character")
-        {
-        }
-    }
 }

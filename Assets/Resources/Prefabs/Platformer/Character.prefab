@@ -177,6 +177,7 @@ GameObject:
   - component: {fileID: 8986150717280332387}
   - component: {fileID: 8986150717280332386}
   - component: {fileID: 3561193817193138336}
+  - component: {fileID: 1127810768080280749}
   m_Layer: 8
   m_Name: Character
   m_TagString: Untagged
@@ -572,3 +573,19 @@ MonoBehaviour:
   launchPoint: {fileID: 3721850691752255772}
   launchOffset: {x: 0.1, y: 0.1, z: 0.1}
   targetPos: {x: 0, y: 0, z: 0}
+--- !u!114 &1127810768080280749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8986150717280332394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 088befbb799d2fe47861c7996a4b41ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  health: 100
+  isInvincible: 0
+  invincibilityCooldown: 0.5

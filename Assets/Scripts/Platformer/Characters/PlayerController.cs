@@ -111,6 +111,14 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public bool IsAlive
+    {
+        get
+        {
+            return animator.GetBool("isAlive");
+        }
+    }
+
     public bool CanDoubleJump
     {
         get
@@ -149,9 +157,14 @@ public class PlayerController : MonoBehaviour
     {
         moveInput = context.ReadValue<Vector2>();
 
-        IsRunning = moveInput != Vector2.zero;
+        if (IsAlive)
+        {
+            IsRunning = moveInput != Vector2.zero;
+            SetFacingDirection(moveInput);
+        }
+        else
+            IsRunning = false;
 
-        SetFacingDirection(moveInput);
     }
 
     private void SetFacingDirection(Vector2 moveInput)

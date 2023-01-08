@@ -30,8 +30,8 @@ public class Bomb : MonoBehaviour
         if (Time.time - startingTime > destroyAfterTime && m_Started)
         {
             MyCollisions();
-            animator.SetTrigger("Explode");
             m_Started = false;
+            animator.SetTrigger("Explode");
         }
     }
 
@@ -44,14 +44,14 @@ public class Bomb : MonoBehaviour
     {
         //Use the OverlapBox to detect if there are any other colliders within this box area.
         //Use the GameObject's centre, half the size (as a radius) and rotation. This creates an invisible box around your GameObject.
-        Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, transform.localScale / 2, Quaternion.identity, m_LayerMask);
+        Collider2D[] hitColliders = Physics2D.OverlapBoxAll(gameObject.transform.position, transform.localScale * 2, 0f, m_LayerMask);
         int i = 0;
         //Check when there is a new collider coming into contact with the box
         while (i < hitColliders.Length)
         {
-            //Output all of the collider names
             Debug.Log("Hit : " + hitColliders[i].name + i);
-            //Increase the number of Colliders in the array
+            // @TODO : Read les stats
+            hitColliders[i].GetComponent<Hitable>().Hit(30);
             i++;
         }
     }
@@ -63,16 +63,7 @@ public class Bomb : MonoBehaviour
         //Check that it is being run in Play Mode, so it doesn't try to draw this in Editor mode
         if (m_Started)
             //Draw a cube where the OverlapBox is (positioned where your GameObject is as well as a size)
-            Gizmos.DrawWireCube(transform.position, transform.localScale);
+            Gizmos.DrawWireCube(transform.position, transform.localScale * 2);
     }
 
-    private void OnTriggerEnter2D(Collider2D coll)
-    {
-        if (coll.tag == "Blocking")
-        {
-            // Prevent from going through floor
-            GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
-        }
-
-    }
 }
