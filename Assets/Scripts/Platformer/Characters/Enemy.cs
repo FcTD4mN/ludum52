@@ -7,9 +7,13 @@ public class Enemy : MonoBehaviour
 {
     // Enemy stats :
     public float walkSpeed = 4f;
+    public float walkStopRate = 0.02f;
+
+    public DetectionZone attackZone;
 
     Rigidbody2D rb;
     TouchingDirections touchingDirections;
+    Animator animator;
 
     public enum WalkableDirection { Right, Left }
     private WalkableDirection _walkDirection;
@@ -42,10 +46,39 @@ public class Enemy : MonoBehaviour
         }
     }
 
+    public bool _hasTarget = false;
+    public bool HasTarget
+    {
+        get
+        {
+            return _hasTarget;
+        }
+        set
+        {
+            _hasTarget = value;
+            animator.SetBool("hasTarget", value);
+        }
+    }
+
+    public bool CanMove
+    {
+        get
+        {
+            return animator.GetBool("canMove");
+        }
+    }
+
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         touchingDirections = GetComponent<TouchingDirections>();
+    }
+
+    void Update()
+    {
+        HasTarget = attackZone.detectedColliders.Count > 0;
     }
 
     void FixedUpdate()
@@ -54,8 +87,10 @@ public class Enemy : MonoBehaviour
         {
             FlipDirection();
         }
-        else
+        else if (CanMove)
             rb.velocity = new Vector2(walkSpeed * walkDirectionVector.x, rb.velocity.y);
+        else
+            rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x, 0, walkStopRate), rb.velocity.y);
     }
 
     void FlipDirection()
@@ -71,6 +106,13 @@ public class Enemy : MonoBehaviour
         else
         {
             Debug.LogError("Current walkable direction is not set properly");
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D coll)
+    {
+        if (coll.name == "Character")
+        {
         }
     }
 }

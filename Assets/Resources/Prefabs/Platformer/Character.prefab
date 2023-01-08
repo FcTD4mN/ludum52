@@ -177,7 +177,7 @@ GameObject:
   - component: {fileID: 8986150717280332387}
   - component: {fileID: 8986150717280332386}
   - component: {fileID: 3561193817193138336}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Character
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -241,7 +241,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 21300000, guid: bce312dd05002a548baf439456ce1f29, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -460,11 +460,35 @@ MonoBehaviour:
     m_ActionId: 050bf38f-1651-4576-b42f-f75dc1f36e82
     m_ActionName: Player/Test[/Keyboard/e]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8986150717280332387}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnUse
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: e99724a8-0780-497f-a578-847bccf4db8d
     m_ActionName: Player/Interact[/Keyboard/f]
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 8986150717280332387}
+        m_TargetAssemblyTypeName: PlayerController, Assembly-CSharp
+        m_MethodName: OnThrowBomb
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 00af8f22-5222-47dc-96c3-1d601b75cd55
     m_ActionName: Player/Throw[/Mouse/rightButton]
   m_NeverAutoSwitchControlSchemes: 0
@@ -507,14 +531,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   castFilter:
     useTriggers: 0
-    useLayerMask: 0
+    useLayerMask: 1
     useDepth: 0
     useOutsideDepth: 0
     useNormalAngle: 0
     useOutsideNormalAngle: 0
     layerMask:
       serializedVersion: 2
-      m_Bits: 0
+      m_Bits: 192
     minDepth: 0
     maxDepth: 0
     minNormalAngle: 0
@@ -543,8 +567,8 @@ MonoBehaviour:
   bombSpeed: 5
   bombPushForce: 4
   traj: {fileID: 0}
-  arrowPrefab: {fileID: 0}
-  bombPrefab: {fileID: 0}
-  launchPoint: {fileID: 0}
-  launchOffset: {x: 0, y: 0, z: 0}
+  arrowPrefab: {fileID: 6270920307405493096, guid: c2c0c5a4baa5ca74896b1ff2d5bd006b, type: 3}
+  bombPrefab: {fileID: 277352446469954537, guid: 29f3a366c4c8fde4abab7c18678798a0, type: 3}
+  launchPoint: {fileID: 3721850691752255772}
+  launchOffset: {x: 0.1, y: 0.1, z: 0.1}
   targetPos: {x: 0, y: 0, z: 0}
