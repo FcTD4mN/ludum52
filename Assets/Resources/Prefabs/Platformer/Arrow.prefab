@@ -99,8 +99,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ac749ef8d628c4f9a8fea4a3a7ded0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
-  speed: 15
   destroyAfterDistance: 10
 --- !u!50 &2846727773858195601
 Rigidbody2D:
@@ -134,7 +132,7 @@ CircleCollider2D:
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
-  m_UsedByEffector: 1
+  m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
