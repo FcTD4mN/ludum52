@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
     private TextMeshProUGUI mLabelBombs;
 
     // BuildMenu
-    public GameObject mBuildMenu;
+    private GameObject mBuildMenu;
 
     private Button mButtonIronHarvester;
     private Button mButtonFireMaker;
@@ -24,7 +24,7 @@ public class UIManager : MonoBehaviour
     private Button mButtonBombFactory;
 
     // Info panel
-    public GameObject mInfoPanel;
+    private GameObject mInfoPanel;
     private TextMeshProUGUI mInfoPanelText;
 
 
@@ -38,7 +38,6 @@ public class UIManager : MonoBehaviour
     private List<GameObject> mAllUIFloatingButtons; // All UI buttons to click to open build menu
 
 
-    private bool BuildButtonsCreated = false; // Required so this can be done in update once, because canvas
     // ===================================
     // Building
     // ===================================
@@ -126,8 +125,11 @@ public class UIManager : MonoBehaviour
         Vector3 mousePosWorld;
         RectTransformUtility.ScreenPointToWorldPointInRectangle( mCanvas.transform as RectTransform, mousePosScreen, Camera.main, out mousePosWorld );
 
+        // PROD BUILDINGS
         foreach( ProductionBuilding building in GameManager.mRTSManager.mAllProductionBuildings )
         {
+            if( building.gameObject.GetComponent<HarvestingBuilding>() != null ) { continue; }
+
             Rect bbox = Utilities.GetBBoxFromTransform( building.gameObject );
             if( bbox.Contains( mousePosWorld ) )
             {
@@ -136,6 +138,22 @@ public class UIManager : MonoBehaviour
             }
         }
 
+        // RECEIVERS
+        List<(GameObject, int)> fullList = new List<(GameObject, int)>( GameManager.mRTSManager.mIronReceivers );
+        fullList.AddRange(GameManager.mRTSManager.mFireReceivers);
+
+        foreach ((GameObject, int) pack in fullList)
+        {
+            GameObject receiver = pack.Item1;
+            Rect bbox = Utilities.GetBBoxFromTransform(receiver);
+            if (bbox.Contains(mousePosWorld))
+            {
+                HoveringReceiver(receiver);
+                return;
+            }
+        }
+
+        // BUILDABLE
         foreach( GameObject buildable in mBuildableObjects )
         {
             Rect bbox = Utilities.GetBBoxFromTransform( buildable );
@@ -146,6 +164,7 @@ public class UIManager : MonoBehaviour
             }
         }
 
+        // BUILDINGS IN BUILD MENU
         if( EventSystem.current.IsPointerOverGameObject() )
         {
             PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
@@ -174,10 +193,25 @@ public class UIManager : MonoBehaviour
     // ===================================
     // UI Stuff
     // ===================================
+    public void ClearUIForSwitchingView()
+    {
+        DeleteAllUIFloatingButtons();
+        mBuildMenu.SetActive(false);
+        mInfoPanel.SetActive(false);
+
+        if (mHoverButton != null)
+        {
+            DeleteUIButton(mHoverButton);
+        }
+    }
+
+
     public void CreateBuildButtonOnEveryBuildableObject()
     {
         foreach( GameObject buildable in mBuildableObjects )
         {
+            if( !buildable.activeSelf ) { continue; }
+
             CreateBuildButtonOverObject( buildable );
         }
     }
@@ -197,35 +231,46 @@ public class UIManager : MonoBehaviour
     }
 
 
-    private void CreatePauseButtonOverBuilding( ProductionBuilding building )
+    private void CreatePauseButtonOverBuilding( GameObject building )
     {
-        mHoverButton = CreateButtonOverObject( "ButtonPause", building.gameObject );
+        mHoverButton = CreateButtonOverObject( "ButtonPause", building );
         GameObject text = mHoverButton.transform.Find("text")?.gameObject;
-        text.GetComponent<TextMeshProUGUI>().text = building.mIsPaused ? "Resume" : "Pause";
+
+        bool isReceiver = false;
+        ProductionBuilding prodBuilding = building.GetComponent<ProductionBuilding>();
+        if( building.GetComponent<Receiver>() != null )
+        {
+            isReceiver = true;
+            prodBuilding = building.GetComponent<Receiver>().mAssociatedHarvester.GetComponent<ProductionBuilding>();
+        }
+
+        text.GetComponent<TextMeshProUGUI>().text = prodBuilding.mIsPaused ? "Resume" : "Pause";
 
         GameObject deleteButton = mHoverButton.transform.Find("Delete")?.gameObject;
         deleteButton.GetComponent<Button>().onClick.AddListener(() =>
         {
 
-            foreach( GameObject obj in mBuildableObjects )
+            if( !isReceiver ) // We reactivate the buildable object + reshow a build button
             {
-                if( obj.transform.position == building.gameObject.transform.position )
+                foreach( GameObject obj in mBuildableObjects )
                 {
-                    obj.SetActive( true );
-                    CreateBuildButtonOverObject( obj );
-                    break;
+                    if( obj.transform.position == prodBuilding.transform.position )
+                    {
+                        CreateBuildButtonOverObject( obj );
+                        break;
+                    }
                 }
             }
-            GameManager.mRTSManager.DestroyBuilding( building.gameObject );
+            GameManager.mRTSManager.DestroyBuilding( building );
             DeleteUIButton( mHoverButton );
 
         });
 
         mHoverButton.GetComponent<Button>().onClick.AddListener( () => {
 
-            building.mIsPaused = !building.mIsPaused;
+            prodBuilding.mIsPaused = !prodBuilding.mIsPaused;
             UpdateInfoPanel();
-            text.GetComponent<TextMeshProUGUI>().text = building.mIsPaused ? "Resume" : "Pause";
+            text.GetComponent<TextMeshProUGUI>().text = prodBuilding.mIsPaused ? "Resume" : "Pause";
 
         });
     }
@@ -270,20 +315,43 @@ public class UIManager : MonoBehaviour
     // ===================================
     // Mouse Hovering
     // ===================================
-    private void HoveringBuilding( ProductionBuilding building )
+    private void HoveringBuilding(ProductionBuilding building)
     {
-        if( mHoveredObject == building.gameObject && mHoverButton != null ) {
+        if (mHoveredObject == building.gameObject && mHoverButton != null)
+        {
             return;
         }
 
-        if( mHoveredObject == building.gameObject ) {
+        if (mHoveredObject == building.gameObject)
+        {
             DeleteUIButton(mHoverButton);
         }
 
         mHoveredObject = building.gameObject;
-        CreatePauseButtonOverBuilding( building );
+        CreatePauseButtonOverBuilding(building.gameObject);
         UpdateInfoPanel();
     }
+
+
+    private void HoveringReceiver(GameObject receiver)
+    {
+        GameObject associatedReceiverObject = receiver.GetComponent<Receiver>().mAssociatedHarvester.gameObject;
+        if (mHoveredObject == associatedReceiverObject && mHoverButton != null)
+        {
+            return;
+        }
+
+        if (mHoveredObject == associatedReceiverObject)
+        {
+            DeleteUIButton(mHoverButton);
+        }
+
+        mHoveredObject = associatedReceiverObject;
+        CreatePauseButtonOverBuilding( receiver );
+        UpdateInfoPanel();
+    }
+
+
     private void HoveringBuildable( GameObject resource )
     {
         if( mHoveredObject == resource && mHoverButton != null ) {
@@ -296,6 +364,8 @@ public class UIManager : MonoBehaviour
 
         mHoveredObject = resource;
     }
+
+
     private void HoveringBuildingDescription( GameObject button )
     {
         if( mHoveredObject == button && mHoverButton != null ) {
@@ -361,14 +431,12 @@ public class UIManager : MonoBehaviour
             mBuildMenu.SetActive( false );
             GameManager.mRTSManager.BuildObjectAtLocation( "BuildingForge", mObjectToBuildTo );
             DeleteUIButton(mBuildButtonClicked);
-            mObjectToBuildTo.SetActive( false );
         });
 
         mButtonBombFactory.onClick.AddListener( () => {
             mBuildMenu.SetActive( false );
             GameManager.mRTSManager.BuildObjectAtLocation( "BuildingBombFactory", mObjectToBuildTo );
             DeleteUIButton(mBuildButtonClicked);
-            mObjectToBuildTo.SetActive( false );
         });
 
     }
