@@ -740,7 +740,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bc733a73801581438dcf1b459c71923, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mAllProductionBuilding: []
 --- !u!1001 &673517642
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -838,7 +837,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778420523994, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00006297446
+      value: 0.000019431114
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778575002822, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
       propertyPath: m_AnchorMax.x
@@ -846,10 +845,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778575002822, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1814086778575002822, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
-      propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778794853024, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
@@ -866,10 +861,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778814796680, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1814086778814796680, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
-      propertyPath: m_AnchorMin.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1814086779214294740, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
@@ -1210,6 +1201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0fa5c1ae9a9184cae69f447f02a935, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mBuildableObjects: []
 --- !u!1 &1021535652
 GameObject:
   m_ObjectHideFlags: 0
@@ -1527,6 +1519,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mRTSWorld: {fileID: 0}
+  mTowers: []
+  mTowerLevel: 1
+  mHarvesterSlots: 2
+  mAllHarvesters: []
+  mAllProductionBuildings: []
+  mProductionBuildingSpots: []
+  mBuffBuildingSpots: []
 --- !u!1 &1384940277
 GameObject:
   m_ObjectHideFlags: 0
@@ -2224,7 +2223,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 751826043676127646, guid: 2f19d4ddf52f1a54fbb08fee2e9d35a2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.0293
+      value: -2.285
       objectReference: {fileID: 0}
     - target: {fileID: 751826043676127646, guid: 2f19d4ddf52f1a54fbb08fee2e9d35a2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2379,7 +2378,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942599265261257720, guid: 1a825eb28c2de284399891cd61544018, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.0007995508
+      value: 0.000002503395
       objectReference: {fileID: 0}
     - target: {fileID: 1942599265354592898, guid: 1a825eb28c2de284399891cd61544018, type: 3}
       propertyPath: m_AnchorMax.x

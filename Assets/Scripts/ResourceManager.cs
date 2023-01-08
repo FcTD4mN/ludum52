@@ -21,7 +21,7 @@ public class ResourceManager : MonoBehaviour
         }
 
         mResourcesAvailable[eResourceNames.Gold.ToString()] = 8000;
-        mResourcesAvailable[eResourceNames.Iron.ToString()] = 200;
+        mResourcesAvailable[eResourceNames.Iron.ToString()] = 2000;
         mResourcesAvailable[eResourceNames.Arrows.ToString()] = 30;
     }
 
