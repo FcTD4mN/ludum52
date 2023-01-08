@@ -68,15 +68,6 @@ public class Hitable : MonoBehaviour
 
             timeSinceHit += Time.deltaTime;
         }
-
-        // Test part : to remove
-        if (lastHit > invincibilityCooldown * 4)
-        {
-            lastHit = 0;
-            // Hit(10);
-        }
-
-        lastHit += Time.deltaTime;
     }
 
     public void Hit(int damage)

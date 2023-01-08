@@ -78,7 +78,7 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        HasTarget = attackZone.detectedColliders.Count > 0;
+        HasTarget = (attackZone.detectedColliders.Count > 0 && GameManager.mInstance.playerCtrler.IsAlive);
     }
 
     void FixedUpdate()
