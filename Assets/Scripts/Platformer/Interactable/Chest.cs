@@ -14,6 +14,7 @@ public class Chest : Interactable
             chestContent = Instantiate(interactablePrefab, launchPoint, transform.rotation);
             Rigidbody2D rb = chestContent.GetComponent<Rigidbody2D>();
             rb.velocity = new Vector2(3f, 1f);
+            isActive = false;
         }
     }
 }
