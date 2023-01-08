@@ -7,12 +7,17 @@ public class ArrowLauncher : MonoBehaviour
     // Arrow stats :
     public float arrowDamage = 10f;
     public float arrowSpeed = 15f;
-
     private List<GameObject> firedArrows;
 
-    // Generating arrows :
+    // Bomb stats :
+    public float bombDamage = 10f;
+    public float bombSpeed = 5f;
+
+    // Prefabs :
     public GameObject arrowPrefab;
+    public GameObject bombPrefab;
     public Transform launchPoint;
+    public Vector3 launchOffset;
 
     [HideInInspector]
     public Vector3 targetPos;
@@ -62,6 +67,21 @@ public class ArrowLauncher : MonoBehaviour
         );
 
         firedArrows.Add(arrow);
+    }
+
+    public void LaunchBomb(bool facingRight)
+    {
+        // Instantiate bomb and push it forward
+        GameObject bomb = Instantiate(bombPrefab, launchPoint.position, transform.rotation);
+        Vector3 direction;
+        if (facingRight)
+            direction = transform.right + Vector3.up;
+        else
+            direction = -transform.right + Vector3.up;
+
+        Rigidbody2D rb = bomb.GetComponent<Rigidbody2D>();
+        rb.AddForce(direction * bombSpeed, ForceMode2D.Impulse);
+        bomb.transform.Translate(launchOffset);
     }
 
 }
