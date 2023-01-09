@@ -98,7 +98,8 @@ public class WeaponLauncher : MonoBehaviour
         // Retrieve direction to next WP
         // Can be adjusted for AIM ASSIT
         Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = (target - transform.position).normalized;
+        Vector2 directionRaw = (target - transform.position);
+        Vector2 direction = directionRaw.normalized;
 
         // Move towards next WP
         float distance = Vector2.Distance(target, transform.position);

@@ -226,6 +226,13 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
+        // Check cooldown
+        if (Time.time - lastAttack < mStats.GetFinalStat(eStatsNames.CoolDownAttack) ||
+                (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) <= 0)
+        {
+            return;
+        }
+
         if (touchingDirections.IsGrounded)
         {
             if (context.started)
@@ -242,17 +249,8 @@ public class PlayerController : MonoBehaviour
             else if (context.canceled)
             {
                 // Release click
-                if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0)
-                {
-                    // Check cooldown
-                    if (Time.time - lastAttack < mStats.GetFinalStat(eStatsNames.CoolDownAttack))
-                    {
-                        return;
-                    }
-
-                    lastAttack = Time.time;
-                    animator.SetTrigger("Attack");
-                }
+                lastAttack = Time.time;
+                animator.SetTrigger("Attack");
             }
         }
         else
@@ -266,9 +264,7 @@ public class PlayerController : MonoBehaviour
                 }
                 animator.SetTrigger("Attack");
             }
-
         }
-
     }
 
     public void OnSwitchArrow(InputAction.CallbackContext context)

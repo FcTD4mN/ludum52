@@ -1,6 +1,6 @@
 public class InteractableIronVein : Interactable
 {
-    public static bool mIsFirstTimeInteracting = true;
+    public static bool mIsFirstTimeInteractingLocal = true;
 
     override public void Interact()
     {
@@ -21,10 +21,10 @@ public class InteractableIronVein : Interactable
 
     public override void DisplayFirstTimeHelp()
     {
-        if (mIsFirstTimeInteracting)
+        if (mIsFirstTimeInteractingLocal)
         {
             GameManager.mUIManager.DisplayMessage("This is an iron source !\nThis will bring you iron if you build an iron harvester over it !", 5);
-            mIsFirstTimeInteracting = false;
+            mIsFirstTimeInteractingLocal = false;
         }
     }
 }

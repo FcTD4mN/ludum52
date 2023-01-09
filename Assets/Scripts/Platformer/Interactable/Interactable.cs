@@ -12,7 +12,9 @@ abstract public class Interactable : MonoBehaviour
 
     // Message part
     public bool mIsFirstTimeInteracting = true;
-    public string mMessage;
+
+    [MultilineAttribute]
+    public string mMessage = "";
     public float mDuration;
 
     void OnEnable()

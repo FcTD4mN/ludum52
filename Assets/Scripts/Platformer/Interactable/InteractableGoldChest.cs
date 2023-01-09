@@ -64,6 +64,8 @@ public class InteractableGoldChest : Interactable
                 Rigidbody2D rb = gold.GetComponent<Rigidbody2D>();
                 rb.velocity = new Vector2(transform.localScale.x * 3f, 1f);
                 spacingRatio += 0.3f;
+
+                gold.GetComponent<GoldCollectable>().value = loot[i];
             }
 
             isActive = false;

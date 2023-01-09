@@ -2425,8 +2425,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2228316989267473542, guid: b1ceff82c01d41f40aeca4dbaf2fc1e1, type: 3}
       propertyPath: mMessage
-      value: <color=#9eb54a>Double Jump UNCLOCKED !</color><br><size=80%>Press [Space]
-        again while in air.</size>
+      value: '<color=#9eb54a>Double Jump UNCLOCKED !</color>
+
+        <size=80%>Press
+        [Space] again while in air.</size>'
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b1ceff82c01d41f40aeca4dbaf2fc1e1, type: 3}
@@ -2492,8 +2494,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2228316989267473542, guid: b1ceff82c01d41f40aeca4dbaf2fc1e1, type: 3}
       propertyPath: mMessage
-      value: <color=#9eb54a>Wall Jump UNCLOCKED !</color><br><size=80%>Press [Space]
-        against a wall.</size>
+      value: '<color=#9eb54a>Wall Jump UNCLOCKED !</color>
+
+        <size=80%>Press
+        [Space] against a wall.</size>'
       objectReference: {fileID: 0}
     - target: {fileID: 2228316989267473542, guid: b1ceff82c01d41f40aeca4dbaf2fc1e1, type: 3}
       propertyPath: unlockedAction
@@ -3527,7 +3531,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942599265261257720, guid: 1a825eb28c2de284399891cd61544018, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.00010489138
+      value: 0.00066722377
       objectReference: {fileID: 0}
     - target: {fileID: 1942599265354592898, guid: 1a825eb28c2de284399891cd61544018, type: 3}
       propertyPath: m_AnchorMax.x
@@ -14615,7 +14619,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778420523994, guid: 6132262decc730841b0d040860526f95, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000045761364
+      value: 0.00073482236
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778575002822, guid: 6132262decc730841b0d040860526f95, type: 3}
       propertyPath: m_AnchorMax.x
@@ -15314,8 +15318,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2228316989267473542, guid: b1ceff82c01d41f40aeca4dbaf2fc1e1, type: 3}
       propertyPath: mMessage
-      value: <color=#9eb54a>Dash UNLOCKED !</color><br><size=80%>Press [tab] to dash<br>Use
-        it in air to reach futher platform</size>
+      value: '<color=#9eb54a>Dash UNLOCKED !</color>
+
+        <size=80%>Press [shift]
+        to dash<br>Use it in air to reach futher platform</size>'
       objectReference: {fileID: 0}
     - target: {fileID: 2228316989267473542, guid: b1ceff82c01d41f40aeca4dbaf2fc1e1, type: 3}
       propertyPath: unlockedAction

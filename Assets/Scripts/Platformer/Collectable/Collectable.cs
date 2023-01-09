@@ -5,7 +5,7 @@ using UnityEngine;
 public class Collectable : MonoBehaviour
 {
     protected string label;
-    protected float value;
+    public float value;
     Rigidbody2D rb;
     protected SpriteRenderer sr;
 

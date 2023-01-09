@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class InteractableFireVein : Interactable
 {
-    public static bool mIsFirstTimeInteracting = true;
+    public static bool mIsFirstTimeInteractingLocal = true;
 
     override public void Interact()
     {
