@@ -1,29 +1,36 @@
-public class Forge : ProductionBuilding
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Workshop : ProductionBuilding
 {
     public static cResourceDescriptor GetResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold.ToString() ] = 2000;
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 100;
-        output.mInputRates[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 2;
-        output.mOutputRates[ cResourceDescriptor.eResourceNames.Arrows.ToString() ] = 1;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 3000;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron.ToString()] = 1000;
 
-        return  output;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 1;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 1;
+        output.mOutputRates[cResourceDescriptor.eResourceNames.FireArrows.ToString()] = 1;
+
+        return output;
     }
 
 
     public static bool IsBuildable()
     {
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
-        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
         {
-            if( resourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName) ) {
-                return  false;
+            if (resourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName))
+            {
+                return false;
             }
         }
 
-        return  GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Forge);
+        return GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Workshop);
     }
 
 
@@ -38,7 +45,7 @@ public class Forge : ProductionBuilding
             }
         }
 
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Forge))
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Workshop))
         {
             return RTSManager.eBuildingErrors.BlueprintRequired;
         }
@@ -49,10 +56,10 @@ public class Forge : ProductionBuilding
 
     public static string GetUIDescription(bool isAllowed)
     {
-        string name = "Forge";
-        string description = "Builds arrows using iron";
+        string name = "Workshop";
+        string description = "Builds fire arrows using arrows and fire";
 
-        RTSManager.eBuildingErrors error = Forge.GetBuildingError();
+        RTSManager.eBuildingErrors error = Workshop.GetBuildingError();
 
         string errorMessage = "";
         switch (error)

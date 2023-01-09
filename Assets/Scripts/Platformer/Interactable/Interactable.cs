@@ -8,13 +8,14 @@ abstract public class Interactable : MonoBehaviour
     public bool isActive;
     protected GameObject interactBtn;
     public GameObject interactablePrefab;
+    internal bool mShowButton = true;
 
     void OnEnable()
     {
         Initialize();
     }
 
-    private void Initialize()
+    virtual internal void Initialize()
     {
         isActive = true;
         interactBtn = transform.Find("InteractBtn").gameObject;
@@ -26,8 +27,9 @@ abstract public class Interactable : MonoBehaviour
         if (coll.name == "Character" && isActive)
         {
             // Display 'E' keyboard + action text
-            interactBtn.SetActive(true);
+            interactBtn.SetActive( mShowButton );
             GameManager.mInstance.playerCtrler.currentInteractable = this;
+            DisplayFirstTimeHelp();
         }
     }
 
@@ -38,4 +40,8 @@ abstract public class Interactable : MonoBehaviour
     }
 
     public abstract void Interact();
+
+    public virtual void DisplayFirstTimeHelp()
+    {
+    }
 }

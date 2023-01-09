@@ -1,29 +1,51 @@
-public class Forge : ProductionBuilding
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class BuffBuildingDamage : BuffBuilding
 {
     public static cResourceDescriptor GetResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold.ToString() ] = 2000;
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 100;
-        output.mInputRates[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 2;
-        output.mOutputRates[ cResourceDescriptor.eResourceNames.Arrows.ToString() ] = 1;
-
-        return  output;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 500;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron.ToString()] = 500;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 2;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 1;
+        return output;
     }
+
+    public static cStatsDescriptor GetStatsDescriptor()
+    {
+        cStatsDescriptor output = new cStatsDescriptor();
+
+        output.mStatValues[cStatsDescriptor.eStatsNames.Damage.ToString()] = 10;
+
+        return output;
+    }
+
+
+
+
+
+
+
+
+
 
 
     public static bool IsBuildable()
     {
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
-        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
         {
-            if( resourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName) ) {
-                return  false;
+            if (resourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName))
+            {
+                return false;
             }
         }
 
-        return  GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Forge);
+        return GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffDamage);
     }
 
 
@@ -38,7 +60,7 @@ public class Forge : ProductionBuilding
             }
         }
 
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Forge))
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffDamage))
         {
             return RTSManager.eBuildingErrors.BlueprintRequired;
         }
@@ -49,10 +71,10 @@ public class Forge : ProductionBuilding
 
     public static string GetUIDescription(bool isAllowed)
     {
-        string name = "Forge";
-        string description = "Builds arrows using iron";
+        string name = "Damage Buff";
+        string description = "Gives buff in exchange of resources";
 
-        RTSManager.eBuildingErrors error = Forge.GetBuildingError();
+        RTSManager.eBuildingErrors error = BuffBuildingDamage.GetBuildingError();
 
         string errorMessage = "";
         switch (error)
@@ -68,12 +90,15 @@ public class Forge : ProductionBuilding
                 break;
         }
 
-        return ProductionBuilding.GetProductionBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor());
+        return BuffBuilding.GetBuffBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor(), GetStatsDescriptor() );
     }
+
 
     override internal void Initialize()
     {
         base.Initialize();
         mResourceDescriptor = GetResourceDescriptor();
+        mStatsModifiers = GetStatsDescriptor();
+        mAdds = true;
     }
 }
