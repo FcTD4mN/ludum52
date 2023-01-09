@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class InteractableFireVein : Interactable
 {
+    public static bool mIsFirstTimeInteracting = true;
+
     override public void Interact()
     {
         if (isActive)
@@ -17,5 +19,9 @@ public class InteractableFireVein : Interactable
             interactBtn.SetActive(false);
             isActive = false;
         }
+    }
+
+    public override void DisplayFirstTimeHelp()
+    {
     }
 }

@@ -19,7 +19,7 @@ public class BuffBuildingJump : BuffBuilding
     {
         cStatsDescriptor output = new cStatsDescriptor();
 
-        output.mStatValues[cStatsDescriptor.eStatsNames.JumpImpulse.ToString()] = 10;
+        output.mStatValues[cStatsDescriptor.eStatsNames.JumpImpulse.ToString()] = 2;
 
         return output;
     }
@@ -74,7 +74,7 @@ public class BuffBuildingJump : BuffBuilding
         string name = "Jump buff";
         string description = "Gives buff in exchange of resources";
 
-        RTSManager.eBuildingErrors error = BuffBuildingDamage.GetBuildingError();
+        RTSManager.eBuildingErrors error = BuffBuildingJump.GetBuildingError();
 
         string errorMessage = "";
         switch (error)

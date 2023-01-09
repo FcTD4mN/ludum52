@@ -1,5 +1,7 @@
 public class InteractableIronVein : Interactable
 {
+    public static bool mIsFirstTimeInteracting = true;
+
     override public void Interact()
     {
         if( isActive )
@@ -14,6 +16,15 @@ public class InteractableIronVein : Interactable
             GameManager.mRTSManager.BuildObjectAtLocation( "BuildingIronHarvester", gameObject );
             interactBtn.SetActive( false );
             isActive = false;
+        }
+    }
+
+    public override void DisplayFirstTimeHelp()
+    {
+        if (mIsFirstTimeInteracting)
+        {
+            GameManager.mUIManager.DisplayMessage("This is an iron source !\nThis will bring you iron if you build an iron harvester over it !", 5);
+            mIsFirstTimeInteracting = false;
         }
     }
 }

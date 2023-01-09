@@ -77,7 +77,7 @@ public class BuffBuildingSpeed : BuffBuilding
         string name = "Speed buff";
         string description = "Gives buff in exchange of resources";
 
-        RTSManager.eBuildingErrors error = BuffBuildingDamage.GetBuildingError();
+        RTSManager.eBuildingErrors error = BuffBuildingSpeed.GetBuildingError();
 
         string errorMessage = "";
         switch (error)

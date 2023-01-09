@@ -59,7 +59,7 @@ public class Workshop : ProductionBuilding
         string name = "Workshop";
         string description = "Builds fire arrows using arrows and fire";
 
-        RTSManager.eBuildingErrors error = BombFactory.GetBuildingError();
+        RTSManager.eBuildingErrors error = Workshop.GetBuildingError();
 
         string errorMessage = "";
         switch (error)

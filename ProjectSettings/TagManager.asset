@@ -40,6 +40,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Decor
+    uniqueID: 4189764795
+    locked: 0
   - name: Interactable
     uniqueID: 2349312569
     locked: 0
