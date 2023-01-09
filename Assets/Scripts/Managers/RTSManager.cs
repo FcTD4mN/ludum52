@@ -6,15 +6,16 @@ public class RTSManager : MonoBehaviour
 {
     public GameObject mRTSWorld;
     public List<GameObject> mTowers;
+    public List<GameObject> mBuffTower;
 
     public int mTowerLevel = 1;
     public int mHarvesterSlots = 2;
 
     public List<HarvestingBuilding> mAllHarvesters;
     public List<ProductionBuilding> mAllProductionBuildings;
+    public List<BuffBuilding> mAllBuffBuildings;
 
 
-    public List<GameObject> mProductionBuildingSpots;
     public List<(GameObject, int)> mAllReceivers;
     public List<GameObject> mBuffBuildingSpots;
 
@@ -33,7 +34,9 @@ public class RTSManager : MonoBehaviour
         IronHarvester,
         FireMine,
         Forge,
-        BombFactory
+        BombFactory,
+        BuffDamage,
+        BuffCooldown
     }
     public List<eBuildingList> mUnlockedBuildings;
 
@@ -47,8 +50,8 @@ public class RTSManager : MonoBehaviour
         mTowers = new List<GameObject>();
         mTowers.Add( GameObject.Find("Tower")?.gameObject );
 
-        mProductionBuildingSpots.Add( mTowers[0].transform.Find("EmptyBuildingSpot1")?.gameObject );
-        mProductionBuildingSpots.Add( mTowers[0].transform.Find("EmptyBuildingSpot2")?.gameObject );
+        mBuffTower = new List<GameObject>();
+        mBuffTower.Add( GameObject.Find("BuffTower")?.gameObject );
 
         mAllProductionBuildings = new List<ProductionBuilding>();
         mAllHarvesters = new List<HarvestingBuilding>();
@@ -58,7 +61,9 @@ public class RTSManager : MonoBehaviour
 
         mUnlockedBuildings = new List<eBuildingList>();
         mUnlockedBuildings.Add( eBuildingList.IronHarvester );
+        mUnlockedBuildings.Add( eBuildingList.FireMine );
         mUnlockedBuildings.Add( eBuildingList.Forge );
+        mUnlockedBuildings.Add( eBuildingList.BuffDamage );
     }
 
 
@@ -188,6 +193,26 @@ public class RTSManager : MonoBehaviour
     }
 
 
+    public void BuildBuffBuildingAtLocation(string objectName, GameObject objectToBuildOver)
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/" + objectName);
+        GameObject newBuilding = Instantiate(prefab,
+                                                objectToBuildOver.transform.position,
+                                                Quaternion.Euler(0, 0, 0));
+
+        newBuilding.transform.SetParent(mRTSWorld.transform);
+
+        Rect buildingSpotBBox = Utilities.GetBBoxFromTransform(objectToBuildOver);
+        Rect newBuildingSpotBBox = Utilities.GetBBoxFromTransform(newBuilding);
+        newBuilding.transform.localScale = new Vector3(buildingSpotBBox.width / newBuildingSpotBBox.width, buildingSpotBBox.height / newBuildingSpotBBox.height, 1);
+
+        mBuildingToBuildableRelations.Add((newBuilding, objectToBuildOver));
+
+        objectToBuildOver.SetActive(false);
+    }
+
+
+
     public void DestroyBuilding( GameObject building )
     {
         List<(GameObject, GameObject)> relations = mBuildingToBuildableRelations.FindAll((element) => { return element.Item1 == building; });
@@ -226,22 +251,8 @@ public class RTSManager : MonoBehaviour
         mTowerLevel += 1;
         mHarvesterSlots += 2;
 
-        GameObject lastTowerFloor = mTowers[mTowers.Count - 1];
-        Vector3 upVector = new Vector3( 0, lastTowerFloor.transform.localScale.y, 0 );
-
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/Tower");
-        GameObject newTowerFloor = Instantiate( prefab,
-                                                lastTowerFloor.transform.position + upVector,
-                                                Quaternion.Euler(0, 0, 0));
-        newTowerFloor.transform.SetParent( mRTSWorld.transform );
-
-        foreach( Transform gg in newTowerFloor.transform )
-        {
-            GameManager.mUIManager.mBuildableObjects.Add( gg.gameObject );
-            GameManager.mUIManager.CreateBuildButtonOverObject( gg.gameObject );
-        }
-
-        mTowers.Add( newTowerFloor );
+        BuildTowerFloor();
+        BuildBuffTowerFloor();
     }
 
 
@@ -249,5 +260,45 @@ public class RTSManager : MonoBehaviour
     {
         int nonHarvesterCount = mAllProductionBuildings.Count - mAllHarvesters.Count;
         return  nonHarvesterCount == mTowerLevel*2;
+    }
+
+
+    private void BuildTowerFloor()
+    {
+        GameObject lastTowerFloor = mTowers[mTowers.Count - 1];
+
+        Vector3 upVector = new Vector3(0, lastTowerFloor.transform.localScale.y, 0);
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/Tower");
+        GameObject newTowerFloor = Instantiate(prefab,
+                                                lastTowerFloor.transform.position + upVector,
+                                                Quaternion.Euler(0, 0, 0));
+        newTowerFloor.transform.SetParent(mRTSWorld.transform);
+
+        foreach (Transform gg in newTowerFloor.transform)
+        {
+            GameManager.mUIManager.CreateBuildButtonOverObject(gg.gameObject);
+        }
+
+        mTowers.Add(newTowerFloor);
+    }
+
+
+    private void BuildBuffTowerFloor()
+    {
+        GameObject lastTowerFloor = mBuffTower[mBuffTower.Count - 1];
+
+        Vector3 upVector = new Vector3(0, lastTowerFloor.transform.localScale.y, 0);
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/BuffTower");
+        GameObject newTowerFloor = Instantiate(prefab,
+                                                lastTowerFloor.transform.position + upVector,
+                                                Quaternion.Euler(0, 0, 0));
+        newTowerFloor.transform.SetParent(mRTSWorld.transform);
+
+        foreach (Transform gg in newTowerFloor.transform)
+        {
+            GameManager.mUIManager.CreateBuildButtonOverObject(gg.gameObject);
+        }
+
+        mBuffTower.Add(newTowerFloor);
     }
 }

@@ -48,6 +48,31 @@ public class BombFactory : ProductionBuilding
         return RTSManager.eBuildingErrors.None;
     }
 
+
+    public static string GetUIDescription(bool isAllowed)
+    {
+        string name = "Bomb Factory";
+        string description = "Builds bombs using iron and fire";
+
+        RTSManager.eBuildingErrors error = BombFactory.GetBuildingError();
+
+        string errorMessage = "";
+        switch (error)
+        {
+            case RTSManager.eBuildingErrors.BlueprintRequired:
+                errorMessage = "Blueprint required";
+                break;
+            case RTSManager.eBuildingErrors.NotEnoughRessources:
+                errorMessage = "Not enough resources";
+                break;
+            case RTSManager.eBuildingErrors.None:
+                errorMessage = isAllowed ? "" : "Can't build that type of building here";
+                break;
+        }
+
+        return ProductionBuilding.GetProductionBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor());
+    }
+
     override internal void Initialize()
     {
         base.Initialize();

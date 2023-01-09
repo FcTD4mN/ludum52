@@ -5,8 +5,8 @@ using UnityEngine;
 public class ProductionBuilding : MonoBehaviour
 {
     internal cResourceDescriptor mResourceDescriptor;
-
-    public bool mIsPaused = false;
+    private bool mIsPaused = false;
+    private bool mIsOutOfResources = false;
 
 
     // ===================================
@@ -15,6 +15,20 @@ public class ProductionBuilding : MonoBehaviour
     public void OnEnable()
     {
         GameManager.mRTSManager.mAllProductionBuildings.Add( this );
+
+        // Sorts so that prod building that are not buffs are first in the list, so resources are first used by regular buildings, then by buffers
+        GameManager.mRTSManager.mAllProductionBuildings.Sort( delegate( ProductionBuilding lhs, ProductionBuilding rhs )
+        {
+            bool lhsIsBuff = lhs.gameObject.GetComponent<BuffBuilding>() != null;
+            bool rhsIsBuff = rhs.gameObject.GetComponent<BuffBuilding>() != null;
+
+            if( lhsIsBuff && rhsIsBuff ) { return  0; }
+            if( lhsIsBuff && !rhsIsBuff ) { return  -1; }
+            if( !lhsIsBuff && rhsIsBuff ) { return  1; }
+
+            return  0;
+
+        });
         Initialize();
         BuildBuilding();
     }
@@ -29,6 +43,29 @@ public class ProductionBuilding : MonoBehaviour
     virtual internal void Initialize()
     {
         mResourceDescriptor = new cResourceDescriptor();
+    }
+
+
+    public bool IsPaused()
+    {
+        return mIsPaused;
+    }
+
+    virtual public void SetPause(bool state)
+    {
+        mIsPaused = state;
+    }
+
+
+    public bool IsOutOfResources()
+    {
+        return  mIsOutOfResources;
+    }
+
+
+    virtual internal void SetOutOfResources( bool state )
+    {
+        mIsOutOfResources = state;
     }
 
 
@@ -65,6 +102,8 @@ public class ProductionBuilding : MonoBehaviour
             }
         }
 
+        SetOutOfResources( !enoughResources );
+
         if( enoughResources )
         {
             foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
@@ -78,5 +117,14 @@ public class ProductionBuilding : MonoBehaviour
                 GameManager.mResourceManager.AddResource( resourceName, deltaOutputCost, false );
             }
         }
+    }
+
+
+
+
+
+    public static string GetProductionBuildingUIDescription(string name, string description, string errorMessage, cResourceDescriptor resourceDescriptor)
+    {
+        return resourceDescriptor.PrintCompleteDescription(name, description, errorMessage);
     }
 }

@@ -18,10 +18,10 @@ public class UIManager : MonoBehaviour
     // BuildMenu
     private GameObject mBuildMenu;
 
-    private Button mButtonIronHarvester;
-    private Button mButtonFireMaker;
     private Button mButtonForge;
     private Button mButtonBombFactory;
+    private Button mButtonDamage;
+    private Button mButtonCooldown;
 
     // Info panel
     private GameObject mInfoPanel;
@@ -56,8 +56,8 @@ public class UIManager : MonoBehaviour
 
         // Build Menu
         mBuildMenu = mCanvas.transform.Find("BuildMenu")?.gameObject;
-        mButtonIronHarvester = GameObject.Find("ButtonIronHarvester")?.gameObject.GetComponent<Button>();
-        mButtonFireMaker = GameObject.Find("ButtonFireMaker")?.gameObject.GetComponent<Button>();
+        mButtonDamage = GameObject.Find("ButtonDamage")?.gameObject.GetComponent<Button>();
+        mButtonCooldown = GameObject.Find("ButtonCooldown")?.gameObject.GetComponent<Button>();
         mButtonForge = GameObject.Find("ButtonForge")?.gameObject.GetComponent<Button>();
         mButtonBombFactory = GameObject.Find("ButtonBombFactory")?.gameObject.GetComponent<Button>();
         BuildBuildMenu();
@@ -68,8 +68,8 @@ public class UIManager : MonoBehaviour
         BuildInfoPanel();
 
         mBuildButtons = new List<GameObject>();
-        mBuildButtons.Add( mButtonIronHarvester.gameObject );
-        mBuildButtons.Add( mButtonFireMaker.gameObject );
+        mBuildButtons.Add( mButtonDamage.gameObject );
+        mBuildButtons.Add( mButtonCooldown.gameObject );
         mBuildButtons.Add( mButtonForge.gameObject );
         mBuildButtons.Add( mButtonBombFactory.gameObject );
 
@@ -82,16 +82,13 @@ public class UIManager : MonoBehaviour
         mBuildableObjects = new List<GameObject>();
         foreach( Transform child in GameManager.mRTSManager.mRTSWorld.transform )
         {
-            if( child.name == "Tower" )
+            foreach (Transform subChild in child )
             {
-                foreach( Transform buildingArea in child )
-                {
-                    if( buildingArea.tag != "Buildable" ) {
-                        continue;
-                    }
-
-                    mBuildableObjects.Add( buildingArea.gameObject );
+                if( subChild.tag != "Buildable" ) {
+                    continue;
                 }
+
+                mBuildableObjects.Add( subChild.gameObject );
             }
 
             if( child.tag != "Buildable" ) {
@@ -241,7 +238,7 @@ public class UIManager : MonoBehaviour
             prodBuilding = building.GetComponent<Receiver>().mAssociatedHarvester.GetComponent<ProductionBuilding>();
         }
 
-        text.GetComponent<TextMeshProUGUI>().text = prodBuilding.mIsPaused ? "Resume" : "Pause";
+        text.GetComponent<TextMeshProUGUI>().text = prodBuilding.IsPaused() ? "Resume" : "Pause";
 
         GameObject deleteButton = mHoverButton.transform.Find("Delete")?.gameObject;
         deleteButton.GetComponent<Button>().onClick.AddListener(() =>
@@ -265,9 +262,9 @@ public class UIManager : MonoBehaviour
 
         mHoverButton.GetComponent<Button>().onClick.AddListener( () => {
 
-            prodBuilding.mIsPaused = !prodBuilding.mIsPaused;
+            prodBuilding.SetPause( !prodBuilding.IsPaused() );
             UpdateInfoPanel();
-            text.GetComponent<TextMeshProUGUI>().text = prodBuilding.mIsPaused ? "Resume" : "Pause";
+            text.GetComponent<TextMeshProUGUI>().text = prodBuilding.IsPaused() ? "Resume" : "Pause";
 
         });
     }
@@ -393,14 +390,14 @@ public class UIManager : MonoBehaviour
     {
         if( !mBuildMenu.activeSelf ) { return; }
 
-        bool isLocationAnIronMine = mObjectToBuildTo.gameObject.GetComponent<IronVein>() != null;
-        bool isLocationAFireMine = mObjectToBuildTo.gameObject.GetComponent<FireVein>() != null;
+        bool isLocationOnTower = GameManager.mRTSManager.mTowers.Contains(mObjectToBuildTo.transform.parent.gameObject );
+        bool isLocationOnBuffTower = GameManager.mRTSManager.mBuffTower.Contains(mObjectToBuildTo.transform.parent.gameObject);
 
-        mButtonIronHarvester.interactable = IronHarvester.IsBuildable() && isLocationAnIronMine && GameManager.mRTSManager.CanBuildHarvester();
-        mButtonFireMaker.interactable = FireMaker.IsBuildable() && isLocationAFireMine && GameManager.mRTSManager.CanBuildHarvester();
+        mButtonDamage.interactable = BuffBuildingDamage.IsBuildable() && isLocationOnBuffTower;
+        mButtonCooldown.interactable = BuffBuildingCooldown.IsBuildable() && isLocationOnBuffTower;
 
-        mButtonForge.interactable = Forge.IsBuildable() && !isLocationAnIronMine && !isLocationAFireMine;
-        mButtonBombFactory.interactable = BombFactory.IsBuildable() && !isLocationAnIronMine && !isLocationAFireMine;
+        mButtonForge.interactable = Forge.IsBuildable() && isLocationOnTower;
+        mButtonBombFactory.interactable = BombFactory.IsBuildable() && isLocationOnTower;
     }
 
 
@@ -412,15 +409,15 @@ public class UIManager : MonoBehaviour
             mBuildMenu.SetActive( false );
         });
 
-        mButtonIronHarvester.onClick.AddListener( () => {
+        mButtonDamage.onClick.AddListener( () => {
             mBuildMenu.SetActive( false );
-            GameManager.mRTSManager.BuildObjectAtLocation( "BuildingIronHarvester", mObjectToBuildTo );
+            GameManager.mRTSManager.BuildBuffBuildingAtLocation( "BuffBuildingDamage", mObjectToBuildTo );
             DeleteUIButton(mBuildButtonClicked);
         });
 
-        mButtonFireMaker.onClick.AddListener( () => {
+        mButtonCooldown.onClick.AddListener( () => {
             mBuildMenu.SetActive( false );
-            GameManager.mRTSManager.BuildObjectAtLocation( "BuildingFireMine", mObjectToBuildTo );
+            GameManager.mRTSManager.BuildBuffBuildingAtLocation( "BuffBuildingCooldown", mObjectToBuildTo );
             DeleteUIButton(mBuildButtonClicked);
         });
 
@@ -451,93 +448,34 @@ public class UIManager : MonoBehaviour
         mInfoPanel.SetActive( false );
         if( mHoveredObject == null ) { return; }
 
+        // PROD BUILDING
         ProductionBuilding prodBuilding = mHoveredObject.GetComponent<ProductionBuilding>();
         if( prodBuilding != null )
         {
-            mInfoPanelText.text = prodBuilding.mIsPaused ? "Paused" : prodBuilding.mResourceDescriptor.PrintProductionRates();
+            mInfoPanelText.text = prodBuilding.IsPaused() ? "Paused" : prodBuilding.mResourceDescriptor.PrintProductionRates();
             mInfoPanel.SetActive( true );
+            return;
         }
 
-        if( mHoveredObject == mButtonIronHarvester.gameObject )
+        // UI BUTTON
+        if( mHoveredObject == mButtonDamage.gameObject )
         {
-            RTSManager.eBuildingErrors error = IronHarvester.GetBuildingError();
-
-            string errorMessage = "";
-            switch( error )
-            {
-                case RTSManager.eBuildingErrors.BlueprintRequired:
-                    errorMessage = "Blueprint required";
-                    break;
-                case RTSManager.eBuildingErrors.NotEnoughRessources:
-                    errorMessage = "Not enough resources";
-                    break;
-                case RTSManager.eBuildingErrors.None:
-                    errorMessage = mButtonIronHarvester.interactable ? "" : "Can't build that type of building here";
-                    break;
-            }
-
-            mInfoPanelText.text = IronHarvester.GetResourceDescriptor().PrintCompleteDescription( "Iron Harvester", "Harvests iron from iron veins", errorMessage );
+            mInfoPanelText.text = BuffBuildingDamage.GetUIDescription(mButtonDamage.interactable);
             mInfoPanel.SetActive( true );
         }
-        else if( mHoveredObject == mButtonFireMaker.gameObject )
+        else if( mHoveredObject == mButtonCooldown.gameObject )
         {
-            RTSManager.eBuildingErrors error = FireMaker.GetBuildingError();
-
-            string errorMessage = "";
-            switch (error)
-            {
-                case RTSManager.eBuildingErrors.BlueprintRequired:
-                    errorMessage = "Blueprint required";
-                    break;
-                case RTSManager.eBuildingErrors.NotEnoughRessources:
-                    errorMessage = "Not enough resources";
-                    break;
-                case RTSManager.eBuildingErrors.None:
-                    errorMessage = mButtonFireMaker.interactable ? "" : "Can't build that type of building here";
-                    break;
-            }
-
-            mInfoPanelText.text = FireMaker.GetResourceDescriptor().PrintCompleteDescription( "Fire Maker", "Harvests fire from fire veins", errorMessage );
+            mInfoPanelText.text = BuffBuildingCooldown.GetUIDescription( mButtonCooldown.interactable );
             mInfoPanel.SetActive( true );
         }
         else if( mHoveredObject == mButtonForge.gameObject )
         {
-            RTSManager.eBuildingErrors error = Forge.GetBuildingError();
-
-            string errorMessage = "";
-            switch (error)
-            {
-                case RTSManager.eBuildingErrors.BlueprintRequired:
-                    errorMessage = "Blueprint required";
-                    break;
-                case RTSManager.eBuildingErrors.NotEnoughRessources:
-                    errorMessage = "Not enough resources";
-                    break;
-                case RTSManager.eBuildingErrors.None:
-                    errorMessage = mButtonForge.interactable ? "" : "Can't build that type of building here";
-                    break;
-            }
-            mInfoPanelText.text = Forge.GetResourceDescriptor().PrintCompleteDescription( "Forge", "Builds arrows using iron", errorMessage );
+            mInfoPanelText.text = Forge.GetUIDescription(mButtonForge.interactable);
             mInfoPanel.SetActive( true );
         }
         else if( mHoveredObject == mButtonBombFactory.gameObject )
         {
-            RTSManager.eBuildingErrors error = BombFactory.GetBuildingError();
-
-            string errorMessage = "";
-            switch (error)
-            {
-                case RTSManager.eBuildingErrors.BlueprintRequired:
-                    errorMessage = "Blueprint required";
-                    break;
-                case RTSManager.eBuildingErrors.NotEnoughRessources:
-                    errorMessage = "Not enough resources";
-                    break;
-                case RTSManager.eBuildingErrors.None:
-                    errorMessage = mButtonBombFactory.interactable ? "" : "Can't build that type of building here";
-                    break;
-            }
-            mInfoPanelText.text = BombFactory.GetResourceDescriptor().PrintCompleteDescription( "Bomb Factory", "Builds bombs using iron and fire", errorMessage );
+            mInfoPanelText.text = BombFactory.GetUIDescription(mButtonBombFactory.interactable);
             mInfoPanel.SetActive( true );
         }
     }

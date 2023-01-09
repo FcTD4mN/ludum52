@@ -47,11 +47,25 @@ public class cStatsDescriptor
         }
     }
 
+    public cStatsDescriptor( cStatsDescriptor other )
+    {
+        mStatValues = new Dictionary<string, float>();
 
-    // ===================================
-    // Manipulation
-    // ===================================
-    public void CombineByAddition( cStatsDescriptor rhs )
+        if (mAllStatsName == null) {
+            BuildStatsList();
+        }
+
+        foreach (string statName in mAllStatsName)
+        {
+            mStatValues[statName] = other.mStatValues[statName];
+        }
+    }
+
+
+        // ===================================
+        // Manipulation
+        // ===================================
+        public void CombineByAddition( cStatsDescriptor rhs )
     {
         foreach (string statName in mAllStatsName)
         {

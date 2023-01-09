@@ -2,7 +2,7 @@ public class InteractableFireVein : Interactable
 {
     override public void Interact()
     {
-        if (isActive)
+        if (isActive && FireMaker.IsBuildable())
         {
             GameManager.mRTSManager.BuildObjectAtLocation("BuildingFireMine", gameObject);
             interactBtn.SetActive(false);
