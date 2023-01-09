@@ -23,7 +23,27 @@ public class FireMaker : HarvestingBuilding
             }
         }
 
-        return  true;
+        return  GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.FireMine);
+    }
+
+
+    public static RTSManager.eBuildingErrors GetBuildingError()
+    {
+        cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
+        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
+        {
+            if (resourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName))
+            {
+                return RTSManager.eBuildingErrors.NotEnoughRessources;
+            }
+        }
+
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.FireMine))
+        {
+            return RTSManager.eBuildingErrors.BlueprintRequired;
+        }
+
+        return RTSManager.eBuildingErrors.None;
     }
 
     override internal void Initialize()

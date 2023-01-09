@@ -455,6 +455,7 @@ GameObject:
   - component: {fileID: 118475349}
   - component: {fileID: 118475348}
   - component: {fileID: 118475347}
+  - component: {fileID: 118475351}
   m_Layer: 0
   m_Name: HitableTest
   m_TagString: Untagged
@@ -536,8 +537,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 088befbb799d2fe47861c7996a4b41ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  health: 100
   isInvincible: 0
   invincibilityCooldown: 0.25
 --- !u!212 &118475350
@@ -592,6 +591,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &118475351
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 118475345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98c1418baeb96034aa9ac090d5f851eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &307505284
 GameObject:
   m_ObjectHideFlags: 0
@@ -1572,7 +1583,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942599265261257720, guid: 1a825eb28c2de284399891cd61544018, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00017128214
+      value: 0.0007814364
       objectReference: {fileID: 0}
     - target: {fileID: 1942599265354592898, guid: 1a825eb28c2de284399891cd61544018, type: 3}
       propertyPath: m_AnchorMax.x
@@ -3147,7 +3158,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778420523994, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00034719965
+      value: 0.00012616265
       objectReference: {fileID: 0}
     - target: {fileID: 1814086778575002822, guid: 7cb5e636287ed72439f9ef674bcc568f, type: 3}
       propertyPath: m_AnchorMax.x

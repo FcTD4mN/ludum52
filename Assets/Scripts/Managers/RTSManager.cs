@@ -15,12 +15,27 @@ public class RTSManager : MonoBehaviour
 
 
     public List<GameObject> mProductionBuildingSpots;
-    public List<(GameObject, int)> mIronReceivers; // TODO => Join les 2 listes, ca sert a R den avoir 2
-    public List<(GameObject, int)> mFireReceivers;
+    public List<(GameObject, int)> mAllReceivers;
     public List<GameObject> mBuffBuildingSpots;
 
 
     public List<(GameObject, GameObject)> mBuildingToBuildableRelations;
+
+    public enum eBuildingErrors
+    {
+        None,
+        NotEnoughRessources,
+        BlueprintRequired
+    }
+
+    public enum eBuildingList
+    {
+        IronHarvester,
+        FireMine,
+        Forge,
+        BombFactory
+    }
+    public List<eBuildingList> mUnlockedBuildings;
 
 
     // ===================================
@@ -38,9 +53,12 @@ public class RTSManager : MonoBehaviour
         mAllProductionBuildings = new List<ProductionBuilding>();
         mAllHarvesters = new List<HarvestingBuilding>();
 
-        mIronReceivers = new List<(GameObject, int)>();
-        mFireReceivers = new List<(GameObject, int)>();
+        mAllReceivers = new List<(GameObject, int)>();
         mBuildingToBuildableRelations = new List<(GameObject, GameObject)>();
+
+        mUnlockedBuildings = new List<eBuildingList>();
+        mUnlockedBuildings.Add( eBuildingList.IronHarvester );
+        mUnlockedBuildings.Add( eBuildingList.Forge );
     }
 
 
@@ -122,13 +140,9 @@ public class RTSManager : MonoBehaviour
         cable.transform.position = new Vector3( cable.transform.position.x, cable.transform.position.y - ((floorMultiplier-1)/4), 0 );
 
         // Add to lists
-        if( newBuilding.GetComponent<IronReceiver>() != null )
+        if( newBuilding.GetComponent<Receiver>() != null )
         {
-            mIronReceivers.Add( (newBuilding, spawnIndex ) );
-        }
-        else if (newBuilding.GetComponent<FireReceiver>() != null)
-        {
-            mFireReceivers.Add((newBuilding, spawnIndex));
+            mAllReceivers.Add( (newBuilding, spawnIndex ) );
         }
 
         newBuilding.GetComponent<Receiver>().mAssociatedHarvester = associatedHarvester.GetComponent<ProductionBuilding>();
@@ -140,13 +154,9 @@ public class RTSManager : MonoBehaviour
     private int GetAvailableSlotIndex()
     {
         List<int> mAllIndices = new List<int>();
-        foreach( (GameObject, int) receiver in mIronReceivers )
+        foreach( (GameObject, int) receiver in mAllReceivers )
         {
             mAllIndices.Add( receiver.Item2 );
-        }
-        foreach ((GameObject, int) receiver in mFireReceivers)
-        {
-            mAllIndices.Add(receiver.Item2);
         }
 
         mAllIndices.Sort();
@@ -191,15 +201,10 @@ public class RTSManager : MonoBehaviour
         {
             DestroyBuilding(building.GetComponent<Receiver>().mAssociatedHarvester.gameObject);
 
-            if (building.GetComponent<IronReceiver>() != null)
+            if (building.GetComponent<Receiver>() != null)
             {
-                (GameObject, int) lastIronReceiver = mIronReceivers.Find((element) => { return element.Item1 == building; });
-                mIronReceivers.Remove(lastIronReceiver);
-            }
-            else if (building.GetComponent<FireReceiver>() != null)
-            {
-                (GameObject, int) lastFireReceiver = mFireReceivers.Find((element) => { return element.Item1 == building; });
-                mFireReceivers.Remove(lastFireReceiver);
+                (GameObject, int) foundReceiver = mAllReceivers.Find((element) => { return element.Item1 == building; });
+                mAllReceivers.Remove(foundReceiver);
             }
         }
 

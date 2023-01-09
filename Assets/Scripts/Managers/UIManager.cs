@@ -139,10 +139,7 @@ public class UIManager : MonoBehaviour
         }
 
         // RECEIVERS
-        List<(GameObject, int)> fullList = new List<(GameObject, int)>( GameManager.mRTSManager.mIronReceivers );
-        fullList.AddRange(GameManager.mRTSManager.mFireReceivers);
-
-        foreach ((GameObject, int) pack in fullList)
+        foreach ((GameObject, int) pack in GameManager.mRTSManager.mAllReceivers)
         {
             GameObject receiver = pack.Item1;
             Rect bbox = Utilities.GetBBoxFromTransform(receiver);
@@ -463,22 +460,84 @@ public class UIManager : MonoBehaviour
 
         if( mHoveredObject == mButtonIronHarvester.gameObject )
         {
-            mInfoPanelText.text = IronHarvester.GetResourceDescriptor().PrintCompleteDescription( "Iron Harvester", "Harvests iron from iron veins" );
+            RTSManager.eBuildingErrors error = IronHarvester.GetBuildingError();
+
+            string errorMessage = "";
+            switch( error )
+            {
+                case RTSManager.eBuildingErrors.BlueprintRequired:
+                    errorMessage = "Blueprint required";
+                    break;
+                case RTSManager.eBuildingErrors.NotEnoughRessources:
+                    errorMessage = "Not enough resources";
+                    break;
+                case RTSManager.eBuildingErrors.None:
+                    errorMessage = mButtonIronHarvester.interactable ? "" : "Can't build that type of building here";
+                    break;
+            }
+
+            mInfoPanelText.text = IronHarvester.GetResourceDescriptor().PrintCompleteDescription( "Iron Harvester", "Harvests iron from iron veins", errorMessage );
             mInfoPanel.SetActive( true );
         }
         else if( mHoveredObject == mButtonFireMaker.gameObject )
         {
-            mInfoPanelText.text = FireMaker.GetResourceDescriptor().PrintCompleteDescription( "Fire Maker", "Harvests fire from fire veins" );
+            RTSManager.eBuildingErrors error = FireMaker.GetBuildingError();
+
+            string errorMessage = "";
+            switch (error)
+            {
+                case RTSManager.eBuildingErrors.BlueprintRequired:
+                    errorMessage = "Blueprint required";
+                    break;
+                case RTSManager.eBuildingErrors.NotEnoughRessources:
+                    errorMessage = "Not enough resources";
+                    break;
+                case RTSManager.eBuildingErrors.None:
+                    errorMessage = mButtonFireMaker.interactable ? "" : "Can't build that type of building here";
+                    break;
+            }
+
+            mInfoPanelText.text = FireMaker.GetResourceDescriptor().PrintCompleteDescription( "Fire Maker", "Harvests fire from fire veins", errorMessage );
             mInfoPanel.SetActive( true );
         }
         else if( mHoveredObject == mButtonForge.gameObject )
         {
-            mInfoPanelText.text = Forge.GetResourceDescriptor().PrintCompleteDescription( "Forge", "Builds arrows using iron" );
+            RTSManager.eBuildingErrors error = Forge.GetBuildingError();
+
+            string errorMessage = "";
+            switch (error)
+            {
+                case RTSManager.eBuildingErrors.BlueprintRequired:
+                    errorMessage = "Blueprint required";
+                    break;
+                case RTSManager.eBuildingErrors.NotEnoughRessources:
+                    errorMessage = "Not enough resources";
+                    break;
+                case RTSManager.eBuildingErrors.None:
+                    errorMessage = mButtonForge.interactable ? "" : "Can't build that type of building here";
+                    break;
+            }
+            mInfoPanelText.text = Forge.GetResourceDescriptor().PrintCompleteDescription( "Forge", "Builds arrows using iron", errorMessage );
             mInfoPanel.SetActive( true );
         }
         else if( mHoveredObject == mButtonBombFactory.gameObject )
         {
-            mInfoPanelText.text = BombFactory.GetResourceDescriptor().PrintCompleteDescription( "Bomb Factory", "Builds bombs using iron and fire" );
+            RTSManager.eBuildingErrors error = BombFactory.GetBuildingError();
+
+            string errorMessage = "";
+            switch (error)
+            {
+                case RTSManager.eBuildingErrors.BlueprintRequired:
+                    errorMessage = "Blueprint required";
+                    break;
+                case RTSManager.eBuildingErrors.NotEnoughRessources:
+                    errorMessage = "Not enough resources";
+                    break;
+                case RTSManager.eBuildingErrors.None:
+                    errorMessage = mButtonBombFactory.interactable ? "" : "Can't build that type of building here";
+                    break;
+            }
+            mInfoPanelText.text = BombFactory.GetResourceDescriptor().PrintCompleteDescription( "Bomb Factory", "Builds bombs using iron and fire", errorMessage );
             mInfoPanel.SetActive( true );
         }
     }

@@ -4,21 +4,18 @@ using UnityEngine;
 
 public class Hitable : MonoBehaviour
 {
-    [SerializeField]
-    private float maxHealth = 100f;
-    [SerializeField]
-    private float health = 100f;
+    private HasStats mStats;
 
     public float Health
     {
         get
         {
-            return health;
+            return mStats.GetFinalStat(cStatsDescriptor.eStatsNames.Health);
         }
         set
         {
-            health = value;
-            if (health <= 0)
+            mStats.SetBaseStat(cStatsDescriptor.eStatsNames.Health, value);
+            if (value <= 0)
             {
                 IsAlive = false;
             }
@@ -50,6 +47,15 @@ public class Hitable : MonoBehaviour
     void OnEnable()
     {
         animator = GetComponent<Animator>();
+        mStats = GetComponent<HasStats>();
+        if (mStats.GetBaseStat(cStatsDescriptor.eStatsNames.MaxHealth) == 0)
+        {
+            mStats.SetBaseStat(cStatsDescriptor.eStatsNames.MaxHealth, 100);
+        }
+        if( mStats.GetBaseStat(cStatsDescriptor.eStatsNames.Health) == 0 )
+        {
+            mStats.SetBaseStat( cStatsDescriptor.eStatsNames.Health, mStats.GetBaseStat(cStatsDescriptor.eStatsNames.MaxHealth) );
+        }
     }
 
     void Update()

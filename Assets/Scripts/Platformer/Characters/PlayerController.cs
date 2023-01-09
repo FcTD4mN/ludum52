@@ -10,10 +10,7 @@ using static cStatsDescriptor;
 public class PlayerController : MonoBehaviour
 {
     // Char Stats
-    public cStatsDescriptor mStatsBase;         // Changing requires to update finalStatsCached
-    private cStatsDescriptor mStatsBonusAdd;    // Changing requires to update finalStatsCached
-    private cStatsDescriptor mStatsBonusMult;   // Changing requires to update finalStatsCached
-    private cStatsDescriptor mStatsFinalCached;
+    public HasStats mStats;
 
     private float lastAttack;
     private float lastDash;
@@ -40,11 +37,11 @@ public class PlayerController : MonoBehaviour
                 {
                     if (touchingDirections.IsGrounded)
                     {
-                        return mStatsFinalCached.mStatValues[eStatsNames.RunSpeed.ToString()];
+                        return mStats.GetFinalStat(eStatsNames.RunSpeed);
                     }
                     else
                     {
-                        return mStatsFinalCached.mStatValues[eStatsNames.AirWalkSpeed.ToString()];
+                        return mStats.GetFinalStat(eStatsNames.AirWalkSpeed);
                     }
                 }
                 else
@@ -154,6 +151,9 @@ public class PlayerController : MonoBehaviour
         rotationPoint = GameObject.Find("RotationPoint");
         lastAttack = -10f;
         lastDash = -10f;
+
+        // Stats
+        mStats = GetComponent<HasStats>();
         BuildStats();
     }
 
@@ -206,19 +206,19 @@ public class PlayerController : MonoBehaviour
             if (touchingDirections.IsGrounded)
             {
                 animator.SetTrigger("Jump");
-                rb.velocity = new Vector2(rb.velocity.x, mStatsFinalCached.mStatValues[eStatsNames.JumpImpulse.ToString()]);
+                rb.velocity = new Vector2(rb.velocity.x, mStats.GetFinalStat(eStatsNames.JumpImpulse));
             }
             else if (touchingDirections.IsOnWall)
             {
                 // @TODO : jump direction based on wall direction ?
                 animator.SetTrigger("WallJump");
-                rb.velocity = new Vector2(-(moveInput.x * mStatsFinalCached.mStatValues[eStatsNames.AirWallSpeed.ToString()]),
-                                            mStatsFinalCached.mStatValues[eStatsNames.JumpImpulse.ToString()]);
+                rb.velocity = new Vector2(-(moveInput.x * mStats.GetFinalStat(eStatsNames.AirWallSpeed)),
+                                            mStats.GetFinalStat(eStatsNames.JumpImpulse));
             }
             else if (CanDoubleJump)
             {
                 animator.SetTrigger("DoubleJump");
-                rb.velocity = new Vector2(rb.velocity.x, mStatsFinalCached.mStatValues[eStatsNames.JumpImpulse.ToString()]);
+                rb.velocity = new Vector2(rb.velocity.x, mStats.GetFinalStat(eStatsNames.JumpImpulse));
             }
         }
     }
@@ -231,7 +231,7 @@ public class PlayerController : MonoBehaviour
             if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0)
             {
                 // Check cooldown
-                if (Time.time - lastAttack < mStatsFinalCached.mStatValues[eStatsNames.CoolDownAttack.ToString()])
+                if (Time.time - lastAttack < mStats.GetFinalStat(eStatsNames.CoolDownAttack))
                 {
                     return;
                 }
@@ -264,11 +264,11 @@ public class PlayerController : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
-        if (context.started && touchingDirections.IsGrounded && CanMove && !(Time.time - lastDash < mStatsFinalCached.mStatValues[eStatsNames.CoolDownDash.ToString()]))
+        if (context.started && touchingDirections.IsGrounded && CanMove && !(Time.time - lastDash < mStats.GetFinalStat(eStatsNames.CoolDownDash)))
         {
             lastDash = Time.time;
             animator.SetTrigger("Dash");
-            rb.velocity = new Vector2(moveInput.x * mStatsFinalCached.mStatValues[eStatsNames.DashSpeed.ToString()], rb.velocity.y);
+            rb.velocity = new Vector2(moveInput.x * mStats.GetFinalStat(eStatsNames.DashSpeed), rb.velocity.y);
         }
     }
 
@@ -290,60 +290,19 @@ public class PlayerController : MonoBehaviour
     }
 
 
-
-    // ===================================
-    // Stats
-    // ===================================
-
-    // Adds values in stats into mStatsBonusAdd
-    public void AddStatsAddition(cStatsDescriptor stats)
-    {
-        mStatsBonusAdd.CombineByAddition(stats);
-        UpdateStats();
-    }
-
-    // Adds values in stats into mStatsBonusMult
-    public void AddStatsMultipliers(cStatsDescriptor stats)
-    {
-        mStatsBonusMult.CombineByAddition(stats);
-        UpdateStats();
-    }
-
-
     private void BuildStats()
     {
-        mStatsBase = new cStatsDescriptor();
-        mStatsBonusAdd = new cStatsDescriptor();
-        mStatsBonusMult = new cStatsDescriptor();
+        cStatsDescriptor baseValues = new cStatsDescriptor();
+        baseValues.mStatValues[eStatsNames.RunSpeed.ToString()] = 4f;
+        baseValues.mStatValues[eStatsNames.AirWalkSpeed.ToString()] = 4f;
+        baseValues.mStatValues[eStatsNames.AirWallSpeed.ToString()] = 4f;
+        baseValues.mStatValues[eStatsNames.DashSpeed.ToString()] = 6f;
+        baseValues.mStatValues[eStatsNames.JumpImpulse.ToString()] = 7f;
+        baseValues.mStatValues[eStatsNames.CoolDownAttack.ToString()] = 0.5f;
+        baseValues.mStatValues[eStatsNames.CoolDownDash.ToString()] = 2f;
+        baseValues.mStatValues[eStatsNames.Health.ToString()] = 100f;
+        baseValues.mStatValues[eStatsNames.MaxHealth.ToString()] = 100f;
 
-        mStatsBonusAdd.ApplyOnEveryStat(val => 0); // (val) => {return  0}. Sets all values to 0
-        mStatsBonusMult.ApplyOnEveryStat(val => 1); // All to 1
-
-        mStatsBase.mStatValues[eStatsNames.RunSpeed.ToString()] = 4f;
-        mStatsBase.mStatValues[eStatsNames.AirWalkSpeed.ToString()] = 4f;
-        mStatsBase.mStatValues[eStatsNames.AirWallSpeed.ToString()] = 4f;
-        mStatsBase.mStatValues[eStatsNames.DashSpeed.ToString()] = 6f;
-        mStatsBase.mStatValues[eStatsNames.JumpImpulse.ToString()] = 7f;
-        mStatsBase.mStatValues[eStatsNames.CoolDownAttack.ToString()] = 0.5f;
-        mStatsBase.mStatValues[eStatsNames.CoolDownDash.ToString()] = 2f;
-
-        UpdateStats();
-    }
-
-
-    public cStatsDescriptor GetFinalStats()
-    {
-        cStatsDescriptor output = new cStatsDescriptor();
-        output.CombineByAddition(mStatsBase);
-        output.CombineByAddition(mStatsBonusAdd);
-        output.CombineByMultiplication(mStatsBonusMult);
-
-        return output;
-    }
-
-
-    private void UpdateStats()
-    {
-        mStatsFinalCached = GetFinalStats();
+        mStats.SetBaseStats(baseValues);
     }
 }

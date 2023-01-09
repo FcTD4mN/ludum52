@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 8418312446951119582}
   - component: {fileID: 8418312446951119583}
   - component: {fileID: 8418312446951119580}
+  - component: {fileID: -92727437768939244}
   m_Layer: 9
   m_Name: SkeletonEnemy
   m_TagString: Untagged
@@ -209,10 +210,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 088befbb799d2fe47861c7996a4b41ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  health: 100
   isInvincible: 0
   invincibilityCooldown: 0.25
+--- !u!114 &-92727437768939244
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8418312446951119556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98c1418baeb96034aa9ac090d5f851eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8418312447452235654
 GameObject:
   m_ObjectHideFlags: 0
