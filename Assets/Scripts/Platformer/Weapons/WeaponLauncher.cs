@@ -87,7 +87,12 @@ public class WeaponLauncher : MonoBehaviour
     public void FireArrow()
     {
         // Instantiate arrow
-        GameObject arrowPrefab = Resources.Load<GameObject>("Prefabs/Platformer/Character/Arrow");
+        GameObject arrowPrefab = null;
+        if (availableArrowType[currentArrowType] == cResourceDescriptor.eResourceNames.Arrows)
+            arrowPrefab = Resources.Load<GameObject>("Prefabs/Platformer/Character/Arrow");
+        else
+            arrowPrefab = Resources.Load<GameObject>("Prefabs/Platformer/Character/FireArrow");
+
         GameObject arrow = Instantiate(arrowPrefab, transform.position, arrowPrefab.transform.rotation);
 
         // Retrieve direction to next WP
