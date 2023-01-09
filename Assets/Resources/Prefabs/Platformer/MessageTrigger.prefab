@@ -25,8 +25,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5493641354294912728}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.3200035, y: -0.34326243, z: -0.08446437}
-  m_LocalScale: {x: 1, y: 0.14184397, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5985703564163090173}
@@ -110,7 +110,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6901981303931509857}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 57.792645, y: -1.1616778, z: 0.5844644}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -158,5 +158,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isActive: 0
   interactablePrefab: {fileID: 0}
+  mIsFirstTimeInteracting: 1
   mMessage: Coucou
   mDuration: 5
