@@ -5,6 +5,22 @@ using UnityEngine;
 public class InteractableNPC : Interactable
 {
     public UnlockableAction unlockedAction;
+    private Animator animator;
+
+    void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
+
+    void Update()
+    {
+        if (!isActive)
+        {
+            Debug.Log("Move position : " + transform.position.x);
+            transform.position = new Vector3(transform.position.x + (0.001f * transform.localScale.x), transform.position.y, transform.position.z);
+        }
+
+    }
 
     public override void Interact()
     {
@@ -24,6 +40,7 @@ public class InteractableNPC : Interactable
             }
 
             // Set animation for leaving
+            animator.SetBool("isRunning", true);
             isActive = false;
         }
     }

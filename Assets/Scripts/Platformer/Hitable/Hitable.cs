@@ -41,24 +41,23 @@ public class Hitable : MonoBehaviour
     public float invincibilityCooldown = 0.25f;
     float timeSinceHit = 0;
 
-    Animator animator;
+    protected Animator animator;
 
     // Start is called before the first frame update
-    void OnEnable()
+    public virtual void OnEnable()
     {
-        animator = GetComponent<Animator>();
         mStats = GetComponent<HasStats>();
         if (mStats.GetBaseStat(cStatsDescriptor.eStatsNames.MaxHealth) == 0)
         {
             mStats.SetBaseStat(cStatsDescriptor.eStatsNames.MaxHealth, 100);
         }
-        if( mStats.GetBaseStat(cStatsDescriptor.eStatsNames.Health) == 0 )
+        if (mStats.GetBaseStat(cStatsDescriptor.eStatsNames.Health) == 0)
         {
-            mStats.SetBaseStat( cStatsDescriptor.eStatsNames.Health, mStats.GetBaseStat(cStatsDescriptor.eStatsNames.MaxHealth) );
+            mStats.SetBaseStat(cStatsDescriptor.eStatsNames.Health, mStats.GetBaseStat(cStatsDescriptor.eStatsNames.MaxHealth));
         }
     }
 
-    void Update()
+    public virtual void Update()
     {
         if (isInvincible)
         {
@@ -73,11 +72,11 @@ public class Hitable : MonoBehaviour
         }
     }
 
-    public void Hit(int damage)
+    public virtual void Hit(int damage)
     {
         if (IsAlive && !isInvincible)
         {
-            GameManager.mUIManager.FloatingMessage(damage.ToString(), Color.red, transform.position );
+            GameManager.mUIManager.FloatingMessage(damage.ToString(), Color.red, transform.position);
             Health -= damage;
             isInvincible = true;
             animator.SetTrigger("Hurt");
