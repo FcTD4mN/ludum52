@@ -226,30 +226,49 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (touchingDirections.IsGrounded)
         {
-            // Swap direction if aiming to player's opposite side
-            if ((IsFacingRight && !IsAimingRight) || (!IsFacingRight && IsAimingRight))
+            if (context.started)
             {
-                SwapDirection();
-            }
-        }
-        else if (context.canceled)
-        {
-            // Release click
-            // Left click
-            if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0)
-            {
-                // Check cooldown
-                if (Time.time - lastAttack < mStats.GetFinalStat(eStatsNames.CoolDownAttack))
+                // Left click
+                // Swap direction if aiming to player's opposite side
+                if ((IsFacingRight && !IsAimingRight) || (!IsFacingRight && IsAimingRight))
                 {
-                    return;
+                    SwapDirection();
                 }
 
-                lastAttack = Time.time;
-                animator.SetTrigger("Attack");
+                animator.SetTrigger("HoldAttack");
+            }
+            else if (context.canceled)
+            {
+                // Release click
+                if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0)
+                {
+                    // Check cooldown
+                    if (Time.time - lastAttack < mStats.GetFinalStat(eStatsNames.CoolDownAttack))
+                    {
+                        return;
+                    }
+
+                    lastAttack = Time.time;
+                    animator.SetTrigger("Attack");
+                }
             }
         }
+        else
+        {
+            if (context.started)
+            {
+                // Swap direction if aiming to player's opposite side
+                if ((IsFacingRight && !IsAimingRight) || (!IsFacingRight && IsAimingRight))
+                {
+                    SwapDirection();
+                }
+                animator.SetTrigger("Attack");
+            }
+
+        }
+
     }
 
     public void OnSwitchArrow(InputAction.CallbackContext context)

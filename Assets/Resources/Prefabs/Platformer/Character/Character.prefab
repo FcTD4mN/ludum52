@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0.9811321, g: 0.38412246, b: 0.38412246, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -493,6 +493,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 00af8f22-5222-47dc-96c3-1d601b75cd55
     m_ActionName: Player/Throw[/Mouse/rightButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 9bd81c9e-d507-4d66-8cf7-10bac624c61a
+    m_ActionName: Player/SwitchArrow[/Keyboard/r]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -559,6 +563,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowDamage: 10
   arrowSpeed: 15
+  availableArrowType: 
   bombDamage: 10
   bombSpeed: 5
   bombPushForce: 4
@@ -567,7 +572,6 @@ MonoBehaviour:
   bombPrefab: {fileID: 277352446469954537, guid: 29f3a366c4c8fde4abab7c18678798a0, type: 3}
   launchPoint: {fileID: 3721850691752255772}
   launchOffset: {x: 0.1, y: 0.1, z: 0.1}
-  targetPos: {x: 0, y: 0, z: 0}
 --- !u!114 &1127810768080280749
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -580,8 +584,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 088befbb799d2fe47861c7996a4b41ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  health: 100
   isInvincible: 0
   invincibilityCooldown: 0.5
 --- !u!114 &2230036051973603813
