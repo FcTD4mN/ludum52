@@ -95,8 +95,6 @@ public class Enemy : MonoBehaviour
 
     protected void FlipDirection()
     {
-        Debug.Log("Flip enemy parent");
-
         if (WalkDirection == WalkableDirection.Right)
         {
             WalkDirection = WalkableDirection.Left;

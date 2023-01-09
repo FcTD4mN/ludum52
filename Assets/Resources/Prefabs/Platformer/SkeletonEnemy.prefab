@@ -1,5 +1,77 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4471722296688704949
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 856572203611037170}
+  - component: {fileID: 1387468274537423373}
+  - component: {fileID: 2345701801206033979}
+  m_Layer: 10
+  m_Name: BackDetectionZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &856572203611037170
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4471722296688704949}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.778, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8418312446951119554}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1387468274537423373
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4471722296688704949}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!114 &2345701801206033979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4471722296688704949}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dc671b5a711dc6479a1b41f128a2dbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  detectedColliders: []
 --- !u!1 &8418312446951119556
 GameObject:
   m_ObjectHideFlags: 0
@@ -13,10 +85,10 @@ GameObject:
   - component: {fileID: 8418312446951119555}
   - component: {fileID: 8418312446951119552}
   - component: {fileID: 8418312446951119553}
-  - component: {fileID: 8418312446951119582}
   - component: {fileID: 8418312446951119583}
   - component: {fileID: 8418312446951119580}
   - component: {fileID: -92727437768939244}
+  - component: {fileID: 508624551160374759}
   m_Layer: 9
   m_Name: SkeletonEnemy
   m_TagString: Untagged
@@ -38,6 +110,7 @@ Transform:
   m_Children:
   - {fileID: 8418312447722097184}
   - {fileID: 8418312447452235655}
+  - {fileID: 856572203611037170}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -150,22 +223,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0.12596929, y: -0.010358393}
   m_Size: {x: 0.43801045, y: 0.95013106}
   m_Direction: 0
---- !u!114 &8418312446951119582
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8418312446951119556}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40add6762a0198a4ea1f9ba0f7181d27, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  walkSpeed: 1
-  walkStopRate: 0.05
-  attackZone: {fileID: 8418312447722097214}
-  _hasTarget: 0
 --- !u!114 &8418312446951119583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,6 +281,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98c1418baeb96034aa9ac090d5f851eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &508624551160374759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8418312446951119556}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e3d4de52623ca847a42fc46d4c72bb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkSpeed: 1
+  walkStopRate: 0.05
+  attackZone: {fileID: 8418312447722097214}
+  _hasTarget: 0
+  backZone: {fileID: 2345701801206033979}
 --- !u!1 &8418312447452235654
 GameObject:
   m_ObjectHideFlags: 0
