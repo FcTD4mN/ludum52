@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class InteractableFireVein : Interactable
 {
     override public void Interact()

@@ -285,7 +285,6 @@ public class PlayerController : MonoBehaviour
         if (context.started && currentInteractable != null)
         {
             currentInteractable.Interact();
-            currentInteractable.isActive = false;
         }
     }
 

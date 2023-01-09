@@ -38,15 +38,12 @@ public class BuffBuilding : ProductionBuilding
     public override void SetPause( bool state )
     {
         base.SetPause( state );
-        Debug.Log("Pause: " + state);
         if( state )
         {
-            Debug.Log("Retracts");
             RetractStats();
         }
         else
         {
-            Debug.Log("Applies");
             ApplyStats();
         }
     }
@@ -56,10 +53,8 @@ public class BuffBuilding : ProductionBuilding
         if( mStatsAreApplied ) { return; }
         mStatsAreApplied = true;
 
-        Debug.Log("DoApply");
-
+        if (GameManager.mInstance.playerCtrler == null) { return; }
         HasStats playerStats = GameManager.mInstance.playerCtrler.GetComponent<HasStats>();
-        if (playerStats.gameObject == null) { return; }
 
         if( mAdds ) {
             playerStats.AddStatsAddition(mStatsModifiers);
@@ -73,10 +68,8 @@ public class BuffBuilding : ProductionBuilding
         if (!mStatsAreApplied) { return; }
         mStatsAreApplied = false;
 
-        Debug.Log("DoRetract");
-
+        if( GameManager.mInstance.playerCtrler == null ) { return; }
         HasStats playerStats = GameManager.mInstance.playerCtrler.GetComponent<HasStats>();
-        if( playerStats.gameObject == null ) { return; }
 
         cStatsDescriptor inverse = new cStatsDescriptor(mStatsModifiers);
         inverse.ApplyOnEveryStat(val => -val);

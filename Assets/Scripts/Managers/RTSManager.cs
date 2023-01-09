@@ -36,7 +36,9 @@ public class RTSManager : MonoBehaviour
         Forge,
         BombFactory,
         BuffDamage,
-        BuffCooldown
+        BuffCooldown,
+        BuffSpeed,
+        BuffJump
     }
     public List<eBuildingList> mUnlockedBuildings;
 
@@ -61,9 +63,7 @@ public class RTSManager : MonoBehaviour
 
         mUnlockedBuildings = new List<eBuildingList>();
         mUnlockedBuildings.Add( eBuildingList.IronHarvester );
-        mUnlockedBuildings.Add( eBuildingList.FireMine );
-        mUnlockedBuildings.Add( eBuildingList.Forge );
-        mUnlockedBuildings.Add( eBuildingList.BuffDamage );
+        mUnlockedBuildings.Add( eBuildingList.Forge ); ;
     }
 
 
@@ -258,7 +258,7 @@ public class RTSManager : MonoBehaviour
 
     public bool CanLevelUp()
     {
-        int nonHarvesterCount = mAllProductionBuildings.Count - mAllHarvesters.Count;
+        int nonHarvesterCount = mAllProductionBuildings.Count - mAllHarvesters.Count - mAllBuffBuildings.Count;
         return  nonHarvesterCount == mTowerLevel*2;
     }
 
@@ -276,6 +276,7 @@ public class RTSManager : MonoBehaviour
 
         foreach (Transform gg in newTowerFloor.transform)
         {
+            GameManager.mUIManager.mBuildableObjects.Add( gg.gameObject );
             GameManager.mUIManager.CreateBuildButtonOverObject(gg.gameObject);
         }
 
@@ -296,6 +297,7 @@ public class RTSManager : MonoBehaviour
 
         foreach (Transform gg in newTowerFloor.transform)
         {
+            GameManager.mUIManager.mBuildableObjects.Add(gg.gameObject);
             GameManager.mUIManager.CreateBuildButtonOverObject(gg.gameObject);
         }
 

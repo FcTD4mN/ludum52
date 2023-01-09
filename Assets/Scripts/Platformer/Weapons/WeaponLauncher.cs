@@ -130,12 +130,20 @@ public class WeaponLauncher : MonoBehaviour
     // Handle Aim draw for bomb :
     void OnDragStart()
     {
+        if( (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0 ) {
+            return;
+        }
+
         startPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         traj.Show();
     }
 
     void OnDrag()
     {
+        if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0) {
+            return;
+        }
+
         endPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         distance = Vector2.Distance(startPoint, endPoint);
         direction = (startPoint - endPoint).normalized;
@@ -146,6 +154,10 @@ public class WeaponLauncher : MonoBehaviour
 
     void OnDragEnd()
     {
+        if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0) {
+            return;
+        }
+
         // Throw the bomb
         AimLaunchBomb(GameManager.mInstance.playerCtrler.IsFacingRight ? true : false, force);
         traj.Hide();

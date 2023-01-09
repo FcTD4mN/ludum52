@@ -22,6 +22,8 @@ public class UIManager : MonoBehaviour
     private Button mButtonBombFactory;
     private Button mButtonDamage;
     private Button mButtonCooldown;
+    private Button mButtonSpeed;
+    private Button mButtonJump;
 
     // Info panel
     private GameObject mInfoPanel;
@@ -58,6 +60,8 @@ public class UIManager : MonoBehaviour
         mBuildMenu = mCanvas.transform.Find("BuildMenu")?.gameObject;
         mButtonDamage = GameObject.Find("ButtonDamage")?.gameObject.GetComponent<Button>();
         mButtonCooldown = GameObject.Find("ButtonCooldown")?.gameObject.GetComponent<Button>();
+        mButtonSpeed = GameObject.Find("ButtonSpeed")?.gameObject.GetComponent<Button>();
+        mButtonJump = GameObject.Find("ButtonJump")?.gameObject.GetComponent<Button>();
         mButtonForge = GameObject.Find("ButtonForge")?.gameObject.GetComponent<Button>();
         mButtonBombFactory = GameObject.Find("ButtonBombFactory")?.gameObject.GetComponent<Button>();
         BuildBuildMenu();
@@ -70,6 +74,8 @@ public class UIManager : MonoBehaviour
         mBuildButtons = new List<GameObject>();
         mBuildButtons.Add( mButtonDamage.gameObject );
         mBuildButtons.Add( mButtonCooldown.gameObject );
+        mBuildButtons.Add( mButtonSpeed.gameObject );
+        mBuildButtons.Add( mButtonJump.gameObject );
         mBuildButtons.Add( mButtonForge.gameObject );
         mBuildButtons.Add( mButtonBombFactory.gameObject );
 
@@ -433,6 +439,20 @@ public class UIManager : MonoBehaviour
             DeleteUIButton(mBuildButtonClicked);
         });
 
+        mButtonSpeed.onClick.AddListener(() =>
+        {
+            mBuildMenu.SetActive(false);
+            GameManager.mRTSManager.BuildObjectAtLocation("BuffBuildingSpeed", mObjectToBuildTo);
+            DeleteUIButton(mBuildButtonClicked);
+        });
+
+        mButtonJump.onClick.AddListener(() =>
+        {
+            mBuildMenu.SetActive(false);
+            GameManager.mRTSManager.BuildObjectAtLocation("BuffBuildingJump", mObjectToBuildTo);
+            DeleteUIButton(mBuildButtonClicked);
+        });
+
     }
 
     // ===================================
@@ -477,6 +497,16 @@ public class UIManager : MonoBehaviour
         {
             mInfoPanelText.text = BombFactory.GetUIDescription(mButtonBombFactory.interactable);
             mInfoPanel.SetActive( true );
+        }
+        else if (mHoveredObject == mButtonSpeed.gameObject)
+        {
+            mInfoPanelText.text = BuffBuildingSpeed.GetUIDescription(mButtonBombFactory.interactable);
+            mInfoPanel.SetActive(true);
+        }
+        else if (mHoveredObject == mButtonJump.gameObject)
+        {
+            mInfoPanelText.text = BuffBuildingJump.GetUIDescription(mButtonBombFactory.interactable);
+            mInfoPanel.SetActive(true);
         }
     }
 }

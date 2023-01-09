@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuffBuildingDamage : BuffBuilding
+public class BuffBuildingSpeed : BuffBuilding
 {
     public static cResourceDescriptor GetResourceDescriptor()
     {
@@ -11,7 +11,7 @@ public class BuffBuildingDamage : BuffBuilding
         output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 500;
         output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron.ToString()] = 500;
         output.mInputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 2;
-        output.mInputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 1;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 4;
         return output;
     }
 
@@ -19,7 +19,10 @@ public class BuffBuildingDamage : BuffBuilding
     {
         cStatsDescriptor output = new cStatsDescriptor();
 
-        output.mStatValues[cStatsDescriptor.eStatsNames.Damage.ToString()] = 10;
+        output.mStatValues[cStatsDescriptor.eStatsNames.RunSpeed.ToString()] = 1;
+        output.mStatValues[cStatsDescriptor.eStatsNames.AirWalkSpeed.ToString()] = 1;
+        output.mStatValues[cStatsDescriptor.eStatsNames.DashSpeed.ToString()] = 1;
+        output.mStatValues[cStatsDescriptor.eStatsNames.AirWallSpeed.ToString()] = 1;
 
         return output;
     }
@@ -45,7 +48,7 @@ public class BuffBuildingDamage : BuffBuilding
             }
         }
 
-        return GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffDamage);
+        return GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffSpeed);
     }
 
 
@@ -60,7 +63,7 @@ public class BuffBuildingDamage : BuffBuilding
             }
         }
 
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffDamage))
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffSpeed))
         {
             return RTSManager.eBuildingErrors.BlueprintRequired;
         }
@@ -71,7 +74,7 @@ public class BuffBuildingDamage : BuffBuilding
 
     public static string GetUIDescription(bool isAllowed)
     {
-        string name = "Damage Buff";
+        string name = "Speed buff";
         string description = "Gives buff in exchange of resources";
 
         RTSManager.eBuildingErrors error = BuffBuildingDamage.GetBuildingError();
@@ -90,7 +93,7 @@ public class BuffBuildingDamage : BuffBuilding
                 break;
         }
 
-        return BuffBuilding.GetBuffBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor(), GetStatsDescriptor() );
+        return BuffBuilding.GetBuffBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor(), GetStatsDescriptor());
     }
 
 
