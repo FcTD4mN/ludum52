@@ -261,11 +261,13 @@ public class PlayerController : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
-        if (context.started && touchingDirections.IsGrounded && CanMove && !(Time.time - lastDash < mStats.GetFinalStat(eStatsNames.CoolDownDash)))
+        bool cooledDown = (Time.time - lastDash < mStats.GetFinalStat(eStatsNames.CoolDownDash));
+        bool unlocked = GameManager.mInstance.IsUnlockAction(UnlockableAction.Dash);
+        if (context.started && CanMove && unlocked && !cooledDown)
         {
             lastDash = Time.time;
             animator.SetTrigger("Dash");
-            rb.velocity = new Vector2(moveInput.x * mStats.GetFinalStat(eStatsNames.DashSpeed), rb.velocity.y);
+            rb.velocity = new Vector2(moveInput.x * mStats.GetFinalStat(eStatsNames.DashSpeed) * 3f, rb.velocity.y);
         }
     }
 

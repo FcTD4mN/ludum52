@@ -91,7 +91,6 @@ public class GameManager : MonoBehaviour
     public void UnlockAction(UnlockableAction action)
     {
         unlockedActions.Add(action);
-        Debug.Log("We unlock this action :" + action);
     }
 
     public bool IsUnlockAction(UnlockableAction action)
@@ -100,4 +99,4 @@ public class GameManager : MonoBehaviour
     }
 }
 
-public enum UnlockableAction { DoubleJump, WallJump };
+public enum UnlockableAction { DoubleJump, WallJump, Dash };

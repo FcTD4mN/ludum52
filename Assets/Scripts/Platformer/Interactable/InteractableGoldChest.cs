@@ -40,7 +40,7 @@ public class InteractableGoldChest : Interactable
 
         for (int i = 0; i < nbGold; i++)
         {
-            loot.Add(Random.Range(minSmallLoot, maxSmallLoot));
+            loot.Add(Random.Range(cMin, cMax));
         }
     }
 
@@ -50,7 +50,7 @@ public class InteractableGoldChest : Interactable
         if (isActive)
         {
             interactBtn.SetActive(false);
-            Vector2 launchPoint = new Vector2(transform.position.x + 0.1f, transform.position.y);
+            Vector2 launchPoint = new Vector2(transform.position.x + (0.1f * transform.localScale.x), transform.position.y);
             float spacingRatio = 0f;
 
             for (int i = 0; i < loot.Count; i++)
@@ -62,7 +62,7 @@ public class InteractableGoldChest : Interactable
                 );
 
                 Rigidbody2D rb = gold.GetComponent<Rigidbody2D>();
-                rb.velocity = new Vector2(3f, 1f);
+                rb.velocity = new Vector2(transform.localScale.x * 3f, 1f);
                 spacingRatio += 0.3f;
             }
 

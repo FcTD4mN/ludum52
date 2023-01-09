@@ -12,7 +12,7 @@ public class InteractableBPChest : Interactable
         if (isActive)
         {
             interactBtn.SetActive(false);
-            Vector2 launchPoint = new Vector2(transform.position.x + 0.5f, transform.position.y);
+            Vector2 launchPoint = new Vector2(transform.position.x + (0.5f * transform.localScale.x), transform.position.y);
 
             GameObject bpPrefab = Instantiate(
                 interactablePrefab,
@@ -23,7 +23,7 @@ public class InteractableBPChest : Interactable
             Rigidbody2D rb = bpPrefab.GetComponent<Rigidbody2D>();
             BPCollectable bp = bpPrefab.GetComponent<BPCollectable>();
             bp.bluePrint = bluePrintChest;
-            rb.velocity = new Vector2(2f, 4f);
+            rb.velocity = new Vector2(transform.localScale.x * 2f, 4f);
             isActive = false;
         }
     }
