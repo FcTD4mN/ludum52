@@ -10,6 +10,11 @@ abstract public class Interactable : MonoBehaviour
     public GameObject interactablePrefab;
     internal bool mShowButton = true;
 
+    // Message part
+    public bool mIsFirstTimeInteracting = true;
+    public string mMessage;
+    public float mDuration;
+
     void OnEnable()
     {
         Initialize();
@@ -27,7 +32,7 @@ abstract public class Interactable : MonoBehaviour
         if (coll.name == "Character" && isActive)
         {
             // Display 'E' keyboard + action text
-            interactBtn.SetActive( mShowButton );
+            interactBtn.SetActive(mShowButton);
             GameManager.mInstance.playerCtrler.currentInteractable = this;
             DisplayFirstTimeHelp();
         }

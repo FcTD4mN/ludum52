@@ -138,7 +138,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isActive: 0
   interactablePrefab: {fileID: 0}
-  bluePrintChest: 0
+  unlockedAction: 0
+  mIsFirstTimeInteracting: 1
+  mMessage: "Double Jump d\xE9bloqu\xE9 !"
+  mDuration: 3
 --- !u!1 &97135359635128165
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,18 +5,24 @@ using UnityEngine;
 public class BPCollectable : Collectable
 {
     public BluePrint bluePrint;
+    private bool mIsFirstTimeInteracting;
 
     void OnEnable()
     {
         Initialize();
+        mIsFirstTimeInteracting = true;
         label = "BluePrint";
     }
 
     public override void Collect()
     {
         base.Collect();
-        Debug.Log("Unlock this blueprint : " + bluePrint);
-        //GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Gold.ToString(), value, true);
+        // Show message 
+        if (mIsFirstTimeInteracting)
+        {
+            GameManager.mUIManager.DisplayMessage("<size=100%><color=#49b6ba>Blueprint UNLOCKED</color></size><br><size=80%><color=#BA4D49>" + bluePrint.ToString() + "</color> building unlocked !<br>Check your base [tab]</size>", 5f);
+            mIsFirstTimeInteracting = false;
+        }
     }
 }
 public enum BluePrint { Damage, Jump, Speed };

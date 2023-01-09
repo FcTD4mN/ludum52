@@ -16,6 +16,13 @@ public class InteractableNPC : Interactable
             // Unlock action (pour l'instant j'ai foutu ça dans le GM)
             GameManager.mInstance.UnlockAction(unlockedAction);
 
+            // Show message 
+            if (mIsFirstTimeInteracting)
+            {
+                GameManager.mUIManager.DisplayMessage(mMessage, mDuration);
+                mIsFirstTimeInteracting = false;
+            }
+
             // Set animation for leaving
             isActive = false;
         }
