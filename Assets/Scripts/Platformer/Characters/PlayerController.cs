@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
 
     // References to GameObject or Scripts
     GameObject aimAssist;
+    GameObject rotationPoint;
     WeaponLauncher bow;
 
     [HideInInspector]
@@ -84,6 +85,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public bool IsAimingRight
+    {
+        get
+        {
+            Vector2 camPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            return (camPos.x >= gameObject.transform.position.x);
+        }
+    }
+
     public bool IsDashing
     {
         get
@@ -138,6 +148,7 @@ public class PlayerController : MonoBehaviour
         touchingDirections = GetComponent<TouchingDirections>();
         bow = GetComponent<WeaponLauncher>();
         aimAssist = GameObject.Find("AimAssist");
+        rotationPoint = GameObject.Find("RotationPoint");
         lastAttack = -10f;
         lastDash = -10f;
 
@@ -182,6 +193,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void SwapDirection()
+    {
+        IsFacingRight = !IsFacingRight;
+    }
+
     public void OnJump(InputAction.CallbackContext context)
     {
         // @TODO : check if he's alive also.
@@ -190,19 +206,19 @@ public class PlayerController : MonoBehaviour
             if (touchingDirections.IsGrounded)
             {
                 animator.SetTrigger("Jump");
-                rb.velocity = new Vector2(rb.velocity.x, mStats.GetFinalStat( eStatsNames.JumpImpulse ));
+                rb.velocity = new Vector2(rb.velocity.x, mStats.GetFinalStat(eStatsNames.JumpImpulse));
             }
             else if (touchingDirections.IsOnWall)
             {
                 // @TODO : jump direction based on wall direction ?
                 animator.SetTrigger("WallJump");
-                rb.velocity = new Vector2(-( moveInput.x * mStats.GetFinalStat(eStatsNames.AirWallSpeed) ),
-                                            mStats.GetFinalStat( eStatsNames.JumpImpulse ) );
+                rb.velocity = new Vector2(-(moveInput.x * mStats.GetFinalStat(eStatsNames.AirWallSpeed)),
+                                            mStats.GetFinalStat(eStatsNames.JumpImpulse));
             }
             else if (CanDoubleJump)
             {
                 animator.SetTrigger("DoubleJump");
-                rb.velocity = new Vector2(rb.velocity.x, mStats.GetFinalStat( eStatsNames.JumpImpulse ) );
+                rb.velocity = new Vector2(rb.velocity.x, mStats.GetFinalStat(eStatsNames.JumpImpulse));
             }
         }
     }
@@ -211,16 +227,23 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            if( (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0 )
+            // SwapDirection();
+            if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0)
             {
-                SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
-                bow.targetPos = sr.transform.position;
-
                 // Check cooldown
-                if ( Time.time - lastAttack < mStats.GetFinalStat(eStatsNames.CoolDownAttack) )
+                if (Time.time - lastAttack < mStats.GetFinalStat(eStatsNames.CoolDownAttack))
                 {
                     return;
                 }
+
+                // Swap direction if aiming to player's opposite side
+                if ((IsFacingRight && !IsAimingRight) || (!IsFacingRight && IsAimingRight))
+                {
+                    SwapDirection();
+                }
+
+                SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
+                bow.targetPos = sr.transform.position;
 
                 lastAttack = Time.time;
                 animator.SetTrigger("Attack");
@@ -232,7 +255,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            if( (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) > 0 )
+            if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) > 0)
             {
                 bow.LaunchBomb(IsFacingRight ? true : false);
             }
@@ -241,7 +264,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnDash(InputAction.CallbackContext context)
     {
-        if (context.started && touchingDirections.IsGrounded && CanMove && !(Time.time - lastDash < mStats.GetFinalStat( eStatsNames.CoolDownDash )))
+        if (context.started && touchingDirections.IsGrounded && CanMove && !(Time.time - lastDash < mStats.GetFinalStat(eStatsNames.CoolDownDash)))
         {
             lastDash = Time.time;
             animator.SetTrigger("Dash");
@@ -280,6 +303,6 @@ public class PlayerController : MonoBehaviour
         baseValues.mStatValues[eStatsNames.Health.ToString()] = 100f;
         baseValues.mStatValues[eStatsNames.MaxHealth.ToString()] = 100f;
 
-        mStats.SetBaseStats( baseValues );
+        mStats.SetBaseStats(baseValues);
     }
 }

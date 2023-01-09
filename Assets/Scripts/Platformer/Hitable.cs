@@ -33,7 +33,6 @@ public class Hitable : MonoBehaviour
         {
             isAlive = value;
             animator.SetBool("isAlive", value);
-            Debug.Log("Alive valute : " + IsAlive);
         }
     }
 
@@ -76,13 +75,11 @@ public class Hitable : MonoBehaviour
 
     public void Hit(int damage)
     {
-        // Debug.Log("We hit the object named : " + gameObject.name);
         if (IsAlive && !isInvincible)
         {
             Health -= damage;
             isInvincible = true;
             animator.SetTrigger("Hurt");
-            // Debug.Log("health = " + Health);
         }
     }
 
