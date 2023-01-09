@@ -25,7 +25,7 @@ public class ResourceManager : MonoBehaviour
             mResourcesAvailable[resourceName] = 0f;
         }
 
-        mResourcesAvailable[eResourceNames.Gold.ToString()] = 10000;
+        mResourcesAvailable[eResourceNames.Gold.ToString()] = 1900;
         mResourcesAvailable[eResourceNames.Iron.ToString()] = 800;
         mResourcesAvailable[eResourceNames.Arrows.ToString()] = 30;
     }
@@ -192,13 +192,14 @@ public class cResourceDescriptor
     public string PrintCompleteDescription( string name, string description, string error )
     {
         string outputString = "";
+        string redColor = "<color=#EB0800>";
 
         outputString = name + "\n" + description + "\n";
 
         outputString += "\n";
         if( error != "" )
         {
-            outputString += "    Issue: " + error;
+            outputString += redColor + "Issue: " + error + "</color>";
             outputString += "\n";
             outputString += "\n";
             outputString += "\n";
@@ -211,7 +212,11 @@ public class cResourceDescriptor
             if( mBuildCosts[resourceName] == 0 ) { continue; }
             atLeastOne = true;
 
-            outputString += "    " + resourceName + ": " + mBuildCosts[resourceName] + "\n";
+            bool hasEnough = mBuildCosts[resourceName] <= GameManager.mResourceManager.GetRessource(resourceName);
+            string colorBalise = hasEnough ? "" : redColor;
+            string colorBaliseEnd = hasEnough ? "" : "</color>";
+
+            outputString += "    " + colorBalise + resourceName + ": " + mBuildCosts[resourceName] + colorBaliseEnd + "\n";
         }
         if( !atLeastOne ) {
             outputString += "    None\n";

@@ -51,6 +51,11 @@ public class BuffBuildingDamage : BuffBuilding
 
     public static RTSManager.eBuildingErrors GetBuildingError()
     {
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffDamage))
+        {
+            return RTSManager.eBuildingErrors.BlueprintRequired;
+        }
+
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
         foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
         {
@@ -58,11 +63,6 @@ public class BuffBuildingDamage : BuffBuilding
             {
                 return RTSManager.eBuildingErrors.NotEnoughRessources;
             }
-        }
-
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffDamage))
-        {
-            return RTSManager.eBuildingErrors.BlueprintRequired;
         }
 
         return RTSManager.eBuildingErrors.None;

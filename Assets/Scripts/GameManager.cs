@@ -14,10 +14,17 @@ public class GameManager : MonoBehaviour
     public PortalManager mPortalManager;
 
     private bool mIsInRTSMode = false;
+    private bool mFirstTime = true;
 
     // PlayerController Ref
     [HideInInspector]
     public PlayerController playerCtrler;
+
+
+    static void CheckIfExists()
+    {
+        if (GameManager.mInstance != null) { return; }
+    }
 
     // Start is called before the first frame update
     void OnEnable()
@@ -65,6 +72,21 @@ public class GameManager : MonoBehaviour
     {
         if (context.started)
         {
+            if( mFirstTime )
+            {
+                mFirstTime = false;
+                string text = "<color=#9eb54a>THE BASE</color>";
+                text += "<br>";
+                text += "<size=60%>This is where you build and manage your productions.";
+                text += "<br>";
+                text += "Every building costs resources to build and to operate.";
+                text += "<br>";
+                text += "Once built, it will produce either resources or buff some stats.";
+                text += "</size>";
+
+                mUIManager.DisplayMessage( text, 10 );
+            }
+
             mIsInRTSMode = !mIsInRTSMode;
 
             CinemachineBrain cervoCamera = Camera.main.GetComponent<CinemachineBrain>();
@@ -90,7 +112,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Faire ca plus propre un jour : 
+    // Faire ca plus propre un jour :
     public List<UnlockableAction> unlockedActions = new List<UnlockableAction>();
 
     public void UnlockAction(UnlockableAction action)

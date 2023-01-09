@@ -49,13 +49,6 @@ public class RTSManager : MonoBehaviour
     // ===================================
     public void Initialize()
     {
-        mRTSWorld = GameObject.Find("RTSWorld")?.gameObject;
-        mTowers = new List<GameObject>();
-        mTowers.Add( GameObject.Find("Tower")?.gameObject );
-
-        mBuffTower = new List<GameObject>();
-        mBuffTower.Add( GameObject.Find("BuffTower")?.gameObject );
-
         mAllProductionBuildings = new List<ProductionBuilding>();
         mAllHarvesters = new List<HarvestingBuilding>();
 
@@ -63,10 +56,19 @@ public class RTSManager : MonoBehaviour
         mBuildingToBuildableRelations = new List<(GameObject, GameObject)>();
 
         mUnlockedBuildings = new List<eBuildingList>();
-        mUnlockedBuildings.Add( eBuildingList.IronHarvester );
-        mUnlockedBuildings.Add( eBuildingList.FireMine );
-        mUnlockedBuildings.Add( eBuildingList.Forge );
-        mUnlockedBuildings.Add( eBuildingList.BuffJump );
+        mUnlockedBuildings.Add(eBuildingList.IronHarvester);
+        mUnlockedBuildings.Add(eBuildingList.FireMine);
+        mUnlockedBuildings.Add(eBuildingList.Forge);
+        mUnlockedBuildings.Add(eBuildingList.BuffJump);
+
+
+        mRTSWorld = GameObject.Find("RTSWorld")?.gameObject;
+        mTowers = new List<GameObject>();
+        mTowers.Add( GameObject.Find("Tower")?.gameObject );
+        mTowers[0].AddComponent( typeof( HarvesterTower ) );
+
+        mBuffTower = new List<GameObject>();
+        mBuffTower.Add( GameObject.Find("BuffTower")?.gameObject );
     }
 
 
@@ -242,7 +244,8 @@ public class RTSManager : MonoBehaviour
 
     public bool CanBuildHarvester()
     {
-        return  mAllHarvesters.Count < mHarvesterSlots;
+        int harvesterCountWithoutTower = mAllHarvesters.Count - 1;
+        return  harvesterCountWithoutTower < mHarvesterSlots;
     }
 
 

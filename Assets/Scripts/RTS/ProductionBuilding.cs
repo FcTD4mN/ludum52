@@ -38,7 +38,6 @@ public class ProductionBuilding : MonoBehaviour
             return  0;
 
         });
-
         Initialize();
         BuildBuilding();
     }
@@ -87,7 +86,6 @@ public class ProductionBuilding : MonoBehaviour
         foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
         {
             GameManager.mResourceManager.AddResource( resourceName, -mResourceDescriptor.mBuildCosts[resourceName], false );
-
         }
     }
 
@@ -95,7 +93,6 @@ public class ProductionBuilding : MonoBehaviour
     public void ProduceResource( float deltaTime )
     {
         if( mIsPaused ) { return; }
-
         // Checking enough input resources are available
         bool enoughResources = true;
         foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
