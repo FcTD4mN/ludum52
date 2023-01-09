@@ -227,7 +227,6 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            // SwapDirection();
             if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0)
             {
                 // Check cooldown
@@ -241,9 +240,6 @@ public class PlayerController : MonoBehaviour
                 {
                     SwapDirection();
                 }
-
-                SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
-                bow.targetPos = sr.transform.position;
 
                 lastAttack = Time.time;
                 animator.SetTrigger("Attack");

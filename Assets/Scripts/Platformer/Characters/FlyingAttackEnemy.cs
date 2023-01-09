@@ -10,8 +10,6 @@ public class FlyingAttackEnemy : FlyingEnemy
 
     public void FireProjectile()
     {
-        Debug.Log("Launch projectile !");
-
         // Instantiate arrow
         GameObject arrowPrefab = Resources.Load<GameObject>("Prefabs/Platformer/EnemyProjectile");
         GameObject arrow = Instantiate(arrowPrefab, transform.position, arrowPrefab.transform.rotation);

@@ -29,9 +29,6 @@ public class WeaponLauncher : MonoBehaviour
     public Transform launchPoint;
     public Vector3 launchOffset;
 
-    [HideInInspector]
-    public Vector3 targetPos;
-
     public void OnEnable()
     {
         firedArrows = new List<GameObject>();
@@ -68,36 +65,33 @@ public class WeaponLauncher : MonoBehaviour
 
     public void FireArrow()
     {
-        // Converting rotation in degree
-        // Vector3 rotation = targetPosWorld - launchPoint.position;
-        // float rotZ;
-        // if (GameManager.mInstance.playerCtrler.IsFacingRight)
-        //     rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
-        // else
-        //     rotZ = Mathf.Atan2(-rotation.y, -rotation.x) * Mathf.Rad2Deg;
-
-        // Quaternion arrowRotation = Quaternion.Euler(0, 0, rotZ);
-
         // Instantiate arrow
-        GameObject arrow = Instantiate(arrowPrefab, launchPoint.position, arrowPrefab.transform.rotation);
+        GameObject arrowPrefab = Resources.Load<GameObject>("Prefabs/Platformer/Arrow");
+        GameObject arrow = Instantiate(arrowPrefab, transform.position, arrowPrefab.transform.rotation);
 
-        // Sending toward direction
-        Rigidbody2D rb = arrow.GetComponent<Rigidbody2D>();
-        Vector3 direction = targetPos - launchPoint.position;
-        Vector2 directionNorm = direction.normalized;
-        rb.velocity = new Vector2(directionNorm.x * arrowSpeed, directionNorm.y * arrowSpeed);
+        // Retrieve direction to next WP
+        // Can be adjusted for AIM ASSIT
+        Vector3 target = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = (target - transform.position).normalized;
 
-        // Face arrow in the right direction
-        Vector3 originScale = arrow.transform.localScale;
-        arrow.transform.localScale = new Vector3(
-            originScale.x * transform.localScale.x > 0 ? 1 : -1,
-            originScale.y,
-            originScale.z
-        );
-
-        firedArrows.Add(arrow);
-        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Arrows.ToString(), -1, false);
+        // Move towards next WP
+        float distance = Vector2.Distance(target, transform.position);
+        Rigidbody2D rbArrow = arrow.GetComponent<Rigidbody2D>();
+        rbArrow.velocity = direction * arrowSpeed;
     }
+
+    // public void FireArrow()
+    // {
+    //     // Converting rotation in degree
+    //     // Vector3 rotation = targetPosWorld - launchPoint.position;
+    //     // float rotZ;
+    //     // if (GameManager.mInstance.playerCtrler.IsFacingRight)
+    //     //     rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
+    //     // else
+    //     //     rotZ = Mathf.Atan2(-rotation.y, -rotation.x) * Mathf.Rad2Deg;
+
+    //     // Quaternion arrowRotation = Quaternion.Euler(0, 0, rotZ);
+    // }
 
     public void LaunchBomb(bool facingRight)
     {
