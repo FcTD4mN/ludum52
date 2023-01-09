@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InteractableChest : Interactable
+public class InteractableGoldChest : Interactable
 {
     [HideInInspector]
     public enum LootType { Small, Medium, Huge };
@@ -49,9 +49,6 @@ public class InteractableChest : Interactable
         // Drop content of the Chest
         if (isActive)
         {
-
-            Debug.Log("Type : " + lootType + " / Contains : " + loot.Count);
-
             interactBtn.SetActive(false);
             Vector2 launchPoint = new Vector2(transform.position.x + 0.1f, transform.position.y);
             float spacingRatio = 0f;
@@ -71,9 +68,5 @@ public class InteractableChest : Interactable
 
             isActive = false;
         }
-    }
-
-    private void GenerateLoot()
-    {
     }
 }
