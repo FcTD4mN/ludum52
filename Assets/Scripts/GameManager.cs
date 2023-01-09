@@ -58,14 +58,14 @@ public class GameManager : MonoBehaviour
 
     public void OnSwitch(InputAction.CallbackContext context)
     {
-        if (context.started )
+        if (context.started)
         {
             mIsInRTSMode = !mIsInRTSMode;
 
             CinemachineBrain cervoCamera = Camera.main.GetComponent<CinemachineBrain>();
             cervoCamera.enabled = !mIsInRTSMode;
 
-            if( mIsInRTSMode )
+            if (mIsInRTSMode)
             {
                 Vector3 positionDeLaTour = mRTSManager.mTowers[0].transform.position;
 
@@ -73,9 +73,9 @@ public class GameManager : MonoBehaviour
                 float towerHalfHeight = mRTSManager.mTowers[0].transform.localScale.y / 2;
                 float floorHeight = 1;
 
-                Camera.main.transform.position = new Vector3( positionDeLaTour.x,
+                Camera.main.transform.position = new Vector3(positionDeLaTour.x,
                                                                 positionDeLaTour.y + camHalfHeight - towerHalfHeight - floorHeight,
-                                                                Camera.main.transform.position.z ) ;
+                                                                Camera.main.transform.position.z);
                 mUIManager.CreateBuildButtonOnEveryBuildableObject();
             }
             else
@@ -84,4 +84,20 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    // Faire ca plus propre un jour : 
+    public List<UnlockableAction> unlockedActions = new List<UnlockableAction>();
+
+    public void UnlockAction(UnlockableAction action)
+    {
+        unlockedActions.Add(action);
+        Debug.Log("We unlock this action :" + action);
+    }
+
+    public bool IsUnlockAction(UnlockableAction action)
+    {
+        return unlockedActions.Contains(action);
+    }
 }
+
+public enum UnlockableAction { DoubleJump, WallJump };

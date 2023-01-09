@@ -208,14 +208,15 @@ public class PlayerController : MonoBehaviour
                 animator.SetTrigger("Jump");
                 rb.velocity = new Vector2(rb.velocity.x, mStats.GetFinalStat(eStatsNames.JumpImpulse));
             }
-            else if (touchingDirections.IsOnWall)
+            else if (touchingDirections.IsOnWall && GameManager.mInstance.IsUnlockAction(UnlockableAction.WallJump))
             {
                 // @TODO : jump direction based on wall direction ?
                 animator.SetTrigger("WallJump");
                 rb.velocity = new Vector2(-(moveInput.x * mStats.GetFinalStat(eStatsNames.AirWallSpeed)),
                                             mStats.GetFinalStat(eStatsNames.JumpImpulse));
+                CanDoubleJump = true;
             }
-            else if (CanDoubleJump)
+            else if (CanDoubleJump && GameManager.mInstance.IsUnlockAction(UnlockableAction.DoubleJump))
             {
                 animator.SetTrigger("DoubleJump");
                 rb.velocity = new Vector2(rb.velocity.x, mStats.GetFinalStat(eStatsNames.JumpImpulse));
