@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
 
     // References to GameObject or Scripts
     GameObject aimAssist;
+    GameObject rotationPoint;
     WeaponLauncher bow;
 
     [HideInInspector]
@@ -87,6 +88,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public bool IsAimingRight
+    {
+        get
+        {
+            Vector2 camPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            return (camPos.x >= gameObject.transform.position.x);
+        }
+    }
+
     public bool IsDashing
     {
         get
@@ -141,6 +151,7 @@ public class PlayerController : MonoBehaviour
         touchingDirections = GetComponent<TouchingDirections>();
         bow = GetComponent<WeaponLauncher>();
         aimAssist = GameObject.Find("AimAssist");
+        rotationPoint = GameObject.Find("RotationPoint");
         lastAttack = -10f;
         lastDash = -10f;
         BuildStats();
@@ -182,6 +193,11 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void SwapDirection()
+    {
+        IsFacingRight = !IsFacingRight;
+    }
+
     public void OnJump(InputAction.CallbackContext context)
     {
         // @TODO : check if he's alive also.
@@ -211,16 +227,23 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            if( (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0 )
+            // SwapDirection();
+            if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0)
             {
-                SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
-                bow.targetPos = sr.transform.position;
-
                 // Check cooldown
                 if (Time.time - lastAttack < mStatsFinalCached.mStatValues[eStatsNames.CoolDownAttack.ToString()])
                 {
                     return;
                 }
+
+                // Swap direction if aiming to player's opposite side
+                if ((IsFacingRight && !IsAimingRight) || (!IsFacingRight && IsAimingRight))
+                {
+                    SwapDirection();
+                }
+
+                SpriteRenderer sr = aimAssist.GetComponent<SpriteRenderer>();
+                bow.targetPos = sr.transform.position;
 
                 lastAttack = Time.time;
                 animator.SetTrigger("Attack");
@@ -232,7 +255,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            if( (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) > 0 )
+            if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) > 0)
             {
                 bow.LaunchBomb(IsFacingRight ? true : false);
             }
@@ -293,16 +316,16 @@ public class PlayerController : MonoBehaviour
         mStatsBonusAdd = new cStatsDescriptor();
         mStatsBonusMult = new cStatsDescriptor();
 
-        mStatsBonusAdd.ApplyOnEveryStat( val => 0 ); // (val) => {return  0}. Sets all values to 0
-        mStatsBonusMult.ApplyOnEveryStat( val => 1 ); // All to 1
+        mStatsBonusAdd.ApplyOnEveryStat(val => 0); // (val) => {return  0}. Sets all values to 0
+        mStatsBonusMult.ApplyOnEveryStat(val => 1); // All to 1
 
-        mStatsBase.mStatValues[ eStatsNames.RunSpeed.ToString() ] = 4f;
-        mStatsBase.mStatValues[ eStatsNames.AirWalkSpeed.ToString() ] = 4f;
-        mStatsBase.mStatValues[ eStatsNames.AirWallSpeed.ToString() ] = 4f;
-        mStatsBase.mStatValues[ eStatsNames.DashSpeed.ToString() ] = 6f;
-        mStatsBase.mStatValues[ eStatsNames.JumpImpulse.ToString() ] = 7f;
-        mStatsBase.mStatValues[ eStatsNames.CoolDownAttack.ToString() ] = 0.5f;
-        mStatsBase.mStatValues[ eStatsNames.CoolDownDash.ToString() ] = 2f;
+        mStatsBase.mStatValues[eStatsNames.RunSpeed.ToString()] = 4f;
+        mStatsBase.mStatValues[eStatsNames.AirWalkSpeed.ToString()] = 4f;
+        mStatsBase.mStatValues[eStatsNames.AirWallSpeed.ToString()] = 4f;
+        mStatsBase.mStatValues[eStatsNames.DashSpeed.ToString()] = 6f;
+        mStatsBase.mStatValues[eStatsNames.JumpImpulse.ToString()] = 7f;
+        mStatsBase.mStatValues[eStatsNames.CoolDownAttack.ToString()] = 0.5f;
+        mStatsBase.mStatValues[eStatsNames.CoolDownDash.ToString()] = 2f;
 
         UpdateStats();
     }
@@ -311,11 +334,11 @@ public class PlayerController : MonoBehaviour
     public cStatsDescriptor GetFinalStats()
     {
         cStatsDescriptor output = new cStatsDescriptor();
-        output.CombineByAddition( mStatsBase );
-        output.CombineByAddition( mStatsBonusAdd );
-        output.CombineByMultiplication( mStatsBonusMult );
+        output.CombineByAddition(mStatsBase);
+        output.CombineByAddition(mStatsBonusAdd);
+        output.CombineByMultiplication(mStatsBonusMult);
 
-        return  output;
+        return output;
     }
 
 

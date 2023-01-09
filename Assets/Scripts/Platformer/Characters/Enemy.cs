@@ -11,13 +11,13 @@ public class Enemy : MonoBehaviour
 
     public DetectionZone attackZone;
 
-    Rigidbody2D rb;
-    TouchingDirections touchingDirections;
-    Animator animator;
+    protected Rigidbody2D rb;
+    protected TouchingDirections touchingDirections;
+    protected Animator animator;
 
     public enum WalkableDirection { Right, Left }
-    private WalkableDirection _walkDirection;
-    private Vector2 walkDirectionVector = Vector2.right;
+    protected WalkableDirection _walkDirection;
+    protected Vector2 walkDirectionVector = Vector2.right;
 
     public WalkableDirection WalkDirection
     {
@@ -93,8 +93,10 @@ public class Enemy : MonoBehaviour
             rb.velocity = new Vector2(Mathf.Lerp(rb.velocity.x, 0, walkStopRate), rb.velocity.y);
     }
 
-    void FlipDirection()
+    protected void FlipDirection()
     {
+        Debug.Log("Flip enemy parent");
+
         if (WalkDirection == WalkableDirection.Right)
         {
             WalkDirection = WalkableDirection.Left;
