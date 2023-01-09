@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 public class UIManager : MonoBehaviour
 {
     private ResourceManager mResourceManager;
-    private Canvas mCanvas;
+    public Canvas mCanvas;
 
     private TextMeshProUGUI mLabelGold;
     private TextMeshProUGUI mLabelIron;
@@ -29,7 +29,10 @@ public class UIManager : MonoBehaviour
     private GameObject mInfoPanel;
     private TextMeshProUGUI mInfoPanelText;
 
-
+    // Tooltip panel
+    private GameObject mTooltipPanel;
+    private TextMeshProUGUI mTooltipPanelText;
+    private Coroutine mTooltipCloseCoroutine;
 
     private GameObject mObjectToBuildTo;
     private GameObject mBuildButtonClicked;
@@ -70,6 +73,12 @@ public class UIManager : MonoBehaviour
         mInfoPanel = mCanvas.transform.Find("InfoPanel")?.gameObject;
         mInfoPanelText = GameObject.Find("InfoPanelText")?.gameObject.GetComponent<TextMeshProUGUI>();
         BuildInfoPanel();
+
+        // Info Panel
+        mTooltipPanel = mCanvas.transform.Find("ToolTipPanel")?.gameObject;
+        mTooltipPanelText = mTooltipPanel.transform.Find("text")?.gameObject.GetComponent<TextMeshProUGUI>();
+        mTooltipPanelText.text = "ok";
+        mTooltipPanel.SetActive( false );
 
         mBuildButtons = new List<GameObject>();
         mBuildButtons.Add( mButtonDamage.gameObject );
@@ -508,5 +517,29 @@ public class UIManager : MonoBehaviour
             mInfoPanelText.text = BuffBuildingJump.GetUIDescription(mButtonBombFactory.interactable);
             mInfoPanel.SetActive(true);
         }
+    }
+
+
+
+    public void DisplayMessage( string message, float duration )
+    {
+        if( mTooltipCloseCoroutine != null ){
+            StopCoroutine( mTooltipCloseCoroutine );
+        }
+        mTooltipCloseCoroutine = null;
+
+        mTooltipPanelText.text = message;
+        mTooltipPanel.SetActive( true );
+
+        mTooltipCloseCoroutine = StartCoroutine( Utilities.ExecuteAfter( duration, () => {
+            mTooltipPanel.SetActive( false );
+            mTooltipCloseCoroutine = null;
+         } ));
+    }
+
+    public void FloatingMessage( string message, Color color, Vector3 position )
+    {
+        Animation anim = new Animation( this );
+        anim.DisplayAnimatedText( position, message, color, 2, 30, mCanvas.transform );
     }
 }

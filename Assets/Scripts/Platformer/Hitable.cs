@@ -77,6 +77,7 @@ public class Hitable : MonoBehaviour
     {
         if (IsAlive && !isInvincible)
         {
+            GameManager.mUIManager.FloatingMessage(damage.ToString(), Color.red, transform.position );
             Health -= damage;
             isInvincible = true;
             animator.SetTrigger("Hurt");
