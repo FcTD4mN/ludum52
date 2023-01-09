@@ -228,6 +228,16 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
+            // Swap direction if aiming to player's opposite side
+            if ((IsFacingRight && !IsAimingRight) || (!IsFacingRight && IsAimingRight))
+            {
+                SwapDirection();
+            }
+        }
+        else if (context.canceled)
+        {
+            // Release click
+            // Left click
             if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) > 0)
             {
                 // Check cooldown
@@ -236,15 +246,18 @@ public class PlayerController : MonoBehaviour
                     return;
                 }
 
-                // Swap direction if aiming to player's opposite side
-                if ((IsFacingRight && !IsAimingRight) || (!IsFacingRight && IsAimingRight))
-                {
-                    SwapDirection();
-                }
-
                 lastAttack = Time.time;
                 animator.SetTrigger("Attack");
             }
+        }
+    }
+
+    public void OnSwitchArrow(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            bow.SwitchArrowType();
+            Debug.Log("We switch arrow type : " + bow.CurrentArrowType().ToString());
         }
     }
 

@@ -8,6 +8,8 @@ public class WeaponLauncher : MonoBehaviour
     public float arrowDamage = 10f;
     public float arrowSpeed = 15f;
     private List<GameObject> firedArrows;
+    public List<cResourceDescriptor.eResourceNames> availableArrowType;
+    private int currentArrowType;
 
     // Bomb :
     public float bombDamage = 10f;
@@ -32,25 +34,44 @@ public class WeaponLauncher : MonoBehaviour
     public void OnEnable()
     {
         firedArrows = new List<GameObject>();
+        currentArrowType = 0;
+        availableArrowType = new List<cResourceDescriptor.eResourceNames>();
+        availableArrowType.Add(cResourceDescriptor.eResourceNames.Arrows);
+        availableArrowType.Add(cResourceDescriptor.eResourceNames.FireArrows);
     }
 
     void Update()
     {
         // Throw bomb aim assist
         // @TODO : Foutre ça dans un InputAction
-        if (Input.GetMouseButtonDown(1))
+        if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) > 0)
         {
-            isDragging = true;
-            OnDragStart();
-        }
-        if (Input.GetMouseButtonUp(1))
-        {
-            isDragging = false;
-            OnDragEnd();
-        }
+            if (Input.GetMouseButtonDown(1))
+            {
+                isDragging = true;
+                OnDragStart();
+            }
+            if (Input.GetMouseButtonUp(1))
+            {
+                isDragging = false;
+                OnDragEnd();
+            }
 
-        if (isDragging)
-            OnDrag();
+            if (isDragging)
+                OnDrag();
+        }
+    }
+
+    public void SwitchArrowType()
+    {
+        currentArrowType++;
+        if (currentArrowType >= availableArrowType.Count)
+            currentArrowType = 0;
+    }
+
+    public cResourceDescriptor.eResourceNames CurrentArrowType()
+    {
+        return availableArrowType[currentArrowType];
     }
 
     public void ClearFiredArrows()
@@ -78,20 +99,9 @@ public class WeaponLauncher : MonoBehaviour
         float distance = Vector2.Distance(target, transform.position);
         Rigidbody2D rbArrow = arrow.GetComponent<Rigidbody2D>();
         rbArrow.velocity = direction * arrowSpeed;
+
+        GameManager.mResourceManager.AddResource(availableArrowType[currentArrowType].ToString(), -1, false);
     }
-
-    // public void FireArrow()
-    // {
-    //     // Converting rotation in degree
-    //     // Vector3 rotation = targetPosWorld - launchPoint.position;
-    //     // float rotZ;
-    //     // if (GameManager.mInstance.playerCtrler.IsFacingRight)
-    //     //     rotZ = Mathf.Atan2(rotation.y, rotation.x) * Mathf.Rad2Deg;
-    //     // else
-    //     //     rotZ = Mathf.Atan2(-rotation.y, -rotation.x) * Mathf.Rad2Deg;
-
-    //     // Quaternion arrowRotation = Quaternion.Euler(0, 0, rotZ);
-    // }
 
     public void LaunchBomb(bool facingRight)
     {
@@ -119,12 +129,15 @@ public class WeaponLauncher : MonoBehaviour
         rb.angularVelocity = 0f;
         rb.isKinematic = false;
         rb.AddForce(force, ForceMode2D.Impulse);
+
+        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Bombs.ToString(), -1, false);
     }
 
     // Handle Aim draw for bomb :
     void OnDragStart()
     {
-        if( (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0 ) {
+        if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0)
+        {
             return;
         }
 
@@ -134,7 +147,8 @@ public class WeaponLauncher : MonoBehaviour
 
     void OnDrag()
     {
-        if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0) {
+        if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0)
+        {
             return;
         }
 
@@ -148,7 +162,8 @@ public class WeaponLauncher : MonoBehaviour
 
     void OnDragEnd()
     {
-        if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0) {
+        if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) <= 0)
+        {
             return;
         }
 
