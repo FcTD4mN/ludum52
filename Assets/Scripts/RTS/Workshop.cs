@@ -2,36 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuffBuildingJump : BuffBuilding
+public class Workshop : ProductionBuilding
 {
     public static cResourceDescriptor GetResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 500;
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron.ToString()] = 500;
-        output.mInputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 2;
-        output.mInputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 4;
-        return output;
-    }
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 3000;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron.ToString()] = 1000;
 
-    public static cStatsDescriptor GetStatsDescriptor()
-    {
-        cStatsDescriptor output = new cStatsDescriptor();
-
-        output.mStatValues[cStatsDescriptor.eStatsNames.JumpImpulse.ToString()] = 10;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 1;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 1;
+        output.mOutputRates[cResourceDescriptor.eResourceNames.FireArrows.ToString()] = 1;
 
         return output;
     }
-
-
-
-
-
-
-
-
-
 
 
     public static bool IsBuildable()
@@ -45,7 +30,7 @@ public class BuffBuildingJump : BuffBuilding
             }
         }
 
-        return GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffJump);
+        return GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Workshop);
     }
 
 
@@ -60,7 +45,7 @@ public class BuffBuildingJump : BuffBuilding
             }
         }
 
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffJump))
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Workshop))
         {
             return RTSManager.eBuildingErrors.BlueprintRequired;
         }
@@ -71,10 +56,10 @@ public class BuffBuildingJump : BuffBuilding
 
     public static string GetUIDescription(bool isAllowed)
     {
-        string name = "Jump buff";
-        string description = "Gives buff in exchange of resources";
+        string name = "Workshop";
+        string description = "Builds fire arrows using arrows and fire";
 
-        RTSManager.eBuildingErrors error = BuffBuildingDamage.GetBuildingError();
+        RTSManager.eBuildingErrors error = BombFactory.GetBuildingError();
 
         string errorMessage = "";
         switch (error)
@@ -90,15 +75,12 @@ public class BuffBuildingJump : BuffBuilding
                 break;
         }
 
-        return BuffBuilding.GetBuffBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor(), GetStatsDescriptor());
+        return ProductionBuilding.GetProductionBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor());
     }
-
 
     override internal void Initialize()
     {
         base.Initialize();
         mResourceDescriptor = GetResourceDescriptor();
-        mStatsModifiers = GetStatsDescriptor();
-        mAdds = true;
     }
 }

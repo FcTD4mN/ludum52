@@ -20,15 +20,25 @@ public class ProductionBuilding : MonoBehaviour
         GameManager.mRTSManager.mAllProductionBuildings.Sort( delegate( ProductionBuilding lhs, ProductionBuilding rhs )
         {
             bool lhsIsBuff = lhs.gameObject.GetComponent<BuffBuilding>() != null;
-            bool rhsIsBuff = rhs.gameObject.GetComponent<BuffBuilding>() != null;
+            bool lhsIsHarv = lhs.gameObject.GetComponent<HarvestingBuilding>() != null;
 
+            bool rhsIsBuff = rhs.gameObject.GetComponent<BuffBuilding>() != null;
+            bool rhsIsHarv = rhs.gameObject.GetComponent<HarvestingBuilding>() != null;
+
+            // This puts buff building last
             if( lhsIsBuff && rhsIsBuff ) { return  0; }
-            if( lhsIsBuff && !rhsIsBuff ) { return  -1; }
-            if( !lhsIsBuff && rhsIsBuff ) { return  1; }
+            if( lhsIsBuff && !rhsIsBuff ) { return  1; }
+            if( !lhsIsBuff && rhsIsBuff ) { return  -1; }
+
+            // This puts harvesters first
+            if( lhsIsHarv && rhsIsHarv ) { return  0; }
+            if( lhsIsHarv ) { return  -1; } // If lhs is harvester, it's >
+            if( !lhsIsHarv ) { return  1; } // If lhs is not harvester, it's <
 
             return  0;
 
         });
+
         Initialize();
         BuildBuilding();
     }

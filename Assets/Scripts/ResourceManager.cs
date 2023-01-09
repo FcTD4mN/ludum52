@@ -25,8 +25,8 @@ public class ResourceManager : MonoBehaviour
             mResourcesAvailable[resourceName] = 0f;
         }
 
-        mResourcesAvailable[eResourceNames.Gold.ToString()] = 8000;
-        mResourcesAvailable[eResourceNames.Iron.ToString()] = 2000;
+        mResourcesAvailable[eResourceNames.Gold.ToString()] = 10000;
+        mResourcesAvailable[eResourceNames.Iron.ToString()] = 800;
         mResourcesAvailable[eResourceNames.Arrows.ToString()] = 30;
     }
 
@@ -94,8 +94,6 @@ public class ResourceManager : MonoBehaviour
     public void UpdateResources()
     {
         float deltaTime = Time.deltaTime;
-
-        // Toutes les secondes
         foreach( ProductionBuilding building in GameManager.mRTSManager.mAllProductionBuildings )
         {
             building.ProduceResource( deltaTime );
@@ -115,6 +113,7 @@ public class cResourceDescriptor
         Iron,
         Fire,
         Arrows,
+        FireArrows,
         Bombs
     }
 

@@ -18,8 +18,11 @@ public class UIManager : MonoBehaviour
     // BuildMenu
     private GameObject mBuildMenu;
 
+    private GameObject mProductionList;
+    private GameObject mBuffList;
     private Button mButtonForge;
     private Button mButtonBombFactory;
+    private Button mButtonWorkshop;
     private Button mButtonDamage;
     private Button mButtonCooldown;
     private Button mButtonSpeed;
@@ -61,12 +64,15 @@ public class UIManager : MonoBehaviour
 
         // Build Menu
         mBuildMenu = mCanvas.transform.Find("BuildMenu")?.gameObject;
+        mProductionList = GameObject.Find("Productions")?.gameObject;
+        mBuffList = GameObject.Find("Buffs")?.gameObject;
         mButtonDamage = GameObject.Find("ButtonDamage")?.gameObject.GetComponent<Button>();
         mButtonCooldown = GameObject.Find("ButtonCooldown")?.gameObject.GetComponent<Button>();
         mButtonSpeed = GameObject.Find("ButtonSpeed")?.gameObject.GetComponent<Button>();
         mButtonJump = GameObject.Find("ButtonJump")?.gameObject.GetComponent<Button>();
         mButtonForge = GameObject.Find("ButtonForge")?.gameObject.GetComponent<Button>();
         mButtonBombFactory = GameObject.Find("ButtonBombFactory")?.gameObject.GetComponent<Button>();
+        mButtonWorkshop = GameObject.Find("ButtonWorkshop")?.gameObject.GetComponent<Button>();
         BuildBuildMenu();
 
         // Info Panel
@@ -87,6 +93,7 @@ public class UIManager : MonoBehaviour
         mBuildButtons.Add( mButtonJump.gameObject );
         mBuildButtons.Add( mButtonForge.gameObject );
         mBuildButtons.Add( mButtonBombFactory.gameObject );
+        mBuildButtons.Add( mButtonWorkshop.gameObject );
 
         mAllUIFloatingButtons = new List<GameObject>();
     }
@@ -398,6 +405,7 @@ public class UIManager : MonoBehaviour
         UpdateBuildMenu();
         mBuildMenu.transform.SetAsLastSibling();
         mBuildMenu.SetActive( true );
+
     }
 
 
@@ -408,11 +416,17 @@ public class UIManager : MonoBehaviour
         bool isLocationOnTower = GameManager.mRTSManager.mTowers.Contains(mObjectToBuildTo.transform.parent.gameObject );
         bool isLocationOnBuffTower = GameManager.mRTSManager.mBuffTower.Contains(mObjectToBuildTo.transform.parent.gameObject);
 
+        mProductionList.SetActive( isLocationOnTower );
+        mBuffList.SetActive( isLocationOnBuffTower );
+
         mButtonDamage.interactable = BuffBuildingDamage.IsBuildable() && isLocationOnBuffTower;
         mButtonCooldown.interactable = BuffBuildingCooldown.IsBuildable() && isLocationOnBuffTower;
+        mButtonSpeed.interactable = BuffBuildingSpeed.IsBuildable() && isLocationOnBuffTower;
+        mButtonJump.interactable = BuffBuildingJump.IsBuildable() && isLocationOnBuffTower;
 
         mButtonForge.interactable = Forge.IsBuildable() && isLocationOnTower;
         mButtonBombFactory.interactable = BombFactory.IsBuildable() && isLocationOnTower;
+        mButtonWorkshop.interactable = Workshop.IsBuildable() && isLocationOnTower;
     }
 
 
@@ -445,6 +459,13 @@ public class UIManager : MonoBehaviour
         mButtonBombFactory.onClick.AddListener( () => {
             mBuildMenu.SetActive( false );
             GameManager.mRTSManager.BuildObjectAtLocation( "BuildingBombFactory", mObjectToBuildTo );
+            DeleteUIButton(mBuildButtonClicked);
+        });
+
+        mButtonWorkshop.onClick.AddListener(() =>
+        {
+            mBuildMenu.SetActive(false);
+            GameManager.mRTSManager.BuildObjectAtLocation("BuildingWorkshop", mObjectToBuildTo);
             DeleteUIButton(mBuildButtonClicked);
         });
 
@@ -502,10 +523,15 @@ public class UIManager : MonoBehaviour
             mInfoPanelText.text = Forge.GetUIDescription(mButtonForge.interactable);
             mInfoPanel.SetActive( true );
         }
-        else if( mHoveredObject == mButtonBombFactory.gameObject )
+        else if (mHoveredObject == mButtonBombFactory.gameObject)
         {
             mInfoPanelText.text = BombFactory.GetUIDescription(mButtonBombFactory.interactable);
-            mInfoPanel.SetActive( true );
+            mInfoPanel.SetActive(true);
+        }
+        else if (mHoveredObject == mButtonWorkshop.gameObject)
+        {
+            mInfoPanelText.text = Workshop.GetUIDescription(mButtonWorkshop.interactable);
+            mInfoPanel.SetActive(true);
         }
         else if (mHoveredObject == mButtonSpeed.gameObject)
         {

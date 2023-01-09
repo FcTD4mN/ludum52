@@ -35,6 +35,7 @@ public class RTSManager : MonoBehaviour
         FireMine,
         Forge,
         BombFactory,
+        Workshop,
         BuffDamage,
         BuffCooldown,
         BuffSpeed,
@@ -63,7 +64,9 @@ public class RTSManager : MonoBehaviour
 
         mUnlockedBuildings = new List<eBuildingList>();
         mUnlockedBuildings.Add( eBuildingList.IronHarvester );
-        mUnlockedBuildings.Add( eBuildingList.Forge ); ;
+        mUnlockedBuildings.Add( eBuildingList.FireMine );
+        mUnlockedBuildings.Add( eBuildingList.Forge );
+        mUnlockedBuildings.Add( eBuildingList.BuffJump );
     }
 
 
