@@ -16,7 +16,7 @@ public class InteractableNPC : Interactable
     {
         if (!isActive)
         {
-            transform.position = new Vector3(transform.position.x + (0.001f * transform.localScale.x), transform.position.y, transform.position.z);
+            transform.position = new Vector3(transform.position.x + (0.002f * transform.localScale.x), transform.position.y, transform.position.z);
         }
 
     }
