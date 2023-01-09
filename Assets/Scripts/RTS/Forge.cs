@@ -29,6 +29,11 @@ public class Forge : ProductionBuilding
 
     public static RTSManager.eBuildingErrors GetBuildingError()
     {
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Forge))
+        {
+            return RTSManager.eBuildingErrors.BlueprintRequired;
+        }
+
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
         foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
         {
@@ -38,10 +43,6 @@ public class Forge : ProductionBuilding
             }
         }
 
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Forge))
-        {
-            return RTSManager.eBuildingErrors.BlueprintRequired;
-        }
 
         return RTSManager.eBuildingErrors.None;
     }

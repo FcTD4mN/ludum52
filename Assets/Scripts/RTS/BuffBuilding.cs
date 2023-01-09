@@ -108,13 +108,14 @@ public class BuffBuilding : ProductionBuilding
                                                         cStatsDescriptor statsDescriptor )
     {
         string outputString = "";
+        string redColor = "<color=#EB0800>";
 
         outputString = name + "\n" + description + "\n";
 
         outputString += "\n";
         if (errorMessage != "")
         {
-            outputString += "    Issue: " + errorMessage;
+            outputString += redColor + "Issue: " + errorMessage + "</color>";
             outputString += "\n";
             outputString += "\n";
             outputString += "\n";
@@ -127,7 +128,11 @@ public class BuffBuilding : ProductionBuilding
             if (resourceDescriptor.mBuildCosts[resourceName] == 0) { continue; }
             atLeastOne = true;
 
-            outputString += "    " + resourceName + ": " + resourceDescriptor.mBuildCosts[resourceName] + "\n";
+            bool hasEnough = resourceDescriptor.mBuildCosts[resourceName] <= GameManager.mResourceManager.GetRessource(resourceName);
+            string colorBalise = hasEnough ? "" : redColor;
+            string colorBaliseEnd = hasEnough ? "" : "</color>";
+
+            outputString += "    " + colorBalise + resourceName + ": " + resourceDescriptor.mBuildCosts[resourceName] + colorBaliseEnd + "\n";
         }
         if (!atLeastOne)
         {

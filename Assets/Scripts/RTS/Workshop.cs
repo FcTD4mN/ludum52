@@ -36,6 +36,11 @@ public class Workshop : ProductionBuilding
 
     public static RTSManager.eBuildingErrors GetBuildingError()
     {
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Workshop))
+        {
+            return RTSManager.eBuildingErrors.BlueprintRequired;
+        }
+
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
         foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
         {
@@ -43,11 +48,6 @@ public class Workshop : ProductionBuilding
             {
                 return RTSManager.eBuildingErrors.NotEnoughRessources;
             }
-        }
-
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.Workshop))
-        {
-            return RTSManager.eBuildingErrors.BlueprintRequired;
         }
 
         return RTSManager.eBuildingErrors.None;

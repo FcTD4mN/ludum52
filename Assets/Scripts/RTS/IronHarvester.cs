@@ -30,6 +30,11 @@ public class IronHarvester : HarvestingBuilding
 
     public static RTSManager.eBuildingErrors GetBuildingError()
     {
+        if( !GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.IronHarvester) )
+        {
+            return  RTSManager.eBuildingErrors.BlueprintRequired;
+        }
+
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
         foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
         {
@@ -39,10 +44,6 @@ public class IronHarvester : HarvestingBuilding
             }
         }
 
-        if( !GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.IronHarvester) )
-        {
-            return  RTSManager.eBuildingErrors.BlueprintRequired;
-        }
 
         return RTSManager.eBuildingErrors.None;
     }

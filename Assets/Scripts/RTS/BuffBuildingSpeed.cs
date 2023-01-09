@@ -54,6 +54,11 @@ public class BuffBuildingSpeed : BuffBuilding
 
     public static RTSManager.eBuildingErrors GetBuildingError()
     {
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffSpeed))
+        {
+            return RTSManager.eBuildingErrors.BlueprintRequired;
+        }
+
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
         foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
         {
@@ -63,10 +68,6 @@ public class BuffBuildingSpeed : BuffBuilding
             }
         }
 
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BuffSpeed))
-        {
-            return RTSManager.eBuildingErrors.BlueprintRequired;
-        }
 
         return RTSManager.eBuildingErrors.None;
     }
