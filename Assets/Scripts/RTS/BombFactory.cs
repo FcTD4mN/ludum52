@@ -31,6 +31,11 @@ public class BombFactory : ProductionBuilding
 
     public static RTSManager.eBuildingErrors GetBuildingError()
     {
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BombFactory))
+        {
+            return RTSManager.eBuildingErrors.BlueprintRequired;
+        }
+
         cResourceDescriptor resourceDescriptor = GetResourceDescriptor();
         foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
         {
@@ -38,11 +43,6 @@ public class BombFactory : ProductionBuilding
             {
                 return RTSManager.eBuildingErrors.NotEnoughRessources;
             }
-        }
-
-        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains(RTSManager.eBuildingList.BombFactory))
-        {
-            return RTSManager.eBuildingErrors.BlueprintRequired;
         }
 
         return RTSManager.eBuildingErrors.None;
