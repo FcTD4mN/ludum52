@@ -7,7 +7,6 @@ abstract public class Interactable : MonoBehaviour
     [HideInInspector]
     public bool isActive;
     protected GameObject interactBtn;
-    protected GameObject chestContent;
     public GameObject interactablePrefab;
 
     void OnEnable()

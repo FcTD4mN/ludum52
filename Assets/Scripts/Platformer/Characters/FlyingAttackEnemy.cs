@@ -11,7 +11,7 @@ public class FlyingAttackEnemy : FlyingEnemy
     public void FireProjectile()
     {
         // Instantiate arrow
-        GameObject arrowPrefab = Resources.Load<GameObject>("Prefabs/Platformer/EnemyProjectile");
+        GameObject arrowPrefab = Resources.Load<GameObject>("Prefabs/Platformer/Enemy/EnemyProjectile");
         GameObject arrow = Instantiate(arrowPrefab, transform.position, arrowPrefab.transform.rotation);
 
         // Retrieve direction to next WP

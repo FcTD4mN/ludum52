@@ -7,6 +7,7 @@ public class Collectable : MonoBehaviour
     protected string label;
     protected float value;
     Rigidbody2D rb;
+    protected SpriteRenderer sr;
 
     void OnEnable()
     {
@@ -16,6 +17,7 @@ public class Collectable : MonoBehaviour
     protected void Initialize()
     {
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     private void OnTriggerEnter2D(Collider2D coll)
