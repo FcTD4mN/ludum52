@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 2118698736465451017}
   - component: {fileID: 2118698736465451018}
   - component: {fileID: 2118698736465451015}
-  - component: {fileID: -2562140874484359673}
+  - component: {fileID: 6683328045625564958}
+  - component: {fileID: 2583820845772722342}
   m_Layer: 14
   m_Name: EnemyProjectile
   m_TagString: Untagged
@@ -124,7 +125,27 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.25655153
---- !u!114 &-2562140874484359673
+--- !u!95 &6683328045625564958
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2118698736465451019}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c91d4acb40ffa0f4b9a143f613c9e2bf, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+--- !u!114 &2583820845772722342
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,4 +157,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27ac749ef8d628c4f9a8fea4a3a7ded0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  destroyAfterDistance: 5
+  destroyAfterDistance: 30
