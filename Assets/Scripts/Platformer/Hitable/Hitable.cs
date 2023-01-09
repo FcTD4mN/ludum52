@@ -55,6 +55,7 @@ public class Hitable : MonoBehaviour
         {
             mStats.SetBaseStat(cStatsDescriptor.eStatsNames.Health, mStats.GetBaseStat(cStatsDescriptor.eStatsNames.MaxHealth));
         }
+        animator = GetComponent<Animator>();
     }
 
     public virtual void Update()

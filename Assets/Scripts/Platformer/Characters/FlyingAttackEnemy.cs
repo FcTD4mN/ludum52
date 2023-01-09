@@ -17,7 +17,8 @@ public class FlyingAttackEnemy : FlyingEnemy
         // Retrieve direction to next WP
         // Can be adjusted if multiple target
         Transform target = GameManager.mInstance.playerCtrler.transform;
-        Vector2 direction = (target.position - transform.position).normalized;
+        Vector2 directionRaw = (target.position - transform.position);
+        Vector2 direction = directionRaw.normalized;
 
         // Move towards next WP
         float distance = Vector2.Distance(target.position, transform.position);
