@@ -44,6 +44,15 @@ public class Utilities
     }
 
 
+    public static Rect OffsetRectBy( Rect rect, Vector2 offset )
+    {
+        return  new Rect( rect.xMin + offset.x,
+                          rect.yMin + offset.y,
+                          rect.width,
+                          rect.height );
+    }
+
+
     // Returns BoundingBox base on transform in world space
     public static Rect GetBBoxFromTransform(GameObject obj)
     {

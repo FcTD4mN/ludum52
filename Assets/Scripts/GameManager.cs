@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Cinemachine;
 
+using UnityEngine.UI;
+
 public class GameManager : MonoBehaviour
 {
     // Singleton
@@ -53,6 +55,19 @@ public class GameManager : MonoBehaviour
             mPortalManager.Initialize();
 
         playerCtrler = GameObject.Find("Character")?.gameObject.GetComponent<PlayerController>();
+
+
+        Rect screenRect = Camera.main.pixelRect;
+
+        cButton test = new cButton( mUIManager.mCanvas.gameObject, "test" );
+        test.SetFrame( new Rect( 10, 10, 100, 100 ) );
+        test.SetCenter( screenRect.center );
+        test.SetColor( new Color( 0.8f, 0.1f, 0f, 1f ) );
+        test.AddText( "CenterButton" );
+
+        cScrollView scroll = new cBuildMenu( mUIManager.mCanvas.gameObject, "ScrollTest" );
+        scroll.SetFrame(new Rect(10, 10, 500, 500));
+        scroll.SetCenter( screenRect.center );
     }
 
     // Update is called once per frame
