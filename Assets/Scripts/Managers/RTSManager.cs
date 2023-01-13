@@ -31,8 +31,9 @@ public class RTSManager : MonoBehaviour
 
     public enum eBuildingList
     {
+        Other,
         IronHarvester,
-        FireMine,
+        FireHarvester,
         Forge,
         BombFactory,
         Workshop,
@@ -57,7 +58,7 @@ public class RTSManager : MonoBehaviour
 
         mUnlockedBuildings = new List<eBuildingList>();
         mUnlockedBuildings.Add(eBuildingList.IronHarvester);
-        mUnlockedBuildings.Add(eBuildingList.FireMine);
+        mUnlockedBuildings.Add(eBuildingList.FireHarvester);
         mUnlockedBuildings.Add(eBuildingList.Forge);
         mUnlockedBuildings.Add(eBuildingList.BuffJump);
 
@@ -95,7 +96,7 @@ public class RTSManager : MonoBehaviour
             {
                 createdReceiver = BuildReceiver("IronReceiver", newBuilding);
             }
-            else if (newBuilding.gameObject.GetComponent<FireMaker>() != null)
+            else if (newBuilding.gameObject.GetComponent<FireHarvester>() != null)
             {
                 createdReceiver = BuildReceiver("FireReceiver", newBuilding);
             }
@@ -308,5 +309,14 @@ public class RTSManager : MonoBehaviour
         }
 
         mBuffTower.Add(newTowerFloor);
+    }
+
+
+    public ProductionBuilding GetPrefabByType( eBuildingList type )
+    {
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/" + type.ToString() );
+        ProductionBuilding prod = prefab.GetComponent<ProductionBuilding>();
+        prod.Initialize();
+        return  prod;
     }
 }

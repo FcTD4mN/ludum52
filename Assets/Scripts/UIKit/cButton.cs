@@ -6,6 +6,7 @@ class cButton:
     cView
 {
     public cLabel mLabel;
+    public Button mButton;
 
 
     // ===================================
@@ -22,7 +23,7 @@ class cButton:
         image.type = Image.Type.Sliced;
         image.fillCenter = true;
 
-        mGameObject.AddComponent<Button>();
+        mButton = mGameObject.AddComponent<Button>();
         SetColor( Color.gray );
     }
 

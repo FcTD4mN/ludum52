@@ -6,14 +6,15 @@ public class InteractableIronVein : Interactable
     {
         if( isActive )
         {
-            if (!IronHarvester.IsBuildable())
+            ProductionBuilding ironHarvester = GameManager.mRTSManager.GetPrefabByType(RTSManager.eBuildingList.FireHarvester);
+            if (!ironHarvester.IsBuildable())
             {
-                RTSManager.eBuildingErrors error = IronHarvester.GetBuildingError();
+                RTSManager.eBuildingErrors error = ironHarvester.GetBuildingError();
                 GameManager.mUIManager.DisplayMessage(error.ToString(), 2);
                 return;
             }
 
-            GameManager.mRTSManager.BuildObjectAtLocation( "BuildingIronHarvester", gameObject );
+            GameManager.mRTSManager.BuildObjectAtLocation( RTSManager.eBuildingList.IronHarvester.ToString(), gameObject );
             interactBtn.SetActive( false );
             isActive = false;
         }

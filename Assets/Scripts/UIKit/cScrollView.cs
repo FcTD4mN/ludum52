@@ -5,9 +5,12 @@ using System;
 class cScrollView :
     cView
 {
-    internal ScrollRect mScrollRect;
-    internal GameObject mViewport;
-    internal GameObject mContent;
+    public ScrollRect mScrollRect;
+    public GameObject mViewport;
+    public GameObject mContent;
+
+    public GameObject mHScrollBar;
+    public GameObject mVScrollBar;
 
 
     public cScrollView( GameObject parentView, string name ) : base(parentView, name)
@@ -16,59 +19,42 @@ class cScrollView :
         GameObject prefab = Resources.Load<GameObject>("Prefabs/UI/ScrollView");
         mGameObject = GameObject.Instantiate( prefab, Vector3.zero, Quaternion.Euler(0, 0, 0), parentView.transform );
 
-        mViewport = mGameObject.transform.Find( "Viewport" ).gameObject;
-        mContent = mViewport.transform.Find( "Content" ).gameObject;
-
         RectTransform rect = mGameObject.GetComponent<RectTransform>();
         rect.anchoredPosition = Vector2.zero;
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.zero;
-        rect.pivot = Vector2.zero;
+        rect.anchorMin = new Vector2( 0, 1 );
+        rect.anchorMax = new Vector2( 0, 1 );
+        rect.pivot = new Vector2( 0, 1 );
 
         mScrollRect = mGameObject.GetComponent<ScrollRect>();
+
+        mViewport = mGameObject.transform.Find("Viewport").gameObject;
+
+        mContent = mViewport.transform.Find("Content").gameObject;
+        RectTransform contentRect = mContent.GetComponent<RectTransform>();
+        contentRect.anchoredPosition = Vector2.zero;
+        contentRect.anchorMax = new Vector2( 0, 1 );
+        contentRect.anchorMin = new Vector2( 0, 1 );
+        contentRect.pivot = new Vector2(0, 1);
+
+        mHScrollBar = mGameObject.transform.Find("Scrollbar Horizontal").gameObject;
+        mVScrollBar = mGameObject.transform.Find("Scrollbar Vertical").gameObject;
+
+
+        SetColor(new Color(0.2f, 0.2f, 0.2f, 0.8f));
     }
+
 
     public void AddViewToContent( cView view )
     {
         view.mGameObject.transform.SetParent( mContent.transform );
     }
-}
 
-
-
-class cBuildMenu :
-    cScrollView
-{
-        public Action mOnClose;
-
-
-        private cProductionBuildingPanel mPanel;
-
-        public cBuildMenu( GameObject parentView, string name) : base(parentView, name)
-        {
-            mPanel = new cProductionBuildingPanel( mGameObject, "Panel" );
-            mScrollRect.horizontal = false;
-
-            AddViewToContent( mPanel );
-        }
-
-
-        override public void LayoutSubviews()
-        {
-            Rect frame = GetFrame();
-
-            int panelRequiredHeight = mPanel.RequiredHeightForWidth( (int)frame.width );
-            int panelHeight = (int)Math.Max( panelRequiredHeight, frame.height );
-
-            mPanel.SetFrame(new Rect(0, 0, frame.width, panelHeight ));
-
-            RectTransform contentRect = mContent.GetComponent<RectTransform>();
-            contentRect.sizeDelta = new Vector2(contentRect.sizeDelta.x, panelHeight);
-        }
+    public void SetContentSize( Vector2 size )
+    {
+        RectTransform contentRect = mContent.GetComponent<RectTransform>();
+        contentRect.sizeDelta = size;
     }
-
-
-
+}
 
 
 

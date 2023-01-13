@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BuffBuilding : ProductionBuilding
+public abstract class BuffBuilding : ProductionBuilding
 {
     internal cStatsDescriptor mStatsModifiers;
 
     internal bool mAdds = true;
     private bool mStatsAreApplied = false;
+
+
+    abstract public cStatsDescriptor GetStatsDescriptor();
 
 
     // ===================================
@@ -32,7 +35,8 @@ public class BuffBuilding : ProductionBuilding
     override internal void Initialize()
     {
         base.Initialize();
-        mResourceDescriptor = new cResourceDescriptor();
+        mResourceDescriptor = GetResourceDescriptor();
+        mStatsModifiers = GetStatsDescriptor();
     }
 
     public override void SetPause( bool state )
@@ -99,6 +103,30 @@ public class BuffBuilding : ProductionBuilding
 
 
 
+
+    public new string GetUIDescription( bool isAllowed )
+    {
+        string name = "Cooldown Reduction";
+        string description = GetDescription();
+
+        RTSManager.eBuildingErrors error = GetBuildingError();
+
+        string errorMessage = "";
+        switch (error)
+        {
+            case RTSManager.eBuildingErrors.BlueprintRequired:
+                errorMessage = "Blueprint required";
+                break;
+            case RTSManager.eBuildingErrors.NotEnoughRessources:
+                errorMessage = "Not enough resources";
+                break;
+            case RTSManager.eBuildingErrors.None:
+                errorMessage = isAllowed ? "" : "Can't build that type of building here";
+                break;
+        }
+
+        return BuffBuilding.GetBuffBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor(), GetStatsDescriptor());
+    }
 
 
     public static string GetBuffBuildingUIDescription( string name,

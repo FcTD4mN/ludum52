@@ -6,6 +6,9 @@ class cView
 {
     public GameObject mGameObject;
 
+    // ===================================
+    // Constructors
+    // ===================================
     public cView( GameObject parentView, string name ): this( name )
     {
         mGameObject.transform.SetParent(parentView.transform);
@@ -17,23 +20,28 @@ class cView
 
         RectTransform rect = mGameObject.AddComponent<RectTransform>();
         rect.anchoredPosition = Vector2.zero;
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.zero;
-        rect.pivot = Vector2.zero;
+        rect.anchorMin = new Vector2( 0, 1 );
+        rect.anchorMax = new Vector2( 0, 1 );
+        rect.pivot = new Vector2( 0, 1 );
 
         mGameObject.AddComponent<CanvasRenderer>();
     }
 
 
-
     // ===================================
     // Geometry
     // ===================================
+    public virtual void LayoutSubviews()
+    {
+    }
+
+
+    // With anchors and pivot point set to topLeft, we need to negate y in order to pass in regular topleft origin based rect and geometry and have it work
     public void SetFrame(Rect frame)
     {
         RectTransform rect = mGameObject.GetComponent<RectTransform>();
 
-        rect.anchoredPosition = new Vector2(frame.xMin, frame.yMin);
+        rect.anchoredPosition = new Vector2(frame.xMin, -frame.yMin);
         rect.sizeDelta = new Vector2(frame.width, frame.height);
 
         LayoutSubviews();
@@ -43,20 +51,43 @@ class cView
     public void SetCenter(Vector2 center)
     {
         RectTransform rect = mGameObject.GetComponent<RectTransform>();
-
-        rect.position = new Vector2( center.x - rect.sizeDelta.x / 2f, center.y - rect.sizeDelta.y / 2f);
+        rect.anchoredPosition = new Vector2( center.x - rect.sizeDelta.x / 2f, -(center.y - rect.sizeDelta.y / 2f));
     }
 
 
     public Rect GetFrame()
     {
-        RectTransform rect = mGameObject.GetComponent<RectTransform>();
-        return  new Rect( rect.anchoredPosition.x, rect.anchoredPosition.y, rect.rect.width, rect.rect.height );
+        return  GetFrame( mGameObject );
     }
 
 
-    public virtual void LayoutSubviews()
+    public Rect GetFrameRelativeTo( GameObject other )
     {
+        Rect frame = GetFrame();
+
+        Transform parent = mGameObject.transform.parent;
+        while( parent != null && parent != other.transform )
+        {
+            Rect parentFrame = GetFrame( parent.gameObject );
+            frame = Utilities.OffsetRectBy( frame, new Vector2( parentFrame.xMin, parentFrame.yMin ) );
+
+            parent = parent.parent;
+        }
+
+        if( parent != null && parent == other.transform )
+        {
+            Rect parentFrame = GetFrame(parent.gameObject);
+            frame = Utilities.OffsetRectBy(frame, new Vector2(parentFrame.xMin, parentFrame.yMin));
+        }
+
+        return  frame;
+    }
+
+
+    private Rect GetFrame( GameObject ofObject )
+    {
+        RectTransform rect = ofObject.GetComponent<RectTransform>();
+        return new Rect(rect.anchoredPosition.x, -rect.anchoredPosition.y, rect.rect.width, rect.rect.height);
     }
 
 

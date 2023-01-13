@@ -2,11 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProductionBuilding : MonoBehaviour
+public abstract class ProductionBuilding : MonoBehaviour
 {
     internal cResourceDescriptor mResourceDescriptor;
     private bool mIsPaused = false;
     private bool mIsOutOfResources = false;
+
+
+
+    abstract public RTSManager.eBuildingList GetBuildingType();
+    abstract public cResourceDescriptor GetResourceDescriptor();
+    virtual public string GetDisplayName()
+    {
+        return GetBuildingType().ToString();
+    }
+    abstract public string GetDescription();
+
+
 
 
     // ===================================
@@ -51,7 +63,7 @@ public class ProductionBuilding : MonoBehaviour
 
     virtual internal void Initialize()
     {
-        mResourceDescriptor = new cResourceDescriptor();
+        mResourceDescriptor = GetResourceDescriptor();
     }
 
 
@@ -125,6 +137,70 @@ public class ProductionBuilding : MonoBehaviour
             }
         }
     }
+
+
+
+
+    public bool IsBuildable()
+    {
+        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
+        {
+            if (mResourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName))
+            {
+                return false;
+            }
+        }
+
+        return GameManager.mRTSManager.mUnlockedBuildings.Contains( GetBuildingType() );
+    }
+
+
+    public RTSManager.eBuildingErrors GetBuildingError()
+    {
+        if (!GameManager.mRTSManager.mUnlockedBuildings.Contains( GetBuildingType() ))
+        {
+            return RTSManager.eBuildingErrors.BlueprintRequired;
+        }
+
+        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
+        {
+            if (mResourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName))
+            {
+                return RTSManager.eBuildingErrors.NotEnoughRessources;
+            }
+        }
+
+        return RTSManager.eBuildingErrors.None;
+    }
+
+
+
+
+    public string GetUIDescription(bool isAllowed)
+    {
+        string name = GetBuildingType().ToString();
+        string description = GetDescription();
+
+        RTSManager.eBuildingErrors error = GetBuildingError();
+
+        string errorMessage = "";
+        switch (error)
+        {
+            case RTSManager.eBuildingErrors.BlueprintRequired:
+                errorMessage = "Blueprint required";
+                break;
+            case RTSManager.eBuildingErrors.NotEnoughRessources:
+                errorMessage = "Not enough resources";
+                break;
+            case RTSManager.eBuildingErrors.None:
+                errorMessage = isAllowed ? "" : "Can't build that type of building here";
+                break;
+        }
+
+        return ProductionBuilding.GetProductionBuildingUIDescription( name, description, errorMessage, mResourceDescriptor );
+    }
+
+
 
 
 

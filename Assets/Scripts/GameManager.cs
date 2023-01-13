@@ -57,17 +57,12 @@ public class GameManager : MonoBehaviour
         playerCtrler = GameObject.Find("Character")?.gameObject.GetComponent<PlayerController>();
 
 
-        Rect screenRect = Camera.main.pixelRect;
+        // Rect screenRect = Camera.main.pixelRect;
 
-        cButton test = new cButton( mUIManager.mCanvas.gameObject, "test" );
-        test.SetFrame( new Rect( 10, 10, 100, 100 ) );
-        test.SetCenter( screenRect.center );
-        test.SetColor( new Color( 0.8f, 0.1f, 0f, 1f ) );
-        test.AddText( "CenterButton" );
-
-        cScrollView scroll = new cBuildMenu( mUIManager.mCanvas.gameObject, "ScrollTest" );
-        scroll.SetFrame(new Rect(10, 10, 500, 500));
-        scroll.SetCenter( screenRect.center );
+        // cBuildMenu buildMenu = new cBuildMenu( mUIManager.mCanvas.gameObject, "BuildMenuNew" );
+        // buildMenu.SetFrame(new Rect(10, 10, 500, 500));
+        // buildMenu.SetCenter( screenRect.center );
+        // buildMenu.ShowBuffBuildingPanel();
     }
 
     // Update is called once per frame

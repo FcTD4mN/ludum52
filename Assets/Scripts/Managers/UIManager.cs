@@ -16,17 +16,7 @@ public class UIManager : MonoBehaviour
     private TextMeshProUGUI mLabelBombs;
 
     // BuildMenu
-    private GameObject mBuildMenu;
-
-    private GameObject mProductionList;
-    private GameObject mBuffList;
-    private Button mButtonForge;
-    private Button mButtonBombFactory;
-    private Button mButtonWorkshop;
-    private Button mButtonDamage;
-    private Button mButtonCooldown;
-    private Button mButtonSpeed;
-    private Button mButtonJump;
+    private cBuildMenu mBuildMenu;
 
     // Info panel
     private GameObject mInfoPanel;
@@ -63,16 +53,11 @@ public class UIManager : MonoBehaviour
         BuildBuildableList();
 
         // Build Menu
-        mBuildMenu = mCanvas.transform.Find("BuildMenu")?.gameObject;
-        mProductionList = GameObject.Find("Productions")?.gameObject;
-        mBuffList = GameObject.Find("Buffs")?.gameObject;
-        mButtonDamage = GameObject.Find("ButtonDamage")?.gameObject.GetComponent<Button>();
-        mButtonCooldown = GameObject.Find("ButtonCooldown")?.gameObject.GetComponent<Button>();
-        mButtonSpeed = GameObject.Find("ButtonSpeed")?.gameObject.GetComponent<Button>();
-        mButtonJump = GameObject.Find("ButtonJump")?.gameObject.GetComponent<Button>();
-        mButtonForge = GameObject.Find("ButtonForge")?.gameObject.GetComponent<Button>();
-        mButtonBombFactory = GameObject.Find("ButtonBombFactory")?.gameObject.GetComponent<Button>();
-        mButtonWorkshop = GameObject.Find("ButtonWorkshop")?.gameObject.GetComponent<Button>();
+        mBuildMenu = new cBuildMenu( mCanvas.gameObject, "BuildMenu" );
+        Rect screenRect = Camera.main.pixelRect;
+        mBuildMenu.SetFrame(new Rect(0, 0, 500, 500));
+        mBuildMenu.SetCenter(screenRect.center);
+        mBuildMenu.mGameObject.SetActive( false );
         BuildBuildMenu();
 
         // Info Panel
@@ -85,15 +70,6 @@ public class UIManager : MonoBehaviour
         mTooltipPanelText = mTooltipPanel.transform.Find("text")?.gameObject.GetComponent<TextMeshProUGUI>();
         mTooltipPanelText.text = "ok";
         mTooltipPanel.SetActive( false );
-
-        mBuildButtons = new List<GameObject>();
-        mBuildButtons.Add( mButtonDamage.gameObject );
-        mBuildButtons.Add( mButtonCooldown.gameObject );
-        mBuildButtons.Add( mButtonSpeed.gameObject );
-        mBuildButtons.Add( mButtonJump.gameObject );
-        mBuildButtons.Add( mButtonForge.gameObject );
-        mBuildButtons.Add( mButtonBombFactory.gameObject );
-        mBuildButtons.Add( mButtonWorkshop.gameObject );
 
         mAllUIFloatingButtons = new List<GameObject>();
     }
@@ -133,7 +109,7 @@ public class UIManager : MonoBehaviour
         mLabelArrows.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows)).ToString();
         mLabelBombs.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs)).ToString();
 
-        UpdateBuildMenu();
+        mBuildMenu.UpdateBuildMenu();
         UpdateMousePosition();
     }
 
@@ -143,6 +119,8 @@ public class UIManager : MonoBehaviour
         Vector3 mousePosScreen = Input.mousePosition;
         Vector3 mousePosWorld;
         RectTransformUtility.ScreenPointToWorldPointInRectangle( mCanvas.transform as RectTransform, mousePosScreen, Camera.main, out mousePosWorld );
+
+        mInfoPanel.SetActive(false);
 
         // PROD BUILDINGS
         foreach( ProductionBuilding building in GameManager.mRTSManager.mAllProductionBuildings )
@@ -180,29 +158,11 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // BUILDINGS IN BUILD MENU
-        if( EventSystem.current.IsPointerOverGameObject() )
-        {
-            PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
-            eventDataCurrentPosition.position = new Vector2(mousePosScreen.x, mousePosScreen.y);
-            List<RaycastResult> results = new List<RaycastResult>();
-            EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
-
-            for (int i = 0; i < results.Count; i++)
-            {
-                if ( mBuildButtons.Contains( results[i].gameObject ) )
-                {
-                    HoveringBuildingDescription( results[i].gameObject );
-                    return;
-                }
-            }
-        }
+        mBuildMenu.UpdateMouse();
 
         if( mHoverButton != null ) {
             DeleteUIButton( mHoverButton );
         }
-
-        mInfoPanel.SetActive( false );
     }
 
 
@@ -212,7 +172,7 @@ public class UIManager : MonoBehaviour
     public void ClearUIForSwitchingView()
     {
         DeleteAllUIFloatingButtons();
-        mBuildMenu.SetActive(false);
+        mBuildMenu.mGameObject.SetActive(false);
         mInfoPanel.SetActive(false);
 
         if (mHoverButton != null)
@@ -382,107 +342,46 @@ public class UIManager : MonoBehaviour
     }
 
 
-    private void HoveringBuildingDescription( GameObject button )
-    {
-        if( mHoveredObject == button && mHoverButton != null ) {
-            return;
-        }
-
-        if( mHoveredObject != button ) {
-            DeleteUIButton(mHoverButton);
-        }
-
-        mHoveredObject = button;
-        UpdateInfoPanel();
-    }
-
-
     // ===================================
     // Build Menu
     // ===================================
     public void ShowBuildMenu()
     {
-        UpdateBuildMenu();
-        mBuildMenu.transform.SetAsLastSibling();
-        mBuildMenu.SetActive( true );
-
-    }
-
-
-    private void UpdateBuildMenu()
-    {
-        if( !mBuildMenu.activeSelf ) { return; }
-
-        bool isLocationOnTower = GameManager.mRTSManager.mTowers.Contains(mObjectToBuildTo.transform.parent.gameObject );
+        bool isLocationOnTower = GameManager.mRTSManager.mTowers.Contains(mObjectToBuildTo.transform.parent.gameObject);
         bool isLocationOnBuffTower = GameManager.mRTSManager.mBuffTower.Contains(mObjectToBuildTo.transform.parent.gameObject);
 
-        mProductionList.SetActive( isLocationOnTower );
-        mBuffList.SetActive( isLocationOnBuffTower );
-
-        mButtonDamage.interactable = BuffBuildingDamage.IsBuildable() && isLocationOnBuffTower;
-        mButtonCooldown.interactable = BuffBuildingCooldown.IsBuildable() && isLocationOnBuffTower;
-        mButtonSpeed.interactable = BuffBuildingSpeed.IsBuildable() && isLocationOnBuffTower;
-        mButtonJump.interactable = BuffBuildingJump.IsBuildable() && isLocationOnBuffTower;
-
-        mButtonForge.interactable = Forge.IsBuildable() && isLocationOnTower;
-        mButtonBombFactory.interactable = BombFactory.IsBuildable() && isLocationOnTower;
-        mButtonWorkshop.interactable = Workshop.IsBuildable() && isLocationOnTower;
+        if( isLocationOnTower ) mBuildMenu.ShowProdBuildingPanel();
+        if( isLocationOnBuffTower ) mBuildMenu.ShowBuffBuildingPanel();
+        mBuildMenu.UpdateBuildMenu();
+        mBuildMenu.mGameObject.transform.SetAsLastSibling();
+        mBuildMenu.mGameObject.SetActive( true );
     }
 
 
     private void BuildBuildMenu()
     {
-        mBuildMenu.SetActive( false );
-
-        mBuildMenu.transform.Find("Close")?.gameObject.GetComponent<Button>().onClick.AddListener( () => {
-            mBuildMenu.SetActive( false );
-        });
-
-        mButtonDamage.onClick.AddListener( () => {
-            mBuildMenu.SetActive( false );
-            GameManager.mRTSManager.BuildBuffBuildingAtLocation( "BuffBuildingDamage", mObjectToBuildTo );
-            DeleteUIButton(mBuildButtonClicked);
-        });
-
-        mButtonCooldown.onClick.AddListener( () => {
-            mBuildMenu.SetActive( false );
-            GameManager.mRTSManager.BuildBuffBuildingAtLocation( "BuffBuildingCooldown", mObjectToBuildTo );
-            DeleteUIButton(mBuildButtonClicked);
-        });
-
-        mButtonForge.onClick.AddListener( () => {
-            mBuildMenu.SetActive( false );
-            GameManager.mRTSManager.BuildObjectAtLocation( "BuildingForge", mObjectToBuildTo );
-            DeleteUIButton(mBuildButtonClicked);
-        });
-
-        mButtonBombFactory.onClick.AddListener( () => {
-            mBuildMenu.SetActive( false );
-            GameManager.mRTSManager.BuildObjectAtLocation( "BuildingBombFactory", mObjectToBuildTo );
-            DeleteUIButton(mBuildButtonClicked);
-        });
-
-        mButtonWorkshop.onClick.AddListener(() =>
+        mBuildMenu.mOnClose = () =>
         {
-            mBuildMenu.SetActive(false);
-            GameManager.mRTSManager.BuildObjectAtLocation("BuildingWorkshop", mObjectToBuildTo);
-            DeleteUIButton(mBuildButtonClicked);
-        });
+            mBuildMenu.mGameObject.SetActive(false);
+        };
 
-        mButtonSpeed.onClick.AddListener(() =>
+
+        mBuildMenu.mOnBuildingClicked = (building)=> {
+
+            mBuildMenu.mGameObject.SetActive(false);
+            GameManager.mRTSManager.BuildBuffBuildingAtLocation( building.ToString(), mObjectToBuildTo);
+            DeleteUIButton(mBuildButtonClicked);
+
+        };
+
+        mBuildMenu.mOnHover = (building) =>
         {
-            mBuildMenu.SetActive(false);
-            GameManager.mRTSManager.BuildObjectAtLocation("BuffBuildingSpeed", mObjectToBuildTo);
-            DeleteUIButton(mBuildButtonClicked);
-        });
+            if( building == null ) return;
 
-        mButtonJump.onClick.AddListener(() =>
-        {
-            mBuildMenu.SetActive(false);
-            GameManager.mRTSManager.BuildObjectAtLocation("BuffBuildingJump", mObjectToBuildTo);
-            DeleteUIButton(mBuildButtonClicked);
-        });
-
+            ProductionBuilding prod = GameManager.mRTSManager.GetPrefabByType( (RTSManager.eBuildingList)building );
+            mInfoPanelText.text = prod.GetUIDescription( true );
+            mInfoPanel.SetActive( true );
+        };
     }
 
     // ===================================
@@ -495,7 +394,6 @@ public class UIManager : MonoBehaviour
 
     private void UpdateInfoPanel()
     {
-        mInfoPanel.SetActive( false );
         if( mHoveredObject == null ) { return; }
 
         // PROD BUILDING
@@ -505,43 +403,6 @@ public class UIManager : MonoBehaviour
             mInfoPanelText.text = prodBuilding.IsPaused() ? "Paused" : prodBuilding.mResourceDescriptor.PrintProductionRates();
             mInfoPanel.SetActive( true );
             return;
-        }
-
-        // UI BUTTON
-        if( mHoveredObject == mButtonDamage.gameObject )
-        {
-            mInfoPanelText.text = BuffBuildingDamage.GetUIDescription(mButtonDamage.interactable);
-            mInfoPanel.SetActive( true );
-        }
-        else if( mHoveredObject == mButtonCooldown.gameObject )
-        {
-            mInfoPanelText.text = BuffBuildingCooldown.GetUIDescription( mButtonCooldown.interactable );
-            mInfoPanel.SetActive( true );
-        }
-        else if( mHoveredObject == mButtonForge.gameObject )
-        {
-            mInfoPanelText.text = Forge.GetUIDescription(mButtonForge.interactable);
-            mInfoPanel.SetActive( true );
-        }
-        else if (mHoveredObject == mButtonBombFactory.gameObject)
-        {
-            mInfoPanelText.text = BombFactory.GetUIDescription(mButtonBombFactory.interactable);
-            mInfoPanel.SetActive(true);
-        }
-        else if (mHoveredObject == mButtonWorkshop.gameObject)
-        {
-            mInfoPanelText.text = Workshop.GetUIDescription(mButtonWorkshop.interactable);
-            mInfoPanel.SetActive(true);
-        }
-        else if (mHoveredObject == mButtonSpeed.gameObject)
-        {
-            mInfoPanelText.text = BuffBuildingSpeed.GetUIDescription(mButtonBombFactory.interactable);
-            mInfoPanel.SetActive(true);
-        }
-        else if (mHoveredObject == mButtonJump.gameObject)
-        {
-            mInfoPanelText.text = BuffBuildingJump.GetUIDescription(mButtonBombFactory.interactable);
-            mInfoPanel.SetActive(true);
         }
     }
 

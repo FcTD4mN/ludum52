@@ -8,14 +8,15 @@ public class InteractableFireVein : Interactable
     {
         if (isActive)
         {
-            if( !FireMaker.IsBuildable() )
+            ProductionBuilding fireHarvester = GameManager.mRTSManager.GetPrefabByType( RTSManager.eBuildingList.FireHarvester );
+            if( !fireHarvester.IsBuildable() )
             {
-                RTSManager.eBuildingErrors error = FireMaker.GetBuildingError();
+                RTSManager.eBuildingErrors error = fireHarvester.GetBuildingError();
                 GameManager.mUIManager.DisplayMessage( error.ToString(), 2 );
                 return;
             }
 
-            GameManager.mRTSManager.BuildObjectAtLocation("BuildingFireMine", gameObject);
+            GameManager.mRTSManager.BuildObjectAtLocation( RTSManager.eBuildingList.FireHarvester.ToString(), gameObject);
             interactBtn.SetActive(false);
             isActive = false;
         }
