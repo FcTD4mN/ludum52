@@ -20,9 +20,4 @@ public abstract class HarvestingBuilding : ProductionBuilding
         GameManager.mRTSManager.mAllHarvesters.Remove( this );
         base.OnDisable();
     }
-
-
-
-
-
 }

@@ -202,11 +202,12 @@ public class RTSManager : MonoBehaviour
     public void BuildBuffBuildingAtLocation(string objectName, GameObject objectToBuildOver)
     {
         GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/" + objectName);
-        GameObject newBuilding = Instantiate(prefab,
+        GameObject newBuilding = Instantiate(   prefab,
                                                 objectToBuildOver.transform.position,
                                                 Quaternion.Euler(0, 0, 0));
 
         newBuilding.transform.SetParent(mRTSWorld.transform);
+        newBuilding?.GetComponent<ProductionBuilding>().AddDiode();
 
         Rect buildingSpotBBox = Utilities.GetBBoxFromTransform(objectToBuildOver);
         Rect newBuildingSpotBBox = Utilities.GetBBoxFromTransform(newBuilding);

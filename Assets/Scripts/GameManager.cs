@@ -55,14 +55,6 @@ public class GameManager : MonoBehaviour
             mPortalManager.Initialize();
 
         playerCtrler = GameObject.Find("Character")?.gameObject.GetComponent<PlayerController>();
-
-
-        // Rect screenRect = Camera.main.pixelRect;
-
-        // cBuildMenu buildMenu = new cBuildMenu( mUIManager.mCanvas.gameObject, "BuildMenuNew" );
-        // buildMenu.SetFrame(new Rect(10, 10, 500, 500));
-        // buildMenu.SetCenter( screenRect.center );
-        // buildMenu.ShowBuffBuildingPanel();
     }
 
     // Update is called once per frame

@@ -7,8 +7,9 @@ public abstract class ProductionBuilding : MonoBehaviour
     internal cResourceDescriptor mResourceDescriptor;
     private bool mIsPaused = false;
     private bool mIsOutOfResources = false;
+    private float mProdRatio = 1f;
 
-
+    public GameObject mDiode;
 
     abstract public RTSManager.eBuildingList GetBuildingType();
     abstract public cResourceDescriptor GetResourceDescriptor();
@@ -26,6 +27,8 @@ public abstract class ProductionBuilding : MonoBehaviour
     // ===================================
     public void OnEnable()
     {
+        Initialize();
+
         GameManager.mRTSManager.mAllProductionBuildings.Add( this );
 
         // Sorts so that prod building that are not buffs are first in the list, so resources are first used by regular buildings, then by buffers
@@ -50,7 +53,7 @@ public abstract class ProductionBuilding : MonoBehaviour
             return  0;
 
         });
-        Initialize();
+
         BuildBuilding();
     }
 
@@ -75,6 +78,7 @@ public abstract class ProductionBuilding : MonoBehaviour
     virtual public void SetPause(bool state)
     {
         mIsPaused = state;
+        UpdateDiode();
     }
 
 
@@ -105,37 +109,45 @@ public abstract class ProductionBuilding : MonoBehaviour
     public void ProduceResource( float deltaTime )
     {
         if( mIsPaused ) { return; }
+
         // Checking enough input resources are available
-        bool enoughResources = true;
+        mProdRatio = 1f;
         foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
         {
             if( mResourceDescriptor.mInputRates[resourceName] == 0f ) {
                 continue;
             }
 
-            float deltaAvailable = GameManager.mResourceManager.GetRessource(resourceName) * deltaTime;
+            float available = GameManager.mResourceManager.GetRessource(resourceName);
             float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime;
-            if( deltaAvailable < deltaInputCost ) {
-                enoughResources = false;
-                break;
+            if( available < deltaInputCost ) {
+                float ratio = available / deltaInputCost;
+                if( ratio < mProdRatio ) mProdRatio = ratio;
             }
         }
 
-        SetOutOfResources( !enoughResources );
+        // Used for stats modifiers, but eventually could apply fraction of stats as well
+        SetOutOfResources( mProdRatio < 1 );
+        UpdateDiode();
 
-        if( enoughResources )
+        if( mProdRatio == 0 ) { return; }
+
+        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
         {
-            foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
-            {
-                // Remove what building consumes
-                float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime;
-                GameManager.mResourceManager.AddResource( resourceName, -deltaInputCost, false );
+            // Remove what building consumes
+            float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime * mProdRatio;
+            GameManager.mResourceManager.AddResource( resourceName, -deltaInputCost, false );
 
-                // Add what building produces
-                float deltaOutputCost = mResourceDescriptor.mOutputRates[resourceName] * deltaTime;
-                GameManager.mResourceManager.AddResource( resourceName, deltaOutputCost, false );
-            }
+            // Add what building produces
+            float deltaOutputCost = mResourceDescriptor.mOutputRates[resourceName] * deltaTime * mProdRatio;
+            GameManager.mResourceManager.AddResource( resourceName, deltaOutputCost, false );
         }
+    }
+
+
+    public float GetProductionRatio()
+    {
+        return  mProdRatio;
     }
 
 
@@ -155,6 +167,51 @@ public abstract class ProductionBuilding : MonoBehaviour
     }
 
 
+    // ===================================
+    // Diode
+    // ===================================
+    public void AddDiode()
+    {
+        if( transform.parent == null ) return;
+
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/Diode");
+        mDiode = Instantiate( prefab,
+                                transform.position + new Vector3( transform.localScale.x/2.5f, transform.localScale.y/2.5f, -1 ),
+                                Quaternion.Euler(0, 0, 0) );
+
+        mDiode.transform.SetParent( gameObject.transform );
+    }
+
+
+    public void UpdateDiode()
+    {
+        if( mDiode == null ) return;
+
+        SpriteRenderer sprite = mDiode.GetComponent<SpriteRenderer>();
+
+        if( mIsPaused )
+        {
+            sprite.material.SetColor("_ColorA", new Color( 1, 0.5f, 0, 1 ));
+            sprite.material.SetColor("_ColorB", new Color( 1, 0.6f, 0.1f, 1));
+            return;
+        }
+
+        if( mProdRatio < 1 )
+        {
+            sprite.material.SetColor( "_ColorA", Color.red );
+            sprite.material.SetColor( "_ColorB", Color.black );
+            return;
+        }
+
+        sprite.material.SetColor("_ColorA", Color.green);
+        sprite.material.SetColor("_ColorB", new Color(0.1f, 1, 0.1f, 1));
+    }
+
+
+
+    // ===================================
+    // UI Stuff
+    // ===================================
     public RTSManager.eBuildingErrors GetBuildingError()
     {
         if (!GameManager.mRTSManager.mUnlockedBuildings.Contains( GetBuildingType() ))

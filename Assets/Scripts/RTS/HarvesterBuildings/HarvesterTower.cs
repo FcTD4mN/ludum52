@@ -12,7 +12,7 @@ public class HarvesterTower : HarvestingBuilding
 
     public override RTSManager.eBuildingList GetBuildingType()
     {
-        return RTSManager.eBuildingList.IronHarvester;
+        return RTSManager.eBuildingList.Other;
     }
 
     public override string GetDescription()

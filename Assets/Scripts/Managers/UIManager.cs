@@ -31,10 +31,20 @@ public class UIManager : MonoBehaviour
     private GameObject mBuildButtonClicked;
     private GameObject mHoverButton; // Button being visible due to hovering
     private GameObject mHoveredObject; // The object the mouse is currently hovering
+    private bool mDidFindHoveredButton = false;
+
+
     public List<GameObject> mBuildableObjects;
     private List<GameObject> mBuildButtons; // All UI buttons to click to build buildings
     private List<GameObject> mAllUIFloatingButtons; // All UI buttons to click to open build menu
 
+
+    private enum eInfoPanelDisplayType
+    {
+        kShowStatsOfExistingBuilding,
+        kShowPrefabStats
+    }
+    private eInfoPanelDisplayType mInfoPanelDisplay;
 
     // ===================================
     // Building
@@ -120,7 +130,8 @@ public class UIManager : MonoBehaviour
         Vector3 mousePosWorld;
         RectTransformUtility.ScreenPointToWorldPointInRectangle( mCanvas.transform as RectTransform, mousePosScreen, Camera.main, out mousePosWorld );
 
-        mInfoPanel.SetActive(false);
+        GameObject previousHovered = mHoveredObject;
+        mDidFindHoveredButton = false;
 
         // PROD BUILDINGS
         foreach( ProductionBuilding building in GameManager.mRTSManager.mAllProductionBuildings )
@@ -131,38 +142,53 @@ public class UIManager : MonoBehaviour
             if( bbox.Contains( mousePosWorld ) )
             {
                 HoveringBuilding( building );
-                return;
+                mDidFindHoveredButton = true;
+                break;
             }
         }
 
         // RECEIVERS
-        foreach ((GameObject, int) pack in GameManager.mRTSManager.mAllReceivers)
+        if( !mDidFindHoveredButton )
         {
-            GameObject receiver = pack.Item1;
-            Rect bbox = Utilities.GetBBoxFromTransform(receiver);
-            if (bbox.Contains(mousePosWorld))
+            foreach ((GameObject, int) pack in GameManager.mRTSManager.mAllReceivers)
             {
-                HoveringReceiver(receiver);
-                return;
+                GameObject receiver = pack.Item1;
+                Rect bbox = Utilities.GetBBoxFromTransform(receiver);
+                if (bbox.Contains(mousePosWorld))
+                {
+                    HoveringReceiver(receiver);
+                    mDidFindHoveredButton = true;
+                    break;
+                }
             }
         }
 
+
+        // Why hovering buildables (aka Build buttons) ? Feels useless
         // BUILDABLE
-        foreach( GameObject buildable in mBuildableObjects )
+        // if (mHoveredObject == null)
+        // {
+        //     foreach( GameObject buildable in mBuildableObjects )
+        //     {
+        //         Rect bbox = Utilities.GetBBoxFromTransform( buildable );
+        //         if( bbox.Contains( mousePosWorld ) )
+        //         {
+        //             HoveringBuildable( buildable );
+        //             break;
+        //         }
+        //     }
+        // }
+
+        if (!mDidFindHoveredButton) mBuildMenu.UpdateMouse();
+
+        if( !mDidFindHoveredButton ) mHoveredObject = null;
+        if( mHoveredObject == null && mHoverButton != null )
         {
-            Rect bbox = Utilities.GetBBoxFromTransform( buildable );
-            if( bbox.Contains( mousePosWorld ) )
-            {
-                HoveringBuildable( buildable );
-                return;
-            }
-        }
-
-        mBuildMenu.UpdateMouse();
-
-        if( mHoverButton != null ) {
             DeleteUIButton( mHoverButton );
+            mHoverButton = null;
         }
+
+        UpdateInfoPanel();
     }
 
 
@@ -175,10 +201,7 @@ public class UIManager : MonoBehaviour
         mBuildMenu.mGameObject.SetActive(false);
         mInfoPanel.SetActive(false);
 
-        if (mHoverButton != null)
-        {
-            DeleteUIButton(mHoverButton);
-        }
+        if (mHoverButton != null) DeleteUIButton(mHoverButton);
     }
 
 
@@ -293,52 +316,36 @@ public class UIManager : MonoBehaviour
     // ===================================
     private void HoveringBuilding(ProductionBuilding building)
     {
-        if (mHoveredObject == building.gameObject && mHoverButton != null)
-        {
-            return;
-        }
-
-        if (mHoveredObject != building.gameObject)
-        {
-            DeleteUIButton(mHoverButton);
-        }
+        if (mHoveredObject == building.gameObject && mHoverButton != null) return;
+        if (mHoveredObject != building.gameObject) DeleteUIButton(mHoverButton);
 
         mHoveredObject = building.gameObject;
+        mInfoPanelDisplay = eInfoPanelDisplayType.kShowStatsOfExistingBuilding;
+
         CreatePauseButtonOverBuilding(building.gameObject);
-        UpdateInfoPanel();
     }
 
 
     private void HoveringReceiver(GameObject receiver)
     {
         GameObject associatedReceiverObject = receiver.GetComponent<Receiver>().mAssociatedHarvester.gameObject;
-        if (mHoveredObject == associatedReceiverObject && mHoverButton != null)
-        {
-            return;
-        }
-
-        if (mHoveredObject != associatedReceiverObject)
-        {
-            DeleteUIButton(mHoverButton);
-        }
+        if (mHoveredObject == associatedReceiverObject && mHoverButton != null) return;
+        if (mHoveredObject != associatedReceiverObject) DeleteUIButton(mHoverButton);
 
         mHoveredObject = associatedReceiverObject;
+        mInfoPanelDisplay = eInfoPanelDisplayType.kShowStatsOfExistingBuilding;
+
         CreatePauseButtonOverBuilding( receiver );
-        UpdateInfoPanel();
     }
 
 
     private void HoveringBuildable( GameObject resource )
     {
-        if( mHoveredObject == resource && mHoverButton != null ) {
-            return;
-        }
-
-        if( mHoveredObject != resource ) {
-            DeleteUIButton(mHoverButton);
-        }
+        if( mHoveredObject == resource && mHoverButton != null ) return;
+        if( mHoveredObject != resource ) DeleteUIButton(mHoverButton);
 
         mHoveredObject = resource;
+        mInfoPanelDisplay = eInfoPanelDisplayType.kShowStatsOfExistingBuilding;
     }
 
 
@@ -377,10 +384,14 @@ public class UIManager : MonoBehaviour
         mBuildMenu.mOnHover = (building) =>
         {
             if( building == null ) return;
-
             ProductionBuilding prod = GameManager.mRTSManager.GetPrefabByType( (RTSManager.eBuildingList)building );
-            mInfoPanelText.text = prod.GetUIDescription( true );
-            mInfoPanel.SetActive( true );
+
+            if (mHoveredObject == prod && mHoverButton != null) return;
+            if (mHoveredObject != prod) DeleteUIButton(mHoverButton);
+
+            mHoveredObject = prod.gameObject;
+            mDidFindHoveredButton = true;
+            mInfoPanelDisplay = eInfoPanelDisplayType.kShowPrefabStats;
         };
     }
 
@@ -394,16 +405,29 @@ public class UIManager : MonoBehaviour
 
     private void UpdateInfoPanel()
     {
-        if( mHoveredObject == null ) { return; }
+        mInfoPanel.SetActive(mHoveredObject != null);
 
-        // PROD BUILDING
-        ProductionBuilding prodBuilding = mHoveredObject.GetComponent<ProductionBuilding>();
-        if( prodBuilding != null )
+        if( mHoveredObject != null )
         {
-            mInfoPanelText.text = prodBuilding.IsPaused() ? "Paused" : prodBuilding.mResourceDescriptor.PrintProductionRates();
-            mInfoPanel.SetActive( true );
-            return;
+            // PROD BUILDING
+            ProductionBuilding prodBuilding = mHoveredObject.GetComponent<ProductionBuilding>();
+            if( prodBuilding == null ) return;
+
+            switch (mInfoPanelDisplay)
+            {
+                case eInfoPanelDisplayType.kShowStatsOfExistingBuilding:
+                    mInfoPanelText.text = prodBuilding.IsPaused() ? "Paused" : prodBuilding.mResourceDescriptor.PrintProductionRates();
+                    break;
+
+                case eInfoPanelDisplayType.kShowPrefabStats:
+                    mInfoPanelText.text = prodBuilding.GetUIDescription( true );
+                    break;
+
+                default:
+                    break;
+            }
         }
+
     }
 
 
