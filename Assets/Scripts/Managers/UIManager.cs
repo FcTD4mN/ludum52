@@ -163,22 +163,6 @@ public class UIManager : MonoBehaviour
             }
         }
 
-
-        // Why hovering buildables (aka Build buttons) ? Feels useless
-        // BUILDABLE
-        // if (mHoveredObject == null)
-        // {
-        //     foreach( GameObject buildable in mBuildableObjects )
-        //     {
-        //         Rect bbox = Utilities.GetBBoxFromTransform( buildable );
-        //         if( bbox.Contains( mousePosWorld ) )
-        //         {
-        //             HoveringBuildable( buildable );
-        //             break;
-        //         }
-        //     }
-        // }
-
         if (!mDidFindHoveredButton) mBuildMenu.UpdateMouse();
 
         if( !mDidFindHoveredButton ) mHoveredObject = null;
@@ -336,16 +320,6 @@ public class UIManager : MonoBehaviour
         mInfoPanelDisplay = eInfoPanelDisplayType.kShowStatsOfExistingBuilding;
 
         CreatePauseButtonOverBuilding( receiver );
-    }
-
-
-    private void HoveringBuildable( GameObject resource )
-    {
-        if( mHoveredObject == resource && mHoverButton != null ) return;
-        if( mHoveredObject != resource ) DeleteUIButton(mHoverButton);
-
-        mHoveredObject = resource;
-        mInfoPanelDisplay = eInfoPanelDisplayType.kShowStatsOfExistingBuilding;
     }
 
 
