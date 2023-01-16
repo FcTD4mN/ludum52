@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class IronHarvester : HarvestingBuilding
 {
-    override public cResourceDescriptor GetResourceDescriptor()
+    override public cResourceDescriptor GetNewResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
@@ -16,7 +16,7 @@ public class IronHarvester : HarvestingBuilding
 
     public override RTSManager.eBuildingList GetBuildingType()
     {
-        return RTSManager.eBuildingList.Forge;
+        return RTSManager.eBuildingList.IronHarvester;
     }
 
     public override string GetDescription()

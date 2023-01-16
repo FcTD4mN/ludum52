@@ -114,6 +114,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void OnOpenControlPanel(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        {
+            if (mIsInRTSMode)
+            {
+                mUIManager.BuildControlPanel();
+            }
+        }
+    }
+
+
+
     // Faire ca plus propre un jour :
     public List<UnlockableAction> unlockedActions = new List<UnlockableAction>();
 

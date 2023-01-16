@@ -1,6 +1,6 @@
 public class HarvesterTower : HarvestingBuilding
 {
-    override public cResourceDescriptor GetResourceDescriptor()
+    override public cResourceDescriptor GetNewResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
@@ -13,6 +13,12 @@ public class HarvesterTower : HarvestingBuilding
     public override RTSManager.eBuildingList GetBuildingType()
     {
         return RTSManager.eBuildingList.Other;
+    }
+
+
+    public override string GetDisplayName()
+    {
+        return "Main Tower";
     }
 
     public override string GetDescription()

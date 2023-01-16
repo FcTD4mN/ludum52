@@ -1,6 +1,6 @@
 public class FireHarvester : HarvestingBuilding
 {
-    override public cResourceDescriptor GetResourceDescriptor()
+    override public cResourceDescriptor GetNewResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 

@@ -116,6 +116,12 @@ public class cResourceDescriptor
         FireArrows,
         Bombs
     }
+    public enum eResourceType
+    {
+        kBuildCost,
+        kInput,
+        kOutput
+    }
 
     public static void BuildResourceList()
     {

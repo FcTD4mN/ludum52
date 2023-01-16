@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BuffBuildingJump : BuffBuilding
 {
-    override public cResourceDescriptor GetResourceDescriptor()
+    override public cResourceDescriptor GetNewResourceDescriptor()
     {
         cResourceDescriptor output = new cResourceDescriptor();
 

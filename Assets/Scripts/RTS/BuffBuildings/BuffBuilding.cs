@@ -35,7 +35,7 @@ public abstract class BuffBuilding : ProductionBuilding
     override internal void Initialize()
     {
         base.Initialize();
-        mResourceDescriptor = GetResourceDescriptor();
+        mResourceDescriptor = GetNewResourceDescriptor();
         mStatsModifiers = GetStatsDescriptor();
     }
 
@@ -125,7 +125,7 @@ public abstract class BuffBuilding : ProductionBuilding
                 break;
         }
 
-        return BuffBuilding.GetBuffBuildingUIDescription(name, description, errorMessage, GetResourceDescriptor(), GetStatsDescriptor());
+        return BuffBuilding.GetBuffBuildingUIDescription(name, description, errorMessage, GetNewResourceDescriptor(), GetStatsDescriptor());
     }
 
 

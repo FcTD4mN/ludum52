@@ -12,7 +12,7 @@ public abstract class ProductionBuilding : MonoBehaviour
     public GameObject mDiode;
 
     abstract public RTSManager.eBuildingList GetBuildingType();
-    abstract public cResourceDescriptor GetResourceDescriptor();
+    abstract public cResourceDescriptor GetNewResourceDescriptor();
     virtual public string GetDisplayName()
     {
         return GetBuildingType().ToString();
@@ -66,7 +66,13 @@ public abstract class ProductionBuilding : MonoBehaviour
 
     virtual internal void Initialize()
     {
-        mResourceDescriptor = GetResourceDescriptor();
+        mResourceDescriptor = GetNewResourceDescriptor();
+    }
+
+
+    public cResourceDescriptor GetResourceDescriptor()
+    {
+        return  mResourceDescriptor;
     }
 
 

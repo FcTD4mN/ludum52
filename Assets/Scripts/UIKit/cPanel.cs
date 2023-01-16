@@ -12,6 +12,10 @@ class cPanel :
         image.type = Image.Type.Sliced;
         image.fillCenter = true;
 
-        SetColor( new Color( 0.2f, 0.2f, 0.2f, 0.8f ) );
+        Outline outline = mGameObject.AddComponent<Outline>();
+        outline.effectDistance = new Vector2( 2, 2 );
+        outline.effectColor = new Color( 0.6f, 0.8f, 0.8f, 1f );
+
+        SetColor( new Color( 0.13f, 0.2f, 0.2f, 1f ) );
     }
 }

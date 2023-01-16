@@ -22,6 +22,9 @@ public class UIManager : MonoBehaviour
     private GameObject mInfoPanel;
     private TextMeshProUGUI mInfoPanelText;
 
+    // Master Control Panel
+    private cMasterControlPanel mMasterControlPanel;
+
     // Tooltip panel
     private GameObject mTooltipPanel;
     private TextMeshProUGUI mTooltipPanelText;
@@ -119,7 +122,8 @@ public class UIManager : MonoBehaviour
         mLabelArrows.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows)).ToString();
         mLabelBombs.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs)).ToString();
 
-        mBuildMenu.UpdateBuildMenu();
+        mBuildMenu?.UpdateBuildMenu();
+        mMasterControlPanel?.Update();
         UpdateMousePosition();
     }
 
@@ -401,9 +405,20 @@ public class UIManager : MonoBehaviour
                     break;
             }
         }
-
     }
 
+
+    // ===================================
+    // Master control panel
+    // ===================================
+    public void BuildControlPanel()
+    {
+        mMasterControlPanel = new cMasterControlPanel( mCanvas.gameObject, "MCP" );
+        var screenRect = Camera.main.pixelRect;
+
+        mMasterControlPanel.SetFrame( new Rect(0, 0, 900, 800));
+        mMasterControlPanel.SetCenter( screenRect.center );
+    }
 
 
     public void DisplayMessage( string message, float duration )
