@@ -26,7 +26,7 @@ class cMasterControlPanel :
 
         mCloseButton = new cButton(mGameObject, "Close");
         mCloseButton.SetColor(Color.black);
-        mCloseButton.AddText("X");
+        mCloseButton.SetText("X");
         mCloseButton.AddOnClickAction(() =>
         {
             GameObject.Destroy( mGameObject );
@@ -41,6 +41,8 @@ class cMasterControlPanel :
 
     public void Update()
     {
+        if( mGameObject == null ) return;
+
         mContent.Update();
     }
 

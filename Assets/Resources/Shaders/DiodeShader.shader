@@ -1,4 +1,4 @@
-Shader "Unlit/DiodeTest"
+Shader "Unlit/DiodeShader"
 {
     Properties
     {

@@ -31,7 +31,7 @@ class cBuildMenu :
 
         mCloseButton = new cButton( mGameObject, "Close" );
         mCloseButton.SetColor( Color.black );
-        mCloseButton.AddText( "X" );
+        mCloseButton.SetText( "X" );
         mCloseButton.AddOnClickAction( () => {
             mOnClose?.Invoke();
         });

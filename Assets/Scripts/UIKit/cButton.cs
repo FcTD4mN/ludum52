@@ -74,7 +74,7 @@ class cButton:
     // ===================================
     // Label
     // ===================================
-    public void AddText( string text )
+    public void SetText( string text )
     {
         if( mLabel == null )
         {

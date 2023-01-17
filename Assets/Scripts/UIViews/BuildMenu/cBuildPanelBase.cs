@@ -76,7 +76,7 @@ abstract class cBuildPanelBase :
         {
             string buildingName = building.ToString();
             cButton button = new cButton(mGameObject, buildingName);
-            button.AddText(buildingName);
+            button.SetText(buildingName);
             button.AddOnClickAction(() =>
             {
 

@@ -14,10 +14,19 @@ class cBuildingLine :
     private List<cResourceView> mInputViews;
     private List<cResourceView> mOutputViews;
 
+    private cLabel mLabelProdRate;
+    private cButton mButtonPause;
+
+    // Unity can't change material properties on UI elements, so we have to patch it by reinstancing a new material copy...
+    // This is used to reduce the amount of material recreation
+    private int mMaterialPatcher = -1;
+
 
     static public float mBuildingLineSpacing = 10;
     static public float mBuildingLineNameWidth = 200f;
     static public float mBuildingLineResourceWidth = 250;
+    static public float mBuildingLineEfficiencyWidth = 70;
+    static public float mBuildingLineButtonPauseWidth = 50;
 
     public cBuildingLine(GameObject parentView, string name, ProductionBuilding building) : base(parentView, name)
     {
@@ -35,6 +44,17 @@ class cBuildingLine :
         mDiode.mImage.material = mDiodeMat;
 
         mAssociatedBuilding = building;
+
+        mLabelProdRate = new cLabel(mGameObject, "prodRate");
+        mLabelProdRate.mText.fontStyle = TMPro.FontStyles.Bold;
+        mLabelProdRate.mText.alignment = TMPro.TextAlignmentOptions.Left;
+
+        mButtonPause = new cButton( mGameObject, "buttonPause" );
+        mButtonPause.SetText( "||" );
+        mButtonPause.SetColor( Color.black );
+        mButtonPause.AddOnClickAction( ()=> {
+            mAssociatedBuilding.SetPause( !mAssociatedBuilding.IsPaused() );
+        });
 
         SetColor(Color.clear);
 
@@ -78,12 +98,26 @@ class cBuildingLine :
             output.SetFrame( outputFrame );
             outputFrame = Utilities.OffsetRectBy( outputFrame, new Vector2( resourceWidth + mBuildingLineSpacing, 0 ) );
         }
+
+        var labelProdFrame = new Rect( titleFrame.xMax + mBuildingLineSpacing + mBuildingLineResourceWidth * 2f + mBuildingLineSpacing * 2f,
+                                    0,
+                                    mBuildingLineEfficiencyWidth,
+                                    frame.height );
+        mLabelProdRate.SetFrame( labelProdFrame );
+
+        var buttonPauseFrame = new Rect( frame.width - mBuildingLineSpacing - mBuildingLineButtonPauseWidth,
+                                            0,
+                                            mBuildingLineButtonPauseWidth,
+                                            frame.height );
+        mButtonPause.SetFrame( buttonPauseFrame );
     }
 
 
     public void Update()
     {
-        float prodRatio = mAssociatedBuilding.GetProductionRatio();
+        float prodRatio = mAssociatedBuilding.IsPaused() ? 0 : mAssociatedBuilding.GetProductionRatio();
+
+        mLabelProdRate.mText.text = (int)(prodRatio*100f) + "%";
 
         foreach (var inputView in mInputViews)
         {
@@ -95,20 +129,35 @@ class cBuildingLine :
             output.Update();
         }
 
-        if (mAssociatedBuilding.IsPaused())
+        var pauseText = mAssociatedBuilding.IsPaused() ? ">" : "||";
+        mButtonPause.SetText(pauseText);
+
+        if (mAssociatedBuilding.IsPaused() )
         {
+            if (mMaterialPatcher == 0) return;
+            mDiodeMat = new Material( mDiodeMat );
+            mDiode.mImage.material = mDiodeMat;
             mDiodeMat.SetColor("_ColorA", new Color(1, 0.5f, 0, 1));
             mDiodeMat.SetColor("_ColorB", new Color(1, 0.6f, 0.1f, 1));
+            mMaterialPatcher = 0;
         }
         else if (prodRatio < 1)
         {
+            if( mMaterialPatcher == 1 ) return;
+            mDiodeMat = new Material(mDiodeMat);
+            mDiode.mImage.material = mDiodeMat;
             mDiodeMat.SetColor("_ColorA", Color.red);
             mDiodeMat.SetColor("_ColorB", Color.black);
+            mMaterialPatcher = 1;
         }
         else
         {
+            if (mMaterialPatcher == 2) return;
+            mDiodeMat = new Material(mDiodeMat);
+            mDiode.mImage.material = mDiodeMat;
             mDiodeMat.SetColor("_ColorA", Color.green);
             mDiodeMat.SetColor("_ColorB", new Color(0.1f, 1, 0.1f, 1));
+            mMaterialPatcher = 2;
         }
     }
 
