@@ -174,7 +174,8 @@ class cBuildingLine :
                                                         "resInputView",
                                                         mAssociatedBuilding,
                                                         resource.Key,
-                                                        cResourceDescriptor.eResourceType.kInput );
+                                                        cResourceDescriptor.eResourceType.kInput,
+                                                        "#ff2222" );
 
             mInputViews.Add( newResourceView );
         }
@@ -193,7 +194,8 @@ class cBuildingLine :
                                                         "resOutputView",
                                                         mAssociatedBuilding,
                                                         resource.Key,
-                                                        cResourceDescriptor.eResourceType.kOutput);
+                                                        cResourceDescriptor.eResourceType.kOutput,
+                                                        "#22ff22" );
 
             mOutputViews.Add(newResourceView);
         }
@@ -210,13 +212,19 @@ class cResourceView :
     private ProductionBuilding mBuilding;
     private string mResourceName;
     private cResourceDescriptor.eResourceType mResourceType;
+    private string mColor;
 
-    public cResourceView(GameObject parentView, string name, ProductionBuilding building, string resourceName, cResourceDescriptor.eResourceType type )
-                            : base(parentView, name)
+    public cResourceView(GameObject parentView,
+                            string name,
+                            ProductionBuilding building,
+                            string resourceName,
+                            cResourceDescriptor.eResourceType type,
+                            string color ) : base(parentView, name)
     {
         mBuilding = building;
         mResourceName = resourceName;
         mResourceType = type;
+        mColor = color;
 
         SetColor( Color.clear );
 
@@ -233,7 +241,10 @@ class cResourceView :
         float buildingRatio = mBuilding.GetProductionRatio();
 
         mLabelName.mText.text = "" + mResourceName[0];
-        mLabelValue.mText.text = mBuilding.IsPaused() ? "0" : (GetResourceValue() * buildingRatio).ToString();
+
+        float value = mBuilding.IsPaused() ? 0 : GetResourceValue() * buildingRatio;
+        string colorTagIn = value == 0 ? "<color=#bbbbbb>" : "<color="+mColor+">";
+        mLabelValue.mText.text = colorTagIn + ((int)value).ToString() + "</color>";
     }
 
 

@@ -9,11 +9,16 @@ class cMasterControlPanel :
     private cButton mCloseButton;
     private cLabel mTitle;
 
+    private cScrollView mScrollAreaLeft;
+    private cMCPResourcesPanel mResourcePanel;
+
     private cScrollView mScrollArea;
     private cMCPContentPanel mContent;
 
-    private int mPadding = 24;
+    private int mPadding = 10;
     private int mTitleSize = 24;
+
+    private int mLeftPanelWidth = 500;
 
 
     public cMasterControlPanel(GameObject parentView, string name) : base(parentView, name)
@@ -32,8 +37,12 @@ class cMasterControlPanel :
             GameObject.Destroy( mGameObject );
         });
 
-        mScrollArea = new cScrollView(mGameObject, "ScrollArea");
+        mScrollAreaLeft = new cScrollView(mGameObject, "ScrollAreaLeft");
+        mResourcePanel = new cMCPResourcesPanel( mGameObject, "resourcePanel" );
+        mScrollAreaLeft.AddViewToContent( mResourcePanel );
 
+
+        mScrollArea = new cScrollView(mGameObject, "ScrollArea");
         mContent = new cMCPContentPanel( mGameObject, "Content" );
         mScrollArea.AddViewToContent( mContent );
     }
@@ -44,6 +53,7 @@ class cMasterControlPanel :
         if( mGameObject == null ) return;
 
         mContent.Update();
+        mResourcePanel.Update();
     }
 
 
@@ -51,27 +61,35 @@ class cMasterControlPanel :
     {
         Rect frame = GetFrame();
 
+        float leftPanelWidth = mLeftPanelWidth - mPadding;
+
         mCloseButton.SetFrame(new Rect(0,
                                          0,
                                          40,
                                          40));
         mCloseButton.SetCenter(new Vector2(frame.xMax, frame.yMin));
 
-
         int titleHeight = mTitleSize;
-        Rect titleFrame = new Rect(mPadding,
+        Rect titleFrame = new Rect( mPadding,
                                     mPadding,
                                     frame.width - mPadding * 2,
                                     titleHeight);
         mTitle.SetFrame(titleFrame);
 
-        float scrollHeight = frame.height - titleFrame.height - mPadding * 2;
-        mScrollArea.SetFrame(new Rect(0, titleFrame.yMax + mPadding, frame.width, scrollHeight));
+        float resHeight = mResourcePanel.RequiredHeightForWidth( leftPanelWidth );
+        mResourcePanel.SetFrame(new Rect(0, 0, leftPanelWidth, resHeight));
 
-        float contentHeight = mContent.RequiredHeightForWidth(frame.width);
-        mContent.SetFrame(new Rect(0, 0, frame.width, contentHeight));
+        float scrollHeight = frame.height - titleFrame.height - mPadding * 3;
+        mScrollAreaLeft.SetFrame(new Rect(mPadding, titleFrame.yMax + mPadding, leftPanelWidth, scrollHeight));
+        mScrollAreaLeft.SetContentSize(new Vector2(0, mResourcePanel.GetFrame().height));
 
 
+        float smallerPadding = mPadding * 0.2f;
+        float rightPartWidth = frame.width - mLeftPanelWidth - mPadding * 1.2f; // small padding between panels
+        float contentHeight = mContent.RequiredHeightForWidth(rightPartWidth);
+        mContent.SetFrame(new Rect(0, 0, rightPartWidth, contentHeight));
+
+        mScrollArea.SetFrame(new Rect( mLeftPanelWidth + smallerPadding, titleFrame.yMax + mPadding, rightPartWidth, scrollHeight));
         mScrollArea.SetContentSize(new Vector2(0, mContent.GetFrame().height));
     }
 }

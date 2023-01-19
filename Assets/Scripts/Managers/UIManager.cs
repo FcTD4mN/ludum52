@@ -416,7 +416,7 @@ public class UIManager : MonoBehaviour
         mMasterControlPanel = new cMasterControlPanel( mCanvas.gameObject, "MCP" );
         var screenRect = Camera.main.pixelRect;
 
-        mMasterControlPanel.SetFrame( new Rect(0, 0, 1200, 800));
+        mMasterControlPanel.SetFrame( new Rect(0, 0, 1600, 800));
         mMasterControlPanel.SetCenter( screenRect.center );
     }
 
