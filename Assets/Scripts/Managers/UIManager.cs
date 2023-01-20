@@ -154,13 +154,12 @@ public class UIManager : MonoBehaviour
         // RECEIVERS
         if( !mDidFindHoveredButton )
         {
-            foreach ((GameObject, int) pack in GameManager.mRTSManager.mAllReceivers)
+            foreach (Receiver receiver in GameManager.mRTSManager.mAllReceivers)
             {
-                GameObject receiver = pack.Item1;
-                Rect bbox = Utilities.GetBBoxFromTransform(receiver);
+                Rect bbox = Utilities.GetBBoxFromTransform(receiver.gameObject);
                 if (bbox.Contains(mousePosWorld))
                 {
-                    HoveringReceiver(receiver);
+                    HoveringReceiver(receiver.gameObject);
                     mDidFindHoveredButton = true;
                     break;
                 }
@@ -354,7 +353,7 @@ public class UIManager : MonoBehaviour
         mBuildMenu.mOnBuildingClicked = (building)=> {
 
             mBuildMenu.mGameObject.SetActive(false);
-            GameManager.mRTSManager.BuildBuffBuildingAtLocation( building.ToString(), mObjectToBuildTo);
+            GameManager.mRTSManager.BuildObjectAtLocation( building.ToString(), mObjectToBuildTo);
             DeleteUIButton(mBuildButtonClicked);
 
         };

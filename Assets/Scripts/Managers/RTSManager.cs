@@ -16,7 +16,7 @@ public class RTSManager : MonoBehaviour
     public List<BuffBuilding> mAllBuffBuildings;
 
 
-    public List<(GameObject, int)> mAllReceivers;
+    public List<Receiver> mAllReceivers;
     public List<GameObject> mBuffBuildingSpots;
 
 
@@ -53,7 +53,7 @@ public class RTSManager : MonoBehaviour
         mAllProductionBuildings = new List<ProductionBuilding>();
         mAllHarvesters = new List<HarvestingBuilding>();
 
-        mAllReceivers = new List<(GameObject, int)>();
+        mAllReceivers = new List<Receiver>();
         mBuildingToBuildableRelations = new List<(GameObject, GameObject)>();
 
         mUnlockedBuildings = new List<eBuildingList>();
@@ -89,7 +89,8 @@ public class RTSManager : MonoBehaviour
         Rect newBuildingSpotBBox = Utilities.GetBBoxFromTransform( newBuilding );
         newBuilding.transform.localScale = new Vector3( buildingSpotBBox.width / newBuildingSpotBBox.width, buildingSpotBBox.height / newBuildingSpotBBox.height, 1 );
 
-        if( newBuilding.gameObject.GetComponent<HarvestingBuilding>() != null )
+        if( newBuilding.gameObject.GetComponent<HarvestingBuilding>() != null && // If we built harvester
+            mAllReceivers.Count < mTowerLevel * mHarvesterSlots ) // and slots are left for receiver
         {
             GameObject createdReceiver = null;
             if (newBuilding.gameObject.GetComponent<IronHarvester>() != null)
@@ -116,7 +117,7 @@ public class RTSManager : MonoBehaviour
     }
 
 
-    private GameObject BuildReceiver( string type, GameObject associatedHarvester )
+    public GameObject BuildReceiver( string type, GameObject associatedHarvester )
     {
         int spawnIndex = GetAvailableSlotIndex();
         int towerFloorIndex = spawnIndex / 2;
@@ -151,12 +152,14 @@ public class RTSManager : MonoBehaviour
         cable.transform.position = new Vector3( cable.transform.position.x, cable.transform.position.y - ((floorMultiplier-1)/4), 0 );
 
         // Add to lists
-        if( newBuilding.GetComponent<Receiver>() != null )
+        var receiverComp = newBuilding.GetComponent<Receiver>();
+        var associatedHarvesterComp = associatedHarvester.GetComponent<HarvestingBuilding>();
+        if( receiverComp != null && associatedHarvesterComp != null )
         {
-            mAllReceivers.Add( (newBuilding, spawnIndex ) );
+            receiverComp.mLocationIndex = spawnIndex;
+            receiverComp.mAssociatedHarvester = associatedHarvesterComp;
+            associatedHarvesterComp.mReceiver = receiverComp;
         }
-
-        newBuilding.GetComponent<Receiver>().mAssociatedHarvester = associatedHarvester.GetComponent<ProductionBuilding>();
 
         return  newBuilding;
     }
@@ -165,9 +168,9 @@ public class RTSManager : MonoBehaviour
     private int GetAvailableSlotIndex()
     {
         List<int> mAllIndices = new List<int>();
-        foreach( (GameObject, int) receiver in mAllReceivers )
+        foreach( Receiver receiver in mAllReceivers )
         {
-            mAllIndices.Add( receiver.Item2 );
+            mAllIndices.Add( receiver.mLocationIndex );
         }
 
         mAllIndices.Sort();
@@ -199,27 +202,6 @@ public class RTSManager : MonoBehaviour
     }
 
 
-    public void BuildBuffBuildingAtLocation(string objectName, GameObject objectToBuildOver)
-    {
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/" + objectName);
-        GameObject newBuilding = Instantiate(   prefab,
-                                                objectToBuildOver.transform.position,
-                                                Quaternion.Euler(0, 0, 0));
-
-        newBuilding.transform.SetParent(mRTSWorld.transform);
-        newBuilding?.GetComponent<ProductionBuilding>().AddDiode();
-
-        Rect buildingSpotBBox = Utilities.GetBBoxFromTransform(objectToBuildOver);
-        Rect newBuildingSpotBBox = Utilities.GetBBoxFromTransform(newBuilding);
-        newBuilding.transform.localScale = new Vector3(buildingSpotBBox.width / newBuildingSpotBBox.width, buildingSpotBBox.height / newBuildingSpotBBox.height, 1);
-
-        mBuildingToBuildableRelations.Add((newBuilding, objectToBuildOver));
-
-        objectToBuildOver.SetActive(false);
-    }
-
-
-
     public void DestroyBuilding( GameObject building )
     {
         List<(GameObject, GameObject)> relations = mBuildingToBuildableRelations.FindAll((element) => { return element.Item1 == building; });
@@ -229,15 +211,11 @@ public class RTSManager : MonoBehaviour
             mBuildingToBuildableRelations.Remove(relation);
         }
 
-        if (building.GetComponent<Receiver>() != null)
+        // If we destroy a receiver, just disconnect the harvester from it, don't destroy the harvester
+        var receiver = building.GetComponent<Receiver>();
+        if( receiver != null )
         {
-            DestroyBuilding(building.GetComponent<Receiver>().mAssociatedHarvester.gameObject);
-
-            if (building.GetComponent<Receiver>() != null)
-            {
-                (GameObject, int) foundReceiver = mAllReceivers.Find((element) => { return element.Item1 == building; });
-                mAllReceivers.Remove(foundReceiver);
-            }
+            receiver.mAssociatedHarvester.mReceiver = null;
         }
 
         GameObject.Destroy( building );

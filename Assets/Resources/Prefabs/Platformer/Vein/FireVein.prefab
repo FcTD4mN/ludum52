@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 4314179775568346703}
   - component: {fileID: 4314179775568346702}
   - component: {fileID: 4314179775568346688}
-  - component: {fileID: 6138246136965950316}
+  - component: {fileID: 3468774438282468374}
   - component: {fileID: 325874084029564277}
   m_Layer: 0
   m_Name: FireVein
@@ -188,7 +188,7 @@ CapsuleCollider2D:
   m_Offset: {x: -0.021475434, y: 0.017180324}
   m_Size: {x: 2.0309775, y: 2.0309775}
   m_Direction: 0
---- !u!114 &6138246136965950316
+--- !u!114 &3468774438282468374
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -197,9 +197,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4314179775568346701}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddac8c01400c8324d9ae368f217a5241, type: 3}
+  m_Script: {fileID: 11500000, guid: d56757dfc3d305a4c88a8ef6542e3092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mHarvester: {fileID: 0}
 --- !u!114 &325874084029564277
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -214,3 +215,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isActive: 0
   interactablePrefab: {fileID: 0}
+  mIsFirstTimeInteracting: 1
+  mMessage: 
+  mDuration: 0

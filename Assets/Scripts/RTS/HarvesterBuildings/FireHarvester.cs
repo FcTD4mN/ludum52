@@ -21,4 +21,9 @@ public class FireHarvester : HarvestingBuilding
     {
         return "Harvests fire";
     }
+
+    override public string GetAssociatedReceiver()
+    {
+        return  "FireReceiver";
+    }
 }

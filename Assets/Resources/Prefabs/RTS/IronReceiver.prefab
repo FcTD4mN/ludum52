@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7450439542044029271}
   - component: {fileID: 5458065911027166113}
-  - component: {fileID: 2799999288935248306}
+  - component: {fileID: 8775117074009519023}
   m_Layer: 0
   m_Name: IronReceiver
   m_TagString: Untagged
@@ -86,7 +86,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &2799999288935248306
+--- !u!114 &8775117074009519023
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,9 +95,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 854160827544264574}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61cbed394feaded45a6ce83c565f9be2, type: 3}
+  m_Script: {fileID: 11500000, guid: 467c66d930d312a4fad8140fdf46bd72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mAssociatedHarvester: {fileID: 0}
+  mLocationIndex: -1
 --- !u!1 &7377783023162681152
 GameObject:
   m_ObjectHideFlags: 0

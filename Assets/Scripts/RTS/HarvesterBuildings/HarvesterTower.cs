@@ -31,8 +31,19 @@ public class HarvesterTower : HarvestingBuilding
         return false;
     }
 
+
+    override public bool IsConnected()
+    {
+        return true;
+    }
+
     public new RTSManager.eBuildingErrors GetBuildingError()
     {
         return RTSManager.eBuildingErrors.None;
+    }
+
+    override public string GetAssociatedReceiver()
+    {
+        return "";
     }
 }

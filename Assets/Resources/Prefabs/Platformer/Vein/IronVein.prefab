@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1713139451038151455}
   - component: {fileID: 1713139451038151454}
   - component: {fileID: 1713139451038151440}
-  - component: {fileID: 8797160944825181539}
   - component: {fileID: 4086008418687854830}
+  - component: {fileID: 874202053263642664}
   m_Layer: 0
   m_Name: IronVein
   m_TagString: Untagged
@@ -104,18 +104,6 @@ CapsuleCollider2D:
   m_Offset: {x: -0.021475434, y: 0.017180324}
   m_Size: {x: 2.0309775, y: 2.0309775}
   m_Direction: 0
---- !u!114 &8797160944825181539
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1713139451038151453}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 805d74d09218348459ef165ac5dfdd3e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4086008418687854830
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -130,6 +118,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isActive: 0
   interactablePrefab: {fileID: 0}
+  mIsFirstTimeInteracting: 1
+  mMessage: 
+  mDuration: 0
+--- !u!114 &874202053263642664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1713139451038151453}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24eb3b69d0e73b44a8be18766a20be76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mHarvester: {fileID: 0}
 --- !u!1 &1713139452179164602
 GameObject:
   m_ObjectHideFlags: 0

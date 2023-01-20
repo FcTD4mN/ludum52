@@ -52,9 +52,7 @@ class cBuildingLine :
         mButtonPause = new cButton( mGameObject, "buttonPause" );
         mButtonPause.SetText( "||" );
         mButtonPause.SetColor( Color.black );
-        mButtonPause.AddOnClickAction( ()=> {
-            mAssociatedBuilding.SetPause( !mAssociatedBuilding.IsPaused() );
-        });
+        mButtonPause.AddOnClickAction( OnPauseClick );
 
         SetColor(Color.clear);
 
@@ -199,6 +197,14 @@ class cBuildingLine :
 
             mOutputViews.Add(newResourceView);
         }
+    }
+
+    // This whole method is now the best way i feel like, pausing should be handled in SetPause() override, a harvester can't be paused, it will always
+    // unplug, like, pausing means unpluging.
+    // But then, for now, it means you shouldn't be able to hit pause on the receiver hover button, cause Pause => then object disappears is kinda weird
+    private void OnPauseClick()
+    {
+        mAssociatedBuilding.SetPause(!mAssociatedBuilding.IsPaused());
     }
 }
 

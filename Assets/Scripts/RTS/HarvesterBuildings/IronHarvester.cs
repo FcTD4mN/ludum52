@@ -23,4 +23,9 @@ public class IronHarvester : HarvestingBuilding
     {
         return "Harvests Iron";
     }
+
+    override public string GetAssociatedReceiver()
+    {
+        return "IronReceiver";
+    }
 }

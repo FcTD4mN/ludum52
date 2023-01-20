@@ -7,7 +7,7 @@ public abstract class ProductionBuilding : MonoBehaviour
     internal cResourceDescriptor mResourceDescriptor;
     private bool mIsPaused = false;
     private bool mIsOutOfResources = false;
-    private float mProdRatio = 1f;
+    internal float mProdRatio = 1f;
 
     public GameObject mDiode;
 
@@ -76,7 +76,7 @@ public abstract class ProductionBuilding : MonoBehaviour
     }
 
 
-    public bool IsPaused()
+    virtual public bool IsPaused()
     {
         return mIsPaused;
     }
@@ -112,7 +112,7 @@ public abstract class ProductionBuilding : MonoBehaviour
     }
 
 
-    public void ProduceResource( float deltaTime )
+    virtual public void ProduceResource( float deltaTime )
     {
         if( mIsPaused ) { return; }
 
