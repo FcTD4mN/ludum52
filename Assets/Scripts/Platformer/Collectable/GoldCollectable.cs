@@ -22,7 +22,7 @@ public class GoldCollectable : Collectable
     {
         base.Collect();
 
-        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Gold.ToString(), value, true);
+        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Gold, value, true);
         GameManager.mUIManager.FloatingMessage((value).ToString(), Color.yellow, transform.position);
     }
 

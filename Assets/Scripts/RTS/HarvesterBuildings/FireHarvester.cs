@@ -4,10 +4,10 @@ public class FireHarvester : HarvestingBuilding
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 1000;
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron.ToString()] = 50;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold] = 1000;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron] = 50;
 
-        output.mOutputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 5;
+        output.mOutputRates[cResourceDescriptor.eResourceNames.Fire] = 5;
 
         return output;
     }

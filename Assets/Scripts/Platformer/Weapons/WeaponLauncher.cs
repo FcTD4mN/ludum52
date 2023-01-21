@@ -106,7 +106,7 @@ public class WeaponLauncher : MonoBehaviour
         Rigidbody2D rbArrow = arrow.GetComponent<Rigidbody2D>();
         rbArrow.velocity = direction * arrowSpeed;
 
-        GameManager.mResourceManager.AddResource(availableArrowType[currentArrowType].ToString(), -1, false);
+        GameManager.mResourceManager.AddResource(availableArrowType[currentArrowType], -1, false);
     }
 
     public void LaunchBomb(bool facingRight)
@@ -123,7 +123,7 @@ public class WeaponLauncher : MonoBehaviour
         rb.AddForce(direction * bombSpeed, ForceMode2D.Impulse);
         bomb.transform.Translate(launchOffset);
 
-        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Bombs.ToString(), -1, false);
+        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Bombs, -1, false);
     }
 
     public void AimLaunchBomb(bool facingRight, Vector2 force)
@@ -136,7 +136,7 @@ public class WeaponLauncher : MonoBehaviour
         rb.isKinematic = false;
         rb.AddForce(force, ForceMode2D.Impulse);
 
-        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Bombs.ToString(), -1, false);
+        GameManager.mResourceManager.AddResource(cResourceDescriptor.eResourceNames.Bombs, -1, false);
     }
 
     // Handle Aim draw for bomb :

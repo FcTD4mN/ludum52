@@ -8,8 +8,8 @@ public class IronHarvester : HarvestingBuilding
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 500;
-        output.mOutputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 5;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold] = 500;
+        output.mOutputRates[cResourceDescriptor.eResourceNames.Iron] = 5;
 
         return output;
     }

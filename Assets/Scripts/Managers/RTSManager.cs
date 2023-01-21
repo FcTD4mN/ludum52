@@ -11,13 +11,16 @@ public class RTSManager : MonoBehaviour
     public int mTowerLevel = 1;
     public int mHarvesterSlots = 2;
 
+    // All Buildings
     public List<HarvestingBuilding> mAllHarvesters;
     public List<ProductionBuilding> mAllProductionBuildings;
     public List<BuffBuilding> mAllBuffBuildings;
 
-
+    // Receivers
     public List<Receiver> mAllReceivers;
-    public List<GameObject> mBuffBuildingSpots;
+
+    // Resource Veins
+    public List<ResourceVeinBase> mAllResourceVeins;
 
 
     public List<(GameObject, GameObject)> mBuildingToBuildableRelations;
@@ -89,27 +92,33 @@ public class RTSManager : MonoBehaviour
         Rect newBuildingSpotBBox = Utilities.GetBBoxFromTransform( newBuilding );
         newBuilding.transform.localScale = new Vector3( buildingSpotBBox.width / newBuildingSpotBBox.width, buildingSpotBBox.height / newBuildingSpotBBox.height, 1 );
 
-        if( newBuilding.gameObject.GetComponent<HarvestingBuilding>() != null && // If we built harvester
-            mAllReceivers.Count < mTowerLevel * mHarvesterSlots ) // and slots are left for receiver
+        var harvester = newBuilding.gameObject.GetComponent<HarvestingBuilding>();
+        if( harvester != null ) // If we built harvester
         {
-            GameObject createdReceiver = null;
-            if (newBuilding.gameObject.GetComponent<IronHarvester>() != null)
-            {
-                createdReceiver = BuildReceiver("IronReceiver", newBuilding);
-            }
-            else if (newBuilding.gameObject.GetComponent<FireHarvester>() != null)
-            {
-                createdReceiver = BuildReceiver("FireReceiver", newBuilding);
-            }
+            var resourceVein = objectToBuildOver.GetComponent<ResourceVeinBase>();
+            if( resourceVein == null ) return;
 
-            mBuildingToBuildableRelations.Add( (createdReceiver, objectToBuildOver) );
+            harvester.mResourceVein = resourceVein;
+
+            if( mAllReceivers.Count < mTowerLevel * mHarvesterSlots ) // and slots are left for receiver
+            {
+                GameObject createdReceiver = null;
+                if (newBuilding.gameObject.GetComponent<IronHarvester>() != null)
+                {
+                    createdReceiver = BuildReceiver("IronReceiver", newBuilding);
+                }
+                else if (newBuilding.gameObject.GetComponent<FireHarvester>() != null)
+                {
+                    createdReceiver = BuildReceiver("FireReceiver", newBuilding);
+                }
+            }
         }
         else
         {
             mBuildingToBuildableRelations.Add((newBuilding, objectToBuildOver));
+            objectToBuildOver.SetActive( false );
         }
 
-        objectToBuildOver.SetActive( false );
         if( CanLevelUp() )
         {
             LevelUp();

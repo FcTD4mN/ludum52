@@ -4,10 +4,10 @@ public class Forge : ProductionBuilding
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold.ToString() ] = 2000;
-        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 100;
-        output.mInputRates[ cResourceDescriptor.eResourceNames.Iron.ToString() ] = 2;
-        output.mOutputRates[ cResourceDescriptor.eResourceNames.Arrows.ToString() ] = 1;
+        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Gold ] = 2000;
+        output.mBuildCosts[ cResourceDescriptor.eResourceNames.Iron ] = 100;
+        output.mInputRates[ cResourceDescriptor.eResourceNames.Iron ] = 2;
+        output.mOutputRates[ cResourceDescriptor.eResourceNames.Arrows ] = 1;
 
         return  output;
     }

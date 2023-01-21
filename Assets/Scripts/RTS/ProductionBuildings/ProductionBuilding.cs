@@ -1,6 +1,8 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+using static cResourceDescriptor;
 
 public abstract class ProductionBuilding : MonoBehaviour
 {
@@ -105,7 +107,7 @@ public abstract class ProductionBuilding : MonoBehaviour
     // ===================================
     public void BuildBuilding()
     {
-        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+        foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
             GameManager.mResourceManager.AddResource( resourceName, -mResourceDescriptor.mBuildCosts[resourceName], false );
         }
@@ -118,7 +120,7 @@ public abstract class ProductionBuilding : MonoBehaviour
 
         // Checking enough input resources are available
         mProdRatio = 1f;
-        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+        foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
             if( mResourceDescriptor.mInputRates[resourceName] == 0f ) {
                 continue;
@@ -138,7 +140,7 @@ public abstract class ProductionBuilding : MonoBehaviour
 
         if( mProdRatio == 0 ) { return; }
 
-        foreach( string resourceName in cResourceDescriptor.mAllResourceNames )
+        foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
             // Remove what building consumes
             float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime * mProdRatio;
@@ -161,7 +163,7 @@ public abstract class ProductionBuilding : MonoBehaviour
 
     public bool IsBuildable()
     {
-        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
+        foreach (eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)))
         {
             if (mResourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName))
             {
@@ -225,7 +227,7 @@ public abstract class ProductionBuilding : MonoBehaviour
             return RTSManager.eBuildingErrors.BlueprintRequired;
         }
 
-        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
+        foreach (eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)))
         {
             if (mResourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName))
             {

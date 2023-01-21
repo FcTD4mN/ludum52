@@ -1,6 +1,8 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+using static cResourceDescriptor;
 
 public abstract class BuffBuilding : ProductionBuilding
 {
@@ -151,7 +153,7 @@ public abstract class BuffBuilding : ProductionBuilding
 
         outputString += "Build Cost: \n";
         bool atLeastOne = false;
-        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
+        foreach (eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)))
         {
             if (resourceDescriptor.mBuildCosts[resourceName] == 0) { continue; }
             atLeastOne = true;
@@ -172,7 +174,7 @@ public abstract class BuffBuilding : ProductionBuilding
         // Costs
         outputString += "Inputs: \n";
         atLeastOne = false;
-        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
+        foreach (eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)))
         {
             if (resourceDescriptor.mInputRates[resourceName] == 0) { continue; }
             atLeastOne = true;

@@ -1,6 +1,8 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+using static cResourceDescriptor;
 
 public abstract class HarvestingBuilding : ProductionBuilding
 {
@@ -61,35 +63,41 @@ public abstract class HarvestingBuilding : ProductionBuilding
         if (IsPaused()) { return; }
 
         // Checking enough input resources are available
-            mProdRatio = 1f;
+        mProdRatio = 1f;
 
-        // Replace this by the vein's resource
-        // foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
-        // {
-        //     if (mResourceDescriptor.mInputRates[resourceName] == 0f)
-        //     {
-        //         continue;
-        //     }
+        // Testing here, so that you can have building like tower, that doesn't pump from anything, and just produces free resources
+        if( mResourceVein != null )
+        {
+            foreach (eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)))
+            {
+                if (mResourceDescriptor.mOutputRates[resourceName] == 0f) continue;
 
-        //     float available = GameManager.mResourceManager.GetRessource(resourceName);
-        //     float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime;
-        //     if (available < deltaInputCost)
-        //     {
-        //         float ratio = available / deltaInputCost;
-        //         if (ratio < mProdRatio) mProdRatio = ratio;
-        //     }
-        // }
+                // README: This will only make pumping from vein possible, not vein + tower at the same time
+                // It uses outputRates to pump from vein available
+                // Could then use inputRates as inputs that are pumped from base
+                float available = mResourceVein.mResource.mAvailable[resourceName];
+                float deltaInputCost = mResourceDescriptor.mOutputRates[resourceName] * deltaTime;
+                if (available < deltaInputCost)
+                {
+                    float ratio = available / deltaInputCost;
+                    if (ratio < mProdRatio) mProdRatio = ratio;
+                }
+            }
+        }
 
         // Used for stats modifiers, but eventually could apply fraction of stats as well
         UpdateDiode();
 
         if (mProdRatio == 0) { return; }
 
-        foreach (string resourceName in cResourceDescriptor.mAllResourceNames)
+        foreach (eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)))
         {
-            // Remove what building consumes
-            float deltaInputCost = mResourceDescriptor.mInputRates[resourceName] * deltaTime * mProdRatio;
-            GameManager.mResourceManager.AddResource(resourceName, -deltaInputCost, false);
+            if (mResourceVein != null)
+            {
+                // Remove what building consumes
+                float deltaInputCost = mResourceDescriptor.mOutputRates[resourceName] * deltaTime * mProdRatio;
+                mResourceVein.mResource.mAvailable[resourceName] -= deltaInputCost;
+            }
 
             // Add what building produces
             float deltaOutputCost = mResourceDescriptor.mOutputRates[resourceName] * deltaTime * mProdRatio;

@@ -8,12 +8,12 @@ public class Workshop : ProductionBuilding
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 3000;
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron.ToString()] = 1000;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold] = 3000;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron] = 1000;
 
-        output.mInputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 1;
-        output.mInputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 1;
-        output.mOutputRates[cResourceDescriptor.eResourceNames.FireArrows.ToString()] = 1;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Iron] = 1;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Fire] = 1;
+        output.mOutputRates[cResourceDescriptor.eResourceNames.FireArrows] = 1;
 
         return output;
     }

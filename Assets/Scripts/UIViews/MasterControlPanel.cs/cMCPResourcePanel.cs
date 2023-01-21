@@ -54,9 +54,9 @@ class cMCPResourcesPanel :
     private void BuildResourceList()
     {
         mResourcesLines = new List<cMCPResourceLine>();
-        foreach (string resource in Enum.GetNames( typeof(cResourceDescriptor.eResourceNames) ) )
+        foreach (cResourceDescriptor.eResourceNames resource in Enum.GetValues( typeof(cResourceDescriptor.eResourceNames) ) )
         {
-            var resourceLine = new cMCPResourceLine( mGameObject, resource, resource );
+            var resourceLine = new cMCPResourceLine( mGameObject, resource.ToString(), resource );
             mResourcesLines.Add( resourceLine );
         }
 
@@ -79,13 +79,13 @@ class cMCPResourceLine :
     private cLabel mTotalConsumed;
     private cLabel mNetRatio;
 
-    private string mResourceName;
+    private cResourceDescriptor.eResourceNames mResourceName;
 
 
     public float mPadding = 0;
     public float mSpacing = 10;
 
-    public cMCPResourceLine(GameObject parentView, string name, string resourceName ) : base(parentView, name)
+    public cMCPResourceLine(GameObject parentView, string name, cResourceDescriptor.eResourceNames resourceName ) : base(parentView, name)
     {
         mResourceName = resourceName;
 
@@ -93,7 +93,7 @@ class cMCPResourceLine :
         mIcon.SetImageFromUnityResources( "Knob" );
 
         mName = new cLabel( mGameObject, "label" );
-        mName.mText.text = resourceName;
+        mName.mText.text = resourceName.ToString();
         mName.mText.alignment = TMPro.TextAlignmentOptions.Left;
 
         mCurrentTotal = new cLabel( mGameObject, "current" );
@@ -149,9 +149,9 @@ class cMCPResourceLine :
         }
         float totalRate = outputValue - inputValue;
 
-        mTotalIncoming.mText.text = GetColorForValue(outputValue ) + outputValue + "</color>";
-        mTotalConsumed.mText.text = GetColorForValue(-inputValue) + inputValue + "</color>";
-        mNetRatio.mText.text = GetColorForValue(totalRate) + totalRate + "</color>";
+        mTotalIncoming.mText.text = GetColorForValue(outputValue ) + (int)outputValue + "</color>";
+        mTotalConsumed.mText.text = GetColorForValue(-inputValue) + (int)inputValue + "</color>";
+        mNetRatio.mText.text = GetColorForValue(totalRate) + (int)totalRate + "</color>";
 
         mCurrentTotal.mText.text = ((int)GameManager.mResourceManager.GetRessource( mResourceName )).ToString();
     }

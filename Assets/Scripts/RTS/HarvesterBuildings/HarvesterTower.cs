@@ -4,8 +4,8 @@ public class HarvesterTower : HarvestingBuilding
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mOutputRates[cResourceDescriptor.eResourceNames.Gold.ToString()] = 10;
-        output.mOutputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 1;
+        output.mOutputRates[cResourceDescriptor.eResourceNames.Gold] = 10;
+        output.mOutputRates[cResourceDescriptor.eResourceNames.Iron] = 1;
 
         return output;
     }

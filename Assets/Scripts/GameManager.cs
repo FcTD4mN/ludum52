@@ -23,18 +23,33 @@ public class GameManager : MonoBehaviour
     public PlayerController playerCtrler;
 
 
-    static void CheckIfExists()
+    // Delayed init
+    private static List<InitializableLate> mWaitingForInitialization;
+    public static void AddToInitQueue( InitializableLate obj )
     {
-        if (GameManager.mInstance != null) { return; }
+        if( mWaitingForInitialization == null ) mWaitingForInitialization = new List<InitializableLate>();
+
+        mWaitingForInitialization.Add( obj );
+    }
+
+
+    static public bool IsLoaded()
+    {
+        return  GameManager.mInstance != null;
     }
 
     // Start is called before the first frame update
     void OnEnable()
     {
+        Initialize();
+    }
+
+
+    public void Initialize()
+    {
         // If there is already an gamemanager instance
         if (GameManager.mInstance != null) { return; }
 
-        cResourceDescriptor.BuildResourceList();
         cStatsDescriptor.BuildStatsList();
 
         mInstance = this;
@@ -55,14 +70,23 @@ public class GameManager : MonoBehaviour
             mPortalManager.Initialize();
 
         playerCtrler = GameObject.Find("Character")?.gameObject.GetComponent<PlayerController>();
+
+        foreach( var obj in mWaitingForInitialization )
+        {
+            obj.Initialize();
+        }
+
+        mWaitingForInitialization.Clear();
     }
 
+
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
+        float deltaTime = Time.fixedDeltaTime;
         // Faire les appels ici pour garantir l'ordre, les resources doivent être updaté avant le reste du jeu
         if (mResourceManager != null)
-            mResourceManager.UpdateResources();
+            mResourceManager.UpdateResources( deltaTime );
 
         // Surement en dernier, l'ui s'update
         if (mUIManager != null)

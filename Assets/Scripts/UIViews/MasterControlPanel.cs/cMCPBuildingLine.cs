@@ -115,7 +115,9 @@ class cBuildingLine :
     {
         float prodRatio = mAssociatedBuilding.IsPaused() ? 0 : mAssociatedBuilding.GetProductionRatio();
 
-        mLabelProdRate.mText.text = (int)(prodRatio*100f) + "%";
+        var prodColor = Color.Lerp( Color.red, Color.green, prodRatio );
+        string hex = ColorUtility.ToHtmlStringRGB( prodColor );
+        mLabelProdRate.mText.text = "<color=#" + hex + ">" + (int)(prodRatio*100f) + "%" + "</color>";
 
         foreach (var inputView in mInputViews)
         {
@@ -216,14 +218,14 @@ class cResourceView :
     private cLabel mLabelValue;
 
     private ProductionBuilding mBuilding;
-    private string mResourceName;
+    private cResourceDescriptor.eResourceNames mResourceName;
     private cResourceDescriptor.eResourceType mResourceType;
     private string mColor;
 
     public cResourceView(GameObject parentView,
                             string name,
                             ProductionBuilding building,
-                            string resourceName,
+                            cResourceDescriptor.eResourceNames resourceName,
                             cResourceDescriptor.eResourceType type,
                             string color ) : base(parentView, name)
     {
@@ -235,7 +237,7 @@ class cResourceView :
         SetColor( Color.clear );
 
         mLabelName = new cLabel( mGameObject, "labelName" );
-        mLabelName.mText.text = "" + mResourceName[0];
+        mLabelName.mText.text = "" + mResourceName.ToString()[0];
 
         mLabelValue = new cLabel( mGameObject, "labelValue" );
         mLabelValue.mText.text = GetResourceValue().ToString();
@@ -246,7 +248,7 @@ class cResourceView :
     {
         float buildingRatio = mBuilding.GetProductionRatio();
 
-        mLabelName.mText.text = "" + mResourceName[0];
+        mLabelName.mText.text = "" + mResourceName.ToString()[0];
 
         float value = mBuilding.IsPaused() ? 0 : GetResourceValue() * buildingRatio;
         string colorTagIn = value == 0 ? "<color=#bbbbbb>" : "<color="+mColor+">";

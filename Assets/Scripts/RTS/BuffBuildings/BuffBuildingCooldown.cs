@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,10 +8,10 @@ public class BuffBuildingCooldown : BuffBuilding
     {
         cResourceDescriptor output = new cResourceDescriptor();
 
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold.ToString()] = 500;
-        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron.ToString()] = 500;
-        output.mInputRates[cResourceDescriptor.eResourceNames.Iron.ToString()] = 2;
-        output.mInputRates[cResourceDescriptor.eResourceNames.Fire.ToString()] = 1;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Gold] = 500;
+        output.mBuildCosts[cResourceDescriptor.eResourceNames.Iron] = 500;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Iron] = 2;
+        output.mInputRates[cResourceDescriptor.eResourceNames.Fire] = 1;
         return output;
     }
 

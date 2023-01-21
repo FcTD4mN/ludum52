@@ -8,42 +8,38 @@ using static cResourceDescriptor;
 
 public class ResourceManager : MonoBehaviour
 {
-    [HideInInspector] private Dictionary<string, float> mResourcesAvailable;
+    [HideInInspector] private Dictionary<eResourceNames, float> mResourcesAvailable;
 
     private Coroutine mCurrentlyRunningAnimation;
     private float mAnimationFinalValue;
-    private string mAnimationResourceName;
+    private eResourceNames mAnimationResourceName;
 
     // ===================================
     // Building
     // ===================================
     public void Initialize()
     {
-        mResourcesAvailable = new Dictionary<string, float>();
-        foreach( string resourceName in mAllResourceNames )
+        mResourcesAvailable = new Dictionary<eResourceNames, float>();
+        foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
             mResourcesAvailable[resourceName] = 0f;
         }
 
-        mResourcesAvailable[eResourceNames.Gold.ToString()] = 5000;
-        mResourcesAvailable[eResourceNames.Iron.ToString()] = 800;
-        mResourcesAvailable[eResourceNames.Arrows.ToString()] = 30;
+        mResourcesAvailable[eResourceNames.Gold] = 5000;
+        mResourcesAvailable[eResourceNames.Iron] = 800;
+        mResourcesAvailable[eResourceNames.Arrows] = 30;
     }
 
 
     // ===================================
     // Getters to get the proper int value
     // ===================================
-    public float GetRessource( eResourceNames type )
-    {
-        return GetRessource( type.ToString() );
-    }
-    public float GetRessource( string name )
+    public float GetRessource( eResourceNames name )
     {
         return mResourcesAvailable[name];
     }
 
-    public void AddResource( string name, float deltaValue, bool animated )
+    public void AddResource( eResourceNames name, float deltaValue, bool animated )
     {
         if (deltaValue == 0)
         {
@@ -69,7 +65,7 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    IEnumerator Animation( string name, float newValue, float time )
+    IEnumerator Animation( eResourceNames name, float newValue, float time )
     {
         float originalValue = mResourcesAvailable[name];
         float deltaValue = newValue - originalValue;
@@ -91,12 +87,16 @@ public class ResourceManager : MonoBehaviour
     // ===================================
     // Update
     // ===================================
-    public void UpdateResources()
+    public void UpdateResources( float fixedDeltaTime )
     {
-        float deltaTime = Time.deltaTime;
+        foreach (ResourceVeinBase vein in GameManager.mRTSManager.mAllResourceVeins)
+        {
+            vein.RegenerateResource(fixedDeltaTime);
+        }
+
         foreach( ProductionBuilding building in GameManager.mRTSManager.mAllProductionBuildings )
         {
-            building.ProduceResource( deltaTime );
+            building.ProduceResource( fixedDeltaTime );
         }
     }
 }
@@ -107,7 +107,7 @@ public class ResourceManager : MonoBehaviour
 
 public class cResourceDescriptor
 {
-    public static List<string> mAllResourceNames;
+    // public static List<string> mAllResourceNames;
     public enum eResourceNames {
         Gold,
         Iron,
@@ -123,34 +123,22 @@ public class cResourceDescriptor
         kOutput
     }
 
-    public static void BuildResourceList()
-    {
-        mAllResourceNames = new List<string>();
 
-        foreach (string name in Enum.GetNames(typeof(eResourceNames)))
-        {
-            mAllResourceNames.Add( name );
-        }
-    }
-
-
-    public Dictionary<string, float> mBuildCosts;
-    public Dictionary<string, float> mInputRates;
-    public Dictionary<string, float> mOutputRates;
+    public Dictionary<eResourceNames, float> mAvailable;
+    public Dictionary<eResourceNames, float> mBuildCosts;
+    public Dictionary<eResourceNames, float> mInputRates;
+    public Dictionary<eResourceNames, float> mOutputRates;
 
     public cResourceDescriptor()
     {
-        mBuildCosts = new Dictionary<string, float>();
-        mInputRates = new Dictionary<string, float>();
-        mOutputRates = new Dictionary<string, float>();
+        mAvailable = new Dictionary<eResourceNames, float>();
+        mBuildCosts = new Dictionary<eResourceNames, float>();
+        mInputRates = new Dictionary<eResourceNames, float>();
+        mOutputRates = new Dictionary<eResourceNames, float>();
 
-        if( mAllResourceNames == null )
+        foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
-            BuildResourceList();
-        }
-
-        foreach( string resourceName in mAllResourceNames )
-        {
+            mAvailable[resourceName] = 0f;
             mBuildCosts[resourceName] = 0f;
             mInputRates[resourceName] = 0f;
             mOutputRates[resourceName] = 0f;
@@ -165,7 +153,7 @@ public class cResourceDescriptor
 
         // Costs first
         outputString += "Inputs: \n";
-        foreach( string resourceName in mAllResourceNames )
+        foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
             if( mInputRates[resourceName] == 0 ) { continue; }
             atLeastOne = true;
@@ -180,7 +168,7 @@ public class cResourceDescriptor
 
         // Then outputs
         outputString += "Outputs: \n";
-        foreach( string resourceName in mAllResourceNames )
+        foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
             if( mOutputRates[resourceName] == 0 ) { continue; }
             atLeastOne = true;
@@ -213,7 +201,7 @@ public class cResourceDescriptor
 
         outputString += "Build Cost: \n";
         bool atLeastOne = false;
-        foreach( string resourceName in mAllResourceNames )
+        foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
             if( mBuildCosts[resourceName] == 0 ) { continue; }
             atLeastOne = true;
