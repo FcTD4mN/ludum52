@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using System;
+using TMPro;
 
 class cBuildingLine :
     cPanel
@@ -9,7 +9,14 @@ class cBuildingLine :
     private Material mDiodeMat;
     private cLabel mTitle;
 
+    private cMasterControlPanel mMaster;
+
+    private cPanel mHoverInfos;
+    private cLabel mHoverInfosText;
+
     private ProductionBuilding mAssociatedBuilding;
+    private HarvestingBuilding  _mAssociatedBuildingHarvesterComp;  // Can be null, it's to avoid constant GetComponent calls
+    private BuffBuilding        _mAssociatedBuildingBuffComp;       // Can be null, it's to avoid constant GetComponent calls
 
     private List<cResourceView> mInputViews;
     private List<cResourceView> mOutputViews;
@@ -28,12 +35,17 @@ class cBuildingLine :
     static public float mBuildingLineEfficiencyWidth = 70;
     static public float mBuildingLineButtonPauseWidth = 50;
 
-    public cBuildingLine(GameObject parentView, string name, ProductionBuilding building) : base(parentView, name)
+    public cBuildingLine(GameObject parentView, string name, ProductionBuilding building, cMasterControlPanel master) : base(parentView, name)
     {
+        mMaster = master;
+
         mTitle = new cLabel(mGameObject, "title");
         mTitle.mText.text = building.GetDisplayName();
         mTitle.mText.fontStyle = TMPro.FontStyles.Bold;
         mTitle.mText.alignment = TMPro.TextAlignmentOptions.Left;
+        var hoverable = mTitle.mGameObject.AddComponent<Hoverable>();
+        hoverable.mOnHoverAction = Hover;
+        hoverable.mOnHoverEndedAction = HoverEnded;
 
         mDiode = new cImage(mGameObject, "diode");
         mDiode.SetImageFromUnityResources("Knob");
@@ -44,6 +56,8 @@ class cBuildingLine :
         mDiode.mImage.material = mDiodeMat;
 
         mAssociatedBuilding = building;
+        _mAssociatedBuildingHarvesterComp = building.GetComponent<HarvestingBuilding>();
+        _mAssociatedBuildingBuffComp = building.GetComponent<BuffBuilding>();
 
         mLabelProdRate = new cLabel(mGameObject, "prodRate");
         mLabelProdRate.mText.fontStyle = TMPro.FontStyles.Bold;
@@ -115,23 +129,32 @@ class cBuildingLine :
     {
         float prodRatio = mAssociatedBuilding.IsPaused() ? 0 : mAssociatedBuilding.GetProductionRatio();
 
+        // Prod label update
         var prodColor = Color.Lerp( Color.red, Color.green, prodRatio );
         string hex = ColorUtility.ToHtmlStringRGB( prodColor );
         mLabelProdRate.mText.text = "<color=#" + hex + ">" + (int)(prodRatio*100f) + "%" + "</color>";
 
+        // Input updates
         foreach (var inputView in mInputViews)
         {
             inputView.Update();
         }
 
+        // Output updates
         foreach (var output in mOutputViews)
         {
             output.Update();
         }
 
+        // Pause button update
         var pauseText = mAssociatedBuilding.IsPaused() ? ">" : "||";
         mButtonPause.SetText(pauseText);
 
+        // Tooltips update
+        if (_mAssociatedBuildingHarvesterComp != null) UpdateHarvesterToolTip();
+        if (_mAssociatedBuildingBuffComp != null) UpdateBufferToolTip();
+
+        // Diode update
         if (mAssociatedBuilding.IsPaused() )
         {
             if (mMaterialPatcher == 0) return;
@@ -208,7 +231,107 @@ class cBuildingLine :
     {
         mAssociatedBuilding.SetPause(!mAssociatedBuilding.IsPaused());
     }
+
+
+    private void Hover()
+    {
+        if( _mAssociatedBuildingHarvesterComp == null && _mAssociatedBuildingBuffComp == null ) return;
+        if( mAssociatedBuilding.GetComponent<HarvesterTower>() != null ) return;
+        if (mHoverInfos != null) return;
+
+        mHoverInfos = new cPanel(mMaster.mGameObject, "hoverInfos");
+        mHoverInfosText = new cLabel(mHoverInfos.mGameObject, "text");
+        mHoverInfosText.mText.alignment = TMPro.TextAlignmentOptions.TopLeft;
+    }
+
+    private void HoverEnded()
+    {
+        if( mHoverInfos == null ) return;
+
+        GameObject.Destroy(mHoverInfos.mGameObject);
+        mHoverInfos = null;
+    }
+
+
+    private void UpdateHarvesterToolTip()
+    {
+        if( mHoverInfos == null ) return;
+        if( _mAssociatedBuildingHarvesterComp == null ) return;
+
+        string finalText = _mAssociatedBuildingHarvesterComp.GetBuildingType().ToString() + " source: \n";
+        foreach( var resource in _mAssociatedBuildingHarvesterComp.mResourceVein.mResource.mAvailable )
+        {
+            // Uses input to figure which resources are inside the vein
+            // This wouldn't work well for resources that would have to replenish capabilities
+            // Best would be to not set all fields of dictionnaries to 0, but only the one relevants
+            // so we would have nothing to do in order to not show every resource with a value of 0 here
+            if( _mAssociatedBuildingHarvesterComp.mResourceVein.mResource.mInputRates[resource.Key] == 0 ) continue;
+
+            finalText += " " + resource.Key.ToString() + ": " + ((int)resource.Value).ToString() + "\n";
+        }
+
+        mHoverInfosText.mText.text = finalText;
+
+        UpdateHoverInfosFrameToFit();
+    }
+
+
+    private void UpdateBufferToolTip()
+    {
+        if (mHoverInfos == null) return;
+        if (_mAssociatedBuildingBuffComp == null) return;
+
+        string finalText = "Stats buffed: \n";
+        foreach (var resource in _mAssociatedBuildingBuffComp.mStatsModifiers.mStatValues)
+        {
+            if (resource.Value == 0) continue;
+
+            finalText += " " + resource.Key.ToString() + ": " + ((int)resource.Value).ToString() + "\n";
+        }
+
+        var text = mHoverInfos.mGameObject.transform.Find("text").GetComponent<TextMeshProUGUI>();
+        text.text = finalText;
+
+        UpdateHoverInfosFrameToFit();
+    }
+
+
+    private void UpdateHoverInfosFrameToFit()
+    {
+        var frame = GetFrameRelativeTo(mMaster.mGameObject);
+        mHoverInfosText.mText.ForceMeshUpdate();
+        var textWidth = mHoverInfosText.mText.textBounds.size.x;
+        var textHeight = mHoverInfosText.mText.textBounds.size.y;
+
+        mHoverInfos.SetFrame(new Rect(frame.xMin, frame.yMin + frame.height, textWidth + 20, textHeight + 20));
+        mHoverInfosText.SetFrame(new Rect(10, 10, textWidth, textHeight));
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class cResourceView :
@@ -260,9 +383,10 @@ class cResourceView :
     {
         var frame = GetFrame();
 
+        mLabelName.mText.ForceMeshUpdate();
         mLabelName.SetFrame( new Rect( 0,
                                         0,
-                                        frame.height,
+                                        mLabelName.mText.textBounds.size.x,
                                         frame.height ));
 
         mLabelValue.SetFrame( new Rect( mLabelName.GetFrame().xMax,

@@ -13,6 +13,8 @@ abstract class cMCPBuildingPanelBase :
     private cLabel mLabelColumnOutputs;
     private cLabel mLabelColumnEfficiency;
 
+    private cMasterControlPanel mMaster;
+
 
     // UI variables
     public float mPadding = 0;
@@ -30,8 +32,10 @@ abstract class cMCPBuildingPanelBase :
     private List<cBuildingLine> mAllBuildingLines;
 
 
-    public cMCPBuildingPanelBase(GameObject parentView, string name, string panelName) : base(parentView, name)
+    public cMCPBuildingPanelBase(GameObject parentView, string name, string panelName, cMasterControlPanel master ) : base(parentView, name)
     {
+        mMaster = master;
+
         mTitle = new cLabel(mGameObject, "title");
         mTitle.mText.text = panelName;
         mTitle.mText.fontStyle = TMPro.FontStyles.Bold;
@@ -137,7 +141,7 @@ abstract class cMCPBuildingPanelBase :
         var buildings = GetBuildingList();
         foreach (ProductionBuilding building in buildings)
         {
-            var newLine = new cBuildingLine(mGameObject, building.name + "line", building);
+            var newLine = new cBuildingLine(mGameObject, building.name + "line", building, mMaster);
             mAllBuildingLines.Add(newLine);
         }
     }

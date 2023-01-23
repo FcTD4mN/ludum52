@@ -7,7 +7,7 @@ using System;
 class cMCPBuffersPanel :
     cMCPBuildingPanelBase
 {
-    public cMCPBuffersPanel(GameObject parentView, string name) : base(parentView, name, "Buffer Buildings")
+    public cMCPBuffersPanel(GameObject parentView, string name, cMasterControlPanel master) : base(parentView, name, "Buffer Buildings", master)
     {
     }
 

@@ -33,6 +33,7 @@ public class UIManager : MonoBehaviour
     private GameObject mObjectToBuildTo;
     private GameObject mBuildButtonClicked;
     private GameObject mHoverButton; // Button being visible due to hovering
+    private Hoverable mHoverUIView; // Button being visible due to hovering
     private GameObject mHoveredObject; // The object the mouse is currently hovering
     private bool mDidFindHoveredButton = false;
 
@@ -124,49 +125,81 @@ public class UIManager : MonoBehaviour
 
         mBuildMenu?.UpdateBuildMenu();
         mMasterControlPanel?.Update();
-        UpdateMousePosition();
+        UpdateHovering();
     }
 
 
-    public void UpdateMousePosition()
+    public void UpdateHovering()
     {
-        Vector3 mousePosScreen = Input.mousePosition;
-        Vector3 mousePosWorld;
-        RectTransformUtility.ScreenPointToWorldPointInRectangle( mCanvas.transform as RectTransform, mousePosScreen, Camera.main, out mousePosWorld );
-
         GameObject previousHovered = mHoveredObject;
         mDidFindHoveredButton = false;
 
-        // PROD BUILDINGS
-        foreach( ProductionBuilding building in GameManager.mRTSManager.mAllProductionBuildings )
-        {
-            if( building.gameObject.GetComponent<HarvestingBuilding>() != null ) { continue; }
+        // If nothing is under the pointer, just clear everything and refresh infoPanel
+        // if (!EventSystem.current.IsPointerOverGameObject()) // Can't use that to optimize, because you want to hover over WORLD objects as well
+        //                                                                      And this only looks at UI elements
 
-            Rect bbox = Utilities.GetBBoxFromTransform( building.gameObject );
-            if( bbox.Contains( mousePosWorld ) )
+        // General UI hover tests
+        var raycasts = RaycastMouse();
+        var previousHoveredUI = mHoverUIView;
+        foreach (var result in raycasts)
+        {
+            var hoverable = result.gameObject.GetComponent<Hoverable>();
+            if (hoverable != null)
             {
-                HoveringBuilding( building );
+                mHoverUIView = hoverable;
+                hoverable.mOnHoverAction();
                 mDidFindHoveredButton = true;
                 break;
             }
         }
 
-        // RECEIVERS
-        if( !mDidFindHoveredButton )
+        // We didn't find any view in UI, so if there was a hoveredUIView, we call hoverEnded then null the pointer
+        if( !mDidFindHoveredButton || previousHoveredUI != mHoverUIView )
         {
-            foreach (Receiver receiver in GameManager.mRTSManager.mAllReceivers)
+            previousHoveredUI?.mOnHoverEndedAction?.Invoke();
+            if( !mDidFindHoveredButton ) mHoverUIView = null;
+        }
+
+        // Test to prevent hovering on elements while UI windows are open
+        if( !mBuildMenu.mGameObject.activeSelf && mMasterControlPanel == null )
+        {
+            Vector3 mousePosScreen = Input.mousePosition;
+            Vector3 mousePosWorld;
+            RectTransformUtility.ScreenPointToWorldPointInRectangle(mCanvas.transform as RectTransform, mousePosScreen, Camera.main, out mousePosWorld);
+
+            // PROD BUILDINGS (world buildings, can't be tested through raycast above)
+            if (!mDidFindHoveredButton)
             {
-                Rect bbox = Utilities.GetBBoxFromTransform(receiver.gameObject);
-                if (bbox.Contains(mousePosWorld))
+                foreach( ProductionBuilding building in GameManager.mRTSManager.mAllProductionBuildings )
                 {
-                    HoveringReceiver(receiver.gameObject);
-                    mDidFindHoveredButton = true;
-                    break;
+                    if( building.gameObject.GetComponent<HarvestingBuilding>() != null ) { continue; }
+
+                    Rect bbox = Utilities.GetBBoxFromTransform( building.gameObject );
+                    if( bbox.Contains( mousePosWorld ) )
+                    {
+                        HoveringBuilding( building );
+                        mDidFindHoveredButton = true;
+                        break;
+                    }
+                }
+            }
+
+            // RECEIVERS (world buildings, can't be tested through raycast above)
+            if( !mDidFindHoveredButton )
+            {
+                foreach (Receiver receiver in GameManager.mRTSManager.mAllReceivers)
+                {
+                    Rect bbox = Utilities.GetBBoxFromTransform(receiver.gameObject);
+                    if (bbox.Contains(mousePosWorld))
+                    {
+                        HoveringReceiver(receiver.gameObject);
+                        mDidFindHoveredButton = true;
+                        break;
+                    }
                 }
             }
         }
 
-        if (!mDidFindHoveredButton) mBuildMenu.UpdateMouse();
 
         if( !mDidFindHoveredButton ) mHoveredObject = null;
         if( mHoveredObject == null && mHoverButton != null )
@@ -367,7 +400,6 @@ public class UIManager : MonoBehaviour
             if (mHoveredObject != prod) DeleteUIButton(mHoverButton);
 
             mHoveredObject = prod.gameObject;
-            mDidFindHoveredButton = true;
             mInfoPanelDisplay = eInfoPanelDisplayType.kShowPrefabStats;
         };
     }
@@ -412,7 +444,19 @@ public class UIManager : MonoBehaviour
     // ===================================
     public void BuildControlPanel()
     {
+        // Hitting P when panel is open
+        if( mMasterControlPanel != null )
+        {
+            GameObject.Destroy( mMasterControlPanel.mGameObject );
+            mMasterControlPanel = null;
+            return;
+        }
+
         mMasterControlPanel = new cMasterControlPanel( mCanvas.gameObject, "MCP" );
+        mMasterControlPanel.mCloseAction = () => {
+            GameObject.Destroy(mMasterControlPanel.mGameObject);
+            mMasterControlPanel = null;
+        };
         var screenRect = Camera.main.pixelRect;
 
         mMasterControlPanel.SetFrame( new Rect(0, 0, 1600, 800));
@@ -440,5 +484,17 @@ public class UIManager : MonoBehaviour
     {
         Animation anim = new Animation( this );
         anim.DisplayAnimatedText( position, message, color, 2, 30, mCanvas.transform );
+    }
+
+    public List<RaycastResult> RaycastMouse()
+    {
+        var graphicRaycaster = mCanvas.GetComponent<GraphicRaycaster>();
+        var eventSystem = mCanvas.GetComponent<EventSystem>();
+        PointerEventData pointerData = new PointerEventData(eventSystem);
+        pointerData.position = Input.mousePosition;
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        graphicRaycaster.Raycast(pointerData, results);
+        return results;
     }
 }

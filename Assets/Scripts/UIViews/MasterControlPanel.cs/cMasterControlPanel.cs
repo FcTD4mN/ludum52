@@ -21,6 +21,9 @@ class cMasterControlPanel :
     private int mLeftPanelWidth = 500;
 
 
+    public Action mCloseAction;
+
+
     public cMasterControlPanel(GameObject parentView, string name) : base(parentView, name)
     {
         mTitle = new cLabel(mGameObject, "title");
@@ -34,7 +37,7 @@ class cMasterControlPanel :
         mCloseButton.SetText("X");
         mCloseButton.AddOnClickAction(() =>
         {
-            GameObject.Destroy( mGameObject );
+            mCloseAction?.Invoke();
         });
 
         mScrollAreaLeft = new cScrollView(mGameObject, "ScrollAreaLeft");
@@ -43,7 +46,7 @@ class cMasterControlPanel :
 
 
         mScrollArea = new cScrollView(mGameObject, "ScrollArea");
-        mContent = new cMCPContentPanel( mGameObject, "Content" );
+        mContent = new cMCPContentPanel( mGameObject, "Content", this );
         mScrollArea.AddViewToContent( mContent );
     }
 

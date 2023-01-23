@@ -44,9 +44,17 @@ class cBuildMenu :
         mProdBuildings.mOnBuildingClicked = ( building ) => {
             mOnBuildingClicked( building );
         };
+        mProdBuildings.mOnBuildingHovered = ( building ) => {
+            mOnHover( building );
+        };
+
         mBuffBuildings.mOnBuildingClicked = (building) =>
         {
             mOnBuildingClicked(building);
+        };
+        mBuffBuildings.mOnBuildingHovered = (building) =>
+        {
+            mOnHover(building);
         };
 
         mScrollArea.AddViewToContent( mProdBuildings );
@@ -111,50 +119,15 @@ class cBuildMenu :
     }
 
 
-
-
     public void UpdateBuildMenu()
     {
+        if( !mGameObject.activeSelf ) return;
+
         bool isLocationOnTower = mProdBuildings.mGameObject.activeSelf;
         bool isLocationOnBuffTower = mBuffBuildings.mGameObject.activeSelf;
 
         mProdBuildings.UpdateButtons();
         mBuffBuildings.UpdateButtons();
     }
-
-
-    public void UpdateMouse()
-    {
-        if( !mGameObject.activeSelf ) return;
-        if ( !EventSystem.current.IsPointerOverGameObject() ) return;
-
-        Rect screenRect = Camera.main.pixelRect;
-        Vector3 mousePosScreen = Input.mousePosition;
-        Vector3 mousePosRegular = new Vector3( mousePosScreen.x, screenRect.height - mousePosScreen.y, mousePosScreen.z );
-
-        List<(RTSManager.eBuildingList, cButton)> allButtons = new List<(RTSManager.eBuildingList, cButton)>();
-        if (mProdBuildings.mGameObject.activeSelf)
-        {
-            allButtons = mProdBuildings.mButtons;
-        }
-        else if (mBuffBuildings.mGameObject.activeSelf)
-        {
-            allButtons = mBuffBuildings.mButtons;
-        }
-
-        foreach( (RTSManager.eBuildingList, cButton) pair in allButtons )
-        {
-            Rect buttonFrameScreen = pair.Item2.GetFrameRelativeTo( mGameObject );
-            if( buttonFrameScreen.Contains( mousePosRegular ) )
-            {
-                mOnHover?.Invoke( pair.Item1 );
-                return;
-            }
-        }
-
-        mOnHover?.Invoke(null);
-    }
-
-
 }
 

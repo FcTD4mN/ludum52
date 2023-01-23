@@ -61,6 +61,7 @@ class cView
     }
 
 
+    // This gives frame as if other was its direct parent, with 0,0 being other's top left
     public Rect GetFrameRelativeTo( GameObject other )
     {
         Rect frame = GetFrame();
@@ -72,12 +73,6 @@ class cView
             frame = Utilities.OffsetRectBy( frame, new Vector2( parentFrame.xMin, parentFrame.yMin ) );
 
             parent = parent.parent;
-        }
-
-        if( parent != null && parent == other.transform )
-        {
-            Rect parentFrame = GetFrame(parent.gameObject);
-            frame = Utilities.OffsetRectBy(frame, new Vector2(parentFrame.xMin, parentFrame.yMin));
         }
 
         return  frame;
@@ -101,5 +96,13 @@ class cView
 
         image.color = color;
     }
+}
 
+
+
+
+class Hoverable : MonoBehaviour
+{
+    public Action mOnHoverAction;
+    public Action mOnHoverEndedAction;
 }

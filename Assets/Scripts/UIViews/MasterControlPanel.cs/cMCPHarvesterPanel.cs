@@ -6,7 +6,7 @@ using System;
 class cMCPHarvesterPanel :
     cMCPBuildingPanelBase
 {
-    public cMCPHarvesterPanel(GameObject parentView, string name) : base(parentView, name, "Harvesters")
+    public cMCPHarvesterPanel(GameObject parentView, string name, cMasterControlPanel master) : base(parentView, name, "Harvesters", master )
     {
     }
 

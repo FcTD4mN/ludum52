@@ -9,6 +9,7 @@ abstract class cBuildPanelBase :
 
     public List<(RTSManager.eBuildingList, cButton)> mButtons;
     public Action<RTSManager.eBuildingList> mOnBuildingClicked;
+    public Action<RTSManager.eBuildingList> mOnBuildingHovered;
 
     // UI variables
     public float mPadding = 32;
@@ -83,6 +84,13 @@ abstract class cBuildPanelBase :
                 mOnBuildingClicked?.Invoke(building);
 
             });
+
+            var hoverable = button.mGameObject.AddComponent<Hoverable>();
+            hoverable.mOnHoverAction = () => {
+
+                mOnBuildingHovered?.Invoke(building);
+
+            };
 
             mButtons.Add((building, button));
 

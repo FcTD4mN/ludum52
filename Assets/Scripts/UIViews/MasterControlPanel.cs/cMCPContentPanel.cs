@@ -10,15 +10,16 @@ class cMCPContentPanel :
     private cMCPBuffersPanel mBuffersPanel;
 
 
+
     // UI variables
     public float mPadding = 32;
     public float mSpacing = 50;
 
-    public cMCPContentPanel(GameObject parentView, string name) : base(parentView, name)
+    public cMCPContentPanel(GameObject parentView, string name, cMasterControlPanel master ) : base(parentView, name)
     {
-        mHarvesterPanel = new cMCPHarvesterPanel(mGameObject, "harvesterPanel");
-        mProducerPanel = new cMCPProductionPanel(mGameObject, "producerPanel");
-        mBuffersPanel = new cMCPBuffersPanel(mGameObject, "bufferPanel");
+        mHarvesterPanel = new cMCPHarvesterPanel(mGameObject, "harvesterPanel", master);
+        mProducerPanel = new cMCPProductionPanel(mGameObject, "producerPanel", master);
+        mBuffersPanel = new cMCPBuffersPanel(mGameObject, "bufferPanel", master);
         SetColor(Color.clear);
     }
 

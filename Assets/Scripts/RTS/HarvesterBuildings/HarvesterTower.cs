@@ -16,6 +16,13 @@ public class HarvesterTower : HarvestingBuilding
     }
 
 
+    internal override void Initialize()
+    {
+        mAddDiode = false;
+        base.Initialize();
+    }
+
+
     public override string GetDisplayName()
     {
         return "Main Tower";

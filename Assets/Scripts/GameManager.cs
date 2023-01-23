@@ -122,6 +122,7 @@ public class GameManager : MonoBehaviour
             {
                 Vector3 positionDeLaTour = mRTSManager.mTowers[0].transform.position;
 
+                Camera.main.orthographicSize = 7;
                 float camHalfHeight = Camera.main.orthographicSize;
                 float towerHalfHeight = mRTSManager.mTowers[0].transform.localScale.y / 2;
                 float floorHeight = 1;
@@ -129,10 +130,12 @@ public class GameManager : MonoBehaviour
                 Camera.main.transform.position = new Vector3(positionDeLaTour.x,
                                                                 positionDeLaTour.y + camHalfHeight - towerHalfHeight - floorHeight,
                                                                 Camera.main.transform.position.z);
+
                 mUIManager.CreateBuildButtonOnEveryBuildableObject();
             }
             else
             {
+                Camera.main.orthographicSize = 5;
                 mUIManager.ClearUIForSwitchingView();
             }
         }

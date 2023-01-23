@@ -12,6 +12,7 @@ public abstract class ProductionBuilding : MonoBehaviour
     internal float mProdRatio = 1f;
 
     public GameObject mDiode;
+    public bool mAddDiode = true;
 
     abstract public RTSManager.eBuildingList GetBuildingType();
     abstract public cResourceDescriptor GetNewResourceDescriptor();
@@ -57,6 +58,7 @@ public abstract class ProductionBuilding : MonoBehaviour
         });
 
         BuildBuilding();
+        if( mAddDiode ) AddDiode();
     }
 
 
@@ -180,12 +182,12 @@ public abstract class ProductionBuilding : MonoBehaviour
     // ===================================
     public void AddDiode()
     {
-        if( transform.parent == null ) return;
-
         GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/Diode");
         mDiode = Instantiate( prefab,
                                 transform.position + new Vector3( transform.localScale.x/2.5f, transform.localScale.y/2.5f, -1 ),
                                 Quaternion.Euler(0, 0, 0) );
+
+        mDiode.transform.localScale = new Vector3( 1, 1, 1 );
 
         mDiode.transform.SetParent( gameObject.transform );
     }

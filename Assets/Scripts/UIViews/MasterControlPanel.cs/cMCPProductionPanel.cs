@@ -7,7 +7,7 @@ using System;
 class cMCPProductionPanel :
     cMCPBuildingPanelBase
 {
-    public cMCPProductionPanel(GameObject parentView, string name) : base(parentView, name, "Producers")
+    public cMCPProductionPanel(GameObject parentView, string name, cMasterControlPanel master) : base(parentView, name, "Producers", master)
     {
     }
 
