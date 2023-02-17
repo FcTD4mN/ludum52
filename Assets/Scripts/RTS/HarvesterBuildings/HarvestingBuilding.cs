@@ -52,7 +52,7 @@ public abstract class HarvestingBuilding : ProductionBuilding
         }
         else
         {
-            GameManager.mRTSManager.BuildReceiver( associatedReceiver, gameObject);
+            GameManager.mRTSManager.mMainTower.BuildReceiver( associatedReceiver, gameObject);
         }
     }
 

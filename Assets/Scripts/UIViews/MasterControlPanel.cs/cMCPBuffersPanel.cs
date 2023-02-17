@@ -13,9 +13,13 @@ class cMCPBuffersPanel :
 
     internal override List<ProductionBuilding> GetBuildingList()
     {
-        return GameManager.mRTSManager.mAllBuffBuildings.ConvertAll(new Converter<BuffBuilding, ProductionBuilding>((buff) =>
+        var producers = new List<ProductionBuilding>();
+
+        foreach (var building in GameManager.mRTSManager.mBuffTower.mBuildings)
         {
-            return buff.gameObject.GetComponent<ProductionBuilding>();
-        }));
+            producers.Add(building);
+        }
+
+        return producers;
     }
 }

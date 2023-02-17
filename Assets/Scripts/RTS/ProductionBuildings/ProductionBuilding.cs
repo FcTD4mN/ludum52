@@ -6,6 +6,8 @@ using static cResourceDescriptor;
 
 public abstract class ProductionBuilding : MonoBehaviour
 {
+    public TowerBase mAssociatedTower;
+
     internal cResourceDescriptor mResourceDescriptor;
     private bool mIsPaused = false;
     private bool mIsOutOfResources = false;
@@ -109,10 +111,25 @@ public abstract class ProductionBuilding : MonoBehaviour
     // ===================================
     public void BuildBuilding()
     {
+        // If available, we rebuild a previously destroyed building
+        if( GameManager.mRTSManager.mAvailableBuildings[GetBuildingType()] > 0 )
+        {
+            GameManager.mRTSManager.mAvailableBuildings[GetBuildingType()] -= 1;
+            return;
+        }
+
+        // Otherwise we build it
         foreach( eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)) )
         {
             GameManager.mResourceManager.AddResource( resourceName, -mResourceDescriptor.mBuildCosts[resourceName], false );
         }
+    }
+    public void DeleteBuilding()
+    {
+        GameManager.mRTSManager.mAvailableBuildings[ GetBuildingType() ] += 1;
+        mAssociatedTower?.RemoveBuilding( this );
+
+        GameObject.Destroy( gameObject );
     }
 
 
@@ -165,6 +182,9 @@ public abstract class ProductionBuilding : MonoBehaviour
 
     public bool IsBuildable()
     {
+        if( GameManager.mRTSManager.mAvailableBuildings[GetBuildingType()] > 0 )
+            return  true;
+
         foreach (eResourceNames resourceName in Enum.GetValues(typeof(eResourceNames)))
         {
             if (mResourceDescriptor.mBuildCosts[resourceName] > GameManager.mResourceManager.GetRessource(resourceName))
@@ -224,6 +244,9 @@ public abstract class ProductionBuilding : MonoBehaviour
     // ===================================
     public RTSManager.eBuildingErrors GetBuildingError()
     {
+        if (GameManager.mRTSManager.mAvailableBuildings[GetBuildingType()] > 0)
+            return  RTSManager.eBuildingErrors.None;
+
         if (!GameManager.mRTSManager.mUnlockedBuildings.Contains( GetBuildingType() ))
         {
             return RTSManager.eBuildingErrors.BlueprintRequired;

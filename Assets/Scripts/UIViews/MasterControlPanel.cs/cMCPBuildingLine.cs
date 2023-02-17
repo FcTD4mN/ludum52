@@ -35,29 +35,16 @@ class cBuildingLine :
     static public float mBuildingLineEfficiencyWidth = 70;
     static public float mBuildingLineButtonPauseWidth = 50;
 
-    public cBuildingLine(GameObject parentView, string name, ProductionBuilding building, cMasterControlPanel master) : base(parentView, name)
+    public cBuildingLine( GameObject parentView, string name, ProductionBuilding building, cMasterControlPanel master ) : base(parentView, name)
     {
         mMaster = master;
 
         mTitle = new cLabel(mGameObject, "title");
-        mTitle.mText.text = building.GetDisplayName();
         mTitle.mText.fontStyle = TMPro.FontStyles.Bold;
         mTitle.mText.alignment = TMPro.TextAlignmentOptions.Left;
         var hoverable = mTitle.mGameObject.AddComponent<Hoverable>();
         hoverable.mOnHoverAction = Hover;
         hoverable.mOnHoverEndedAction = HoverEnded;
-
-        mDiode = new cImage(mGameObject, "diode");
-        mDiode.SetImageFromUnityResources("Knob");
-
-        Shader diodeShader = Resources.Load<Shader>( "Shaders/DiodeShader" );
-        mDiodeMat = new Material( diodeShader );
-        mDiodeMat.mainTexture = mDiode.mImage.sprite.texture;
-        mDiode.mImage.material = mDiodeMat;
-
-        mAssociatedBuilding = building;
-        _mAssociatedBuildingHarvesterComp = building.GetComponent<HarvestingBuilding>();
-        _mAssociatedBuildingBuffComp = building.GetComponent<BuffBuilding>();
 
         mLabelProdRate = new cLabel(mGameObject, "prodRate");
         mLabelProdRate.mText.fontStyle = TMPro.FontStyles.Bold;
@@ -68,7 +55,47 @@ class cBuildingLine :
         mButtonPause.SetColor( Color.black );
         mButtonPause.AddOnClickAction( OnPauseClick );
 
+        mInputViews = new List<cResourceView>();
+        mOutputViews = new List<cResourceView>();
+
         SetColor(Color.clear);
+
+        BuildUIForBuilding( building );
+    }
+
+
+    public void BuildUIForBuilding( ProductionBuilding building )
+    {
+        mAssociatedBuilding = building;
+        _mAssociatedBuildingHarvesterComp = building?.GetComponent<HarvestingBuilding>();
+        _mAssociatedBuildingBuffComp = building?.GetComponent<BuffBuilding>();
+
+        mTitle.mText.text = building == null ? "<Empty>" : building.GetDisplayName();
+
+        foreach (var view in mInputViews)
+        {
+            GameObject.Destroy(view.mGameObject);
+        }
+        mInputViews.Clear();
+
+        foreach (var view in mOutputViews)
+        {
+            GameObject.Destroy(view.mGameObject);
+        }
+        mOutputViews.Clear();
+
+        bool buildingIsNotNull = building != null;
+        mButtonPause.mGameObject.SetActive( buildingIsNotNull );
+        mLabelProdRate.mGameObject.SetActive( buildingIsNotNull );
+        mDiode?.mGameObject.SetActive( buildingIsNotNull );
+
+        mDiode = new cImage(mGameObject, "diode");
+        mDiode.SetImageFromUnityResources("Knob");
+
+        Shader diodeShader = Resources.Load<Shader>("Shaders/DiodeShader");
+        mDiodeMat = new Material(diodeShader);
+        mDiodeMat.mainTexture = mDiode.mImage.sprite.texture;
+        mDiode.mImage.material = mDiodeMat;
 
         BuildInputs();
         BuildOutputs();
@@ -79,16 +106,28 @@ class cBuildingLine :
     {
         var frame = GetFrame();
 
-        mDiode.SetFrame(new Rect(0,
-                                    0,
-                                    frame.height,
-                                    frame.height));
+        bool diodeIsThere = mDiode != null;
+        float diodeSize = frame.height;
 
-        Rect titleFrame = new Rect(mDiode.GetFrame().xMax + mBuildingLineSpacing,
+        if( diodeIsThere )
+        {
+            mDiode.SetFrame(new Rect(0,
+                                        0,
+                                        diodeSize,
+                                        diodeSize));
+        }
+
+        // Always aligned to diode size, so that text will alin with any existing building
+        Rect titleFrame = new Rect( diodeSize + mBuildingLineSpacing,
                                     0,
                                     mBuildingLineNameWidth,
                                     frame.height);
         mTitle.SetFrame(titleFrame);
+
+
+
+        // Following views are only visible if there is a building associated
+        if( mAssociatedBuilding == null ) { return; }
 
         var resourceWidth = 40f;
         var inputFrame = new Rect(  titleFrame.xMax + mBuildingLineSpacing,
@@ -127,6 +166,11 @@ class cBuildingLine :
 
     public void Update()
     {
+        // Diode update
+        DiodeUpdate();
+
+        if( mAssociatedBuilding == null ) { return; }
+
         float prodRatio = mAssociatedBuilding.IsPaused() ? 0 : mAssociatedBuilding.GetProductionRatio();
 
         // Prod label update
@@ -153,12 +197,27 @@ class cBuildingLine :
         // Tooltips update
         if (_mAssociatedBuildingHarvesterComp != null) UpdateHarvesterToolTip();
         if (_mAssociatedBuildingBuffComp != null) UpdateBufferToolTip();
+    }
 
-        // Diode update
-        if (mAssociatedBuilding.IsPaused() )
+
+    private void DiodeUpdate()
+    {
+        if (mAssociatedBuilding == null)
+        {
+            if (mMaterialPatcher == 5) return;
+            mDiodeMat = new Material(mDiodeMat);
+            mDiode.mImage.material = mDiodeMat;
+            mDiodeMat.SetColor("_ColorA", new Color(0f, 0f, 0f, 1));
+            mDiodeMat.SetColor("_ColorB", new Color(0f, 0f, 0f, 1));
+            mMaterialPatcher = 5;
+            return;
+        }
+
+        float prodRatio = mAssociatedBuilding.IsPaused() ? 0 : mAssociatedBuilding.GetProductionRatio();
+        if (mAssociatedBuilding.IsPaused())
         {
             if (mMaterialPatcher == 0) return;
-            mDiodeMat = new Material( mDiodeMat );
+            mDiodeMat = new Material(mDiodeMat);
             mDiode.mImage.material = mDiodeMat;
             mDiodeMat.SetColor("_ColorA", new Color(1, 0.5f, 0, 1));
             mDiodeMat.SetColor("_ColorB", new Color(1, 0.6f, 0.1f, 1));
@@ -166,7 +225,7 @@ class cBuildingLine :
         }
         else if (prodRatio < 1)
         {
-            if( mMaterialPatcher == 1 ) return;
+            if (mMaterialPatcher == 1) return;
             mDiodeMat = new Material(mDiodeMat);
             mDiode.mImage.material = mDiodeMat;
             mDiodeMat.SetColor("_ColorA", Color.red);
@@ -187,7 +246,8 @@ class cBuildingLine :
 
     private void BuildInputs()
     {
-        mInputViews = new List<cResourceView>();
+        if( mAssociatedBuilding == null ) { return; }
+
         var buildingResourceDescriptor = mAssociatedBuilding.GetResourceDescriptor();
         foreach( var resource in buildingResourceDescriptor.mInputRates )
         {
@@ -207,7 +267,8 @@ class cBuildingLine :
 
     private void BuildOutputs()
     {
-        mOutputViews = new List<cResourceView>();
+        if (mAssociatedBuilding == null) { return; }
+
         var buildingResourceDescriptor = mAssociatedBuilding.GetResourceDescriptor();
         foreach (var resource in buildingResourceDescriptor.mOutputRates)
         {
@@ -229,6 +290,8 @@ class cBuildingLine :
     // But then, for now, it means you shouldn't be able to hit pause on the receiver hover button, cause Pause => then object disappears is kinda weird
     private void OnPauseClick()
     {
+        if( mAssociatedBuilding == null ) { return; }
+
         mAssociatedBuilding.SetPause(!mAssociatedBuilding.IsPaused());
     }
 
@@ -305,6 +368,15 @@ class cBuildingLine :
 
         mHoverInfos.SetFrame(new Rect(frame.xMin, frame.yMin + frame.height, textWidth + 20, textHeight + 20));
         mHoverInfosText.SetFrame(new Rect(10, 10, textWidth, textHeight));
+    }
+
+
+    private void EmptyLineButtonClicked()
+    {
+        var buildMenu = new cBuildMenu( mGameObject, "buildMenu" );
+        buildMenu.mOnBuildingClicked = (building)=>{
+
+        };
     }
 }
 

@@ -10,11 +10,11 @@ public class Receiver : MonoBehaviour
 
     public void OnEnable()
     {
-        GameManager.mRTSManager.mAllReceivers.Add( this );
+        GameManager.mRTSManager.mMainTower.mAllReceivers.Add( this );
     }
 
     public void OnDisable()
     {
-        GameManager.mRTSManager.mAllReceivers.Remove(this);
+        GameManager.mRTSManager.mMainTower.mAllReceivers.Remove(this);
     }
 }

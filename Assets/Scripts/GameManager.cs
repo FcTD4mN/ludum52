@@ -120,11 +120,11 @@ public class GameManager : MonoBehaviour
 
             if (mIsInRTSMode)
             {
-                Vector3 positionDeLaTour = mRTSManager.mTowers[0].transform.position;
+                Vector3 positionDeLaTour = mRTSManager.mMainTower.mFloors[0].transform.position;
 
                 Camera.main.orthographicSize = 7;
                 float camHalfHeight = Camera.main.orthographicSize;
-                float towerHalfHeight = mRTSManager.mTowers[0].transform.localScale.y / 2;
+                float towerHalfHeight = mRTSManager.mMainTower.mFloors[0].transform.localScale.y / 2;
                 float floorHeight = 1;
 
                 Camera.main.transform.position = new Vector3(positionDeLaTour.x,

@@ -139,10 +139,13 @@ abstract class cMCPBuildingPanelBase :
     private void BuildBuildings()
     {
         var buildings = GetBuildingList();
+
+        int i = 0;
         foreach (ProductionBuilding building in buildings)
         {
-            var newLine = new cBuildingLine(mGameObject, building.name + "line", building, mMaster);
+            var newLine = new cBuildingLine(mGameObject, "buildingLine" + i, building, mMaster);
             mAllBuildingLines.Add(newLine);
+            ++i;
         }
     }
 }

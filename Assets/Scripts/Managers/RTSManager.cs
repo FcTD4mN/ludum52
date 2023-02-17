@@ -1,23 +1,20 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class RTSManager : MonoBehaviour
 {
     public GameObject mRTSWorld;
-    public List<GameObject> mTowers;
-    public List<GameObject> mBuffTower;
-
-    public int mTowerLevel = 1;
-    public int mHarvesterSlots = 2;
+    public TowerMain mMainTower;
+    public TowerBuff mBuffTower;
 
     // All Buildings
     public List<HarvestingBuilding> mAllHarvesters;
     public List<ProductionBuilding> mAllProductionBuildings;
     public List<BuffBuilding> mAllBuffBuildings;
 
-    // Receivers
-    public List<Receiver> mAllReceivers;
+    // Built building that have been removed
+    public Dictionary<eBuildingList, int> mAvailableBuildings;
 
     // Resource Veins
     public List<ResourceVeinBase> mAllResourceVeins;
@@ -56,7 +53,12 @@ public class RTSManager : MonoBehaviour
         mAllProductionBuildings = new List<ProductionBuilding>();
         mAllHarvesters = new List<HarvestingBuilding>();
 
-        mAllReceivers = new List<Receiver>();
+        mAvailableBuildings = new Dictionary<eBuildingList, int>();
+        foreach (eBuildingList type in Enum.GetValues(typeof(eBuildingList)))
+        {
+            mAvailableBuildings[type] = 0;
+        }
+
         mBuildingToBuildableRelations = new List<(GameObject, GameObject)>();
 
         mUnlockedBuildings = new List<eBuildingList>();
@@ -67,12 +69,10 @@ public class RTSManager : MonoBehaviour
 
 
         mRTSWorld = GameObject.Find("RTSWorld")?.gameObject;
-        mTowers = new List<GameObject>();
-        mTowers.Add( GameObject.Find("Tower")?.gameObject );
-        mTowers[0].AddComponent( typeof( HarvesterTower ) );
-
-        mBuffTower = new List<GameObject>();
-        mBuffTower.Add( GameObject.Find("BuffTower")?.gameObject );
+        mMainTower = new TowerMain();
+        mMainTower.Initialize();
+        mBuffTower = new TowerBuff();
+        mBuffTower.Initialize();
     }
 
 
@@ -100,114 +100,38 @@ public class RTSManager : MonoBehaviour
 
             harvester.mResourceVein = resourceVein;
 
-            if( mAllReceivers.Count < mTowerLevel * mHarvesterSlots ) // and slots are left for receiver
+            if( mMainTower.mAllReceivers.Count < mMainTower.GetTotalPossibleReceiverCount() ) // and slots are left for receiver
             {
                 GameObject createdReceiver = null;
                 if (newBuilding.gameObject.GetComponent<IronHarvester>() != null)
                 {
-                    createdReceiver = BuildReceiver("IronReceiver", newBuilding);
+                    createdReceiver = mMainTower.BuildReceiver("IronReceiver", newBuilding);
                 }
                 else if (newBuilding.gameObject.GetComponent<FireHarvester>() != null)
                 {
-                    createdReceiver = BuildReceiver("FireReceiver", newBuilding);
+                    createdReceiver = mMainTower.BuildReceiver("FireReceiver", newBuilding);
                 }
             }
         }
-        else
+        else // Regular building
         {
             mBuildingToBuildableRelations.Add((newBuilding, objectToBuildOver));
             objectToBuildOver.SetActive( false );
+
+            var parentFloor = objectToBuildOver.transform.parent;
+            var relatedTower = GetTowerByFloor( parentFloor.gameObject );
+            if( relatedTower != null )
+            {
+                var floorIndex = parentFloor.GetSiblingIndex();
+                var index = floorIndex * relatedTower.GetTotalPossibleBuildingCountPerFloor() + objectToBuildOver.transform.GetSiblingIndex();
+                relatedTower.AddBuildingAtIndex( newBuilding.GetComponent<ProductionBuilding>(), index );
+            }
         }
 
         if( CanLevelUp() )
         {
             LevelUp();
         }
-    }
-
-
-    public GameObject BuildReceiver( string type, GameObject associatedHarvester )
-    {
-        int spawnIndex = GetAvailableSlotIndex();
-        int towerFloorIndex = spawnIndex / 2;
-        GameObject towerFloor = mTowers[towerFloorIndex];
-
-        bool createOnTheRight = spawnIndex % 2 == 1;
-
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/" + type);
-        GameObject newBuilding = Instantiate(prefab,
-                                                Vector3.zero,
-                                                Quaternion.Euler(0, 0, 0));
-
-
-        Vector3 spawnLocation = new Vector3();
-        float towerHalfSize = towerFloor.transform.localScale.x / 2;
-        float receiverHalfSize = newBuilding.transform.localScale.x / 2;
-        if (createOnTheRight)
-        {
-            spawnLocation.Set(towerFloor.transform.position.x + towerHalfSize + receiverHalfSize, towerFloor.transform.position.y, 0);
-        }
-        else
-        {
-            spawnLocation.Set(towerFloor.transform.position.x - towerHalfSize - receiverHalfSize, towerFloor.transform.position.y, 0);
-        }
-        newBuilding.transform.position = spawnLocation;
-        newBuilding.transform.SetParent(towerFloor.transform);
-
-        GameObject cable = newBuilding.transform.Find("Cable").gameObject;
-        float floorMultiplier = (towerFloorIndex + 1) * (mTowers[0].transform.localScale.y + newBuilding.transform.localScale.y / 2);
-
-        cable.transform.localScale = new Vector3( cable.transform.localScale.x, floorMultiplier, 1 );
-        cable.transform.position = new Vector3( cable.transform.position.x, cable.transform.position.y - ((floorMultiplier-1)/4), 0 );
-
-        // Add to lists
-        var receiverComp = newBuilding.GetComponent<Receiver>();
-        var associatedHarvesterComp = associatedHarvester.GetComponent<HarvestingBuilding>();
-        if( receiverComp != null && associatedHarvesterComp != null )
-        {
-            receiverComp.mLocationIndex = spawnIndex;
-            receiverComp.mAssociatedHarvester = associatedHarvesterComp;
-            associatedHarvesterComp.mReceiver = receiverComp;
-        }
-
-        return  newBuilding;
-    }
-
-
-    private int GetAvailableSlotIndex()
-    {
-        List<int> mAllIndices = new List<int>();
-        foreach( Receiver receiver in mAllReceivers )
-        {
-            mAllIndices.Add( receiver.mLocationIndex );
-        }
-
-        mAllIndices.Sort();
-
-        if( mAllIndices.Count == 0 )
-        {
-            return  0;
-        }
-
-        if( mAllIndices.Count == 1 )
-        {
-            return  mAllIndices[0] == 0 ? 1 : 0;
-        }
-
-        if( mAllIndices[0] != 0 )
-        {
-            return  0;
-        }
-
-        for( int i = 0; i < mAllIndices.Count - 1; i++ )
-        {
-            int delta = mAllIndices[i+1] - mAllIndices[i];
-            if( delta > 1 ) {
-                return  mAllIndices[i] + 1;
-            }
-        }
-
-        return  mAllIndices[mAllIndices.Count - 1] + 1;
     }
 
 
@@ -225,86 +149,43 @@ public class RTSManager : MonoBehaviour
         if( receiver != null )
         {
             receiver.mAssociatedHarvester.mReceiver = null;
+            GameObject.Destroy( building );
+            return;
         }
 
-        GameObject.Destroy( building );
+        // Using destroy method for production buildings
+        building.GetComponent<ProductionBuilding>()?.DeleteBuilding();
     }
 
 
-    public bool CanBuildHarvester()
-    {
-        int harvesterCountWithoutTower = mAllHarvesters.Count - 1;
-        return  harvesterCountWithoutTower < mHarvesterSlots;
-    }
-
-
-    // ===================================
-    // Tower
-    // ===================================
     public void LevelUp()
     {
-        mTowerLevel += 1;
-        mHarvesterSlots += 2;
-
-        BuildTowerFloor();
-        BuildBuffTowerFloor();
+        mMainTower.LevelUp();
+        mBuffTower.LevelUp();
     }
 
 
     public bool CanLevelUp()
     {
         int nonHarvesterCount = mAllProductionBuildings.Count - mAllHarvesters.Count - mAllBuffBuildings.Count;
-        return  nonHarvesterCount == mTowerLevel*2;
+        return  nonHarvesterCount == mMainTower.GetTotalPossibleBuildingCount();
     }
 
 
-    private void BuildTowerFloor()
+    public ProductionBuilding GetPrefabByType(eBuildingList type)
     {
-        GameObject lastTowerFloor = mTowers[mTowers.Count - 1];
-
-        Vector3 upVector = new Vector3(0, lastTowerFloor.transform.localScale.y, 0);
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/Tower");
-        GameObject newTowerFloor = Instantiate(prefab,
-                                                lastTowerFloor.transform.position + upVector,
-                                                Quaternion.Euler(0, 0, 0));
-        newTowerFloor.transform.SetParent(mRTSWorld.transform);
-
-        foreach (Transform gg in newTowerFloor.transform)
-        {
-            GameManager.mUIManager.mBuildableObjects.Add( gg.gameObject );
-            GameManager.mUIManager.CreateBuildButtonOverObject(gg.gameObject);
-        }
-
-        mTowers.Add(newTowerFloor);
-    }
-
-
-    private void BuildBuffTowerFloor()
-    {
-        GameObject lastTowerFloor = mBuffTower[mBuffTower.Count - 1];
-
-        Vector3 upVector = new Vector3(0, lastTowerFloor.transform.localScale.y, 0);
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/BuffTower");
-        GameObject newTowerFloor = Instantiate(prefab,
-                                                lastTowerFloor.transform.position + upVector,
-                                                Quaternion.Euler(0, 0, 0));
-        newTowerFloor.transform.SetParent(mRTSWorld.transform);
-
-        foreach (Transform gg in newTowerFloor.transform)
-        {
-            GameManager.mUIManager.mBuildableObjects.Add(gg.gameObject);
-            GameManager.mUIManager.CreateBuildButtonOverObject(gg.gameObject);
-        }
-
-        mBuffTower.Add(newTowerFloor);
-    }
-
-
-    public ProductionBuilding GetPrefabByType( eBuildingList type )
-    {
-        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/" + type.ToString() );
+        GameObject prefab = Resources.Load<GameObject>("Prefabs/RTS/" + type.ToString());
         ProductionBuilding prod = prefab.GetComponent<ProductionBuilding>();
         prod.Initialize();
-        return  prod;
+        return prod;
+    }
+
+
+    public TowerBase GetTowerByFloor( GameObject floor )
+    {
+        if( mMainTower.mFloors.Contains( floor ) ) return  mMainTower;
+        if( mBuffTower.mFloors.Contains( floor ) ) return  mBuffTower;
+
+        return  null;
     }
 }

@@ -64,7 +64,10 @@ public class UIManager : MonoBehaviour
         mLabelBombs = GameObject.Find("LabelBombs")?.gameObject.GetComponent<TextMeshProUGUI>();
 
         mCanvas = GameObject.Find("UI-RTS")?.gameObject.GetComponent<Canvas>();
-        BuildBuildableList();
+
+        mBuildableObjects = new List<GameObject>();
+        BuildBuildableList(GameManager.mRTSManager.mMainTower.mMainTowerNode);
+        BuildBuildableList(GameManager.mRTSManager.mBuffTower.mTowerBuffNode);
 
         // Build Menu
         mBuildMenu = new cBuildMenu( mCanvas.gameObject, "BuildMenu" );
@@ -89,10 +92,9 @@ public class UIManager : MonoBehaviour
     }
 
 
-    private void BuildBuildableList()
+    private void BuildBuildableList( GameObject root )
     {
-        mBuildableObjects = new List<GameObject>();
-        foreach( Transform child in GameManager.mRTSManager.mRTSWorld.transform )
+        foreach( Transform child in root.transform )
         {
             foreach (Transform subChild in child )
             {
@@ -187,7 +189,7 @@ public class UIManager : MonoBehaviour
             // RECEIVERS (world buildings, can't be tested through raycast above)
             if( !mDidFindHoveredButton )
             {
-                foreach (Receiver receiver in GameManager.mRTSManager.mAllReceivers)
+                foreach (Receiver receiver in GameManager.mRTSManager.mMainTower.mAllReceivers)
                 {
                     Rect bbox = Utilities.GetBBoxFromTransform(receiver.gameObject);
                     if (bbox.Contains(mousePosWorld))
@@ -364,8 +366,8 @@ public class UIManager : MonoBehaviour
     // ===================================
     public void ShowBuildMenu()
     {
-        bool isLocationOnTower = GameManager.mRTSManager.mTowers.Contains(mObjectToBuildTo.transform.parent.gameObject);
-        bool isLocationOnBuffTower = GameManager.mRTSManager.mBuffTower.Contains(mObjectToBuildTo.transform.parent.gameObject);
+        bool isLocationOnTower = GameManager.mRTSManager.mMainTower.mFloors.Contains(mObjectToBuildTo.transform.parent.gameObject);
+        bool isLocationOnBuffTower = GameManager.mRTSManager.mBuffTower.mFloors.Contains(mObjectToBuildTo.transform.parent.gameObject);
 
         if( isLocationOnTower ) mBuildMenu.ShowProdBuildingPanel();
         if( isLocationOnBuffTower ) mBuildMenu.ShowBuffBuildingPanel();

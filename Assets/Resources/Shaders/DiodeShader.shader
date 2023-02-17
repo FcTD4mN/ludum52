@@ -4,7 +4,7 @@ Shader "Unlit/DiodeShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _ColorA ("ColorA", Color) = (0,0,0,1)
-        _ColorB ("ColorB", Color) = (1,0,0,1)
+        _ColorB ("ColorB", Color) = (0,0,0,1)
         _BlinkSpeed ("BlinkSpeed", Float) = 2
 
         _StencilComp ("Stencil Comparison", Float) = 8
