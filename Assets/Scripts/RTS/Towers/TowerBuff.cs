@@ -36,12 +36,6 @@ public class TowerBuff: TowerBase
                                                             Quaternion.Euler(0, 0, 0));
         newTowerFloor.transform.SetParent(mTowerNode.transform);
 
-        foreach (Transform gg in newTowerFloor.transform)
-        {
-            GameManager.mUIManager.mBuildableObjects.Add(gg.gameObject);
-            GameManager.mUIManager.CreateBuildButtonOverObject(gg.gameObject);
-        }
-
         mFloors.Add(newTowerFloor);
     }
 }

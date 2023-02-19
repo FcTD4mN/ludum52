@@ -180,6 +180,8 @@ abstract class cMCPBuildingPanelBase :
     abstract internal bool ShouldPerformAction( pDelegateSender sender );
     virtual public void Action(pDelegateSender sender, object[] args)
     {
+        // This check should no longer be usefull, when this was done, delegate registration was done here to maintower
+        // so obviously would we get there when we shouldn't
         if( !ShouldPerformAction( sender ) ) return;
 
         var message = args[0];

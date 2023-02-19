@@ -72,7 +72,7 @@ class cMasterControlPanel :
                                          0,
                                          40,
                                          40));
-        mCloseButton.SetCenter(new Vector2(frame.xMax, frame.yMin));
+        mCloseButton.SetCenter(new Vector2(frame.width, 0));
 
         int titleHeight = mTitleSize;
         Rect titleFrame = new Rect( mPadding,

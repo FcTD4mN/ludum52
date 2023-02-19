@@ -93,6 +93,7 @@ public class UIManager : MonoBehaviour,
         mAllUIFloatingButtons = new List<(GameObject, GameObject)>();
 
         ((pDelegateSender)GameManager.mRTSManager.mMainTower).AddDelegate( this );
+        ((pDelegateSender)GameManager.mRTSManager.mBuffTower).AddDelegate( this );
     }
 
 
@@ -335,14 +336,14 @@ public class UIManager : MonoBehaviour,
     // ===================================
     public void Action( pDelegateSender sender, object[] args )
     {
-        if( sender is TowerBase )
+        if( sender is TowerBase towerBase )
         {
-            TowerMessage( args );
+            TowerMessage( towerBase, args );
         }
     }
 
 
-    private void TowerMessage(object[] args)
+    private void TowerMessage( TowerBase sender, object[] args)
     {
         var message = args[0];
         switch (message)
@@ -375,7 +376,18 @@ public class UIManager : MonoBehaviour,
 
             case TowerBase.eTowerMessages.kLevelUp:
                 {
-                    // Nothing
+                    var addedFloor = sender.mFloors[ sender.mLevel - 1 ];
+                    foreach (Transform gg in addedFloor.transform)
+                    {
+                        mBuildableObjects.Add(gg.gameObject);
+                        CreateBuildButtonOverObject(gg.gameObject);
+                    }
+
+                    // If mcp is opened, put it front, because we just created new UIbuttons, they will be over mcp if it is open
+                    if( mMasterControlPanel != null )
+                    {
+                        mMasterControlPanel.mGameObject.transform.SetAsLastSibling();
+                    }
                     break;
                 }
 
