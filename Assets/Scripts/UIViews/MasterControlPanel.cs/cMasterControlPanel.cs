@@ -21,11 +21,6 @@ class cMasterControlPanel :
 
     public Action mCloseAction;
 
-
-    ~cMasterControlPanel()
-    {
-        Debug.Log("cMasterControlPanel");
-    }
     public cMasterControlPanel(GameObject parentView, string name) : base(parentView, name)
     {
         mTitle = new cLabel(mGameObject, "title");

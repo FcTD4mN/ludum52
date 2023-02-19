@@ -8,7 +8,6 @@ class cBuildMenu :
 {
     public Action mOnClose;
     public Action<RTSManager.eBuildingList> mOnBuildingClicked;
-    public Action<RTSManager.eBuildingList?> mOnHover;
 
     private cButton mCloseButton;
     private cLabel mTitle;
@@ -44,17 +43,10 @@ class cBuildMenu :
         mProdBuildings.mOnBuildingClicked = ( building ) => {
             mOnBuildingClicked?.Invoke( building );
         };
-        mProdBuildings.mOnBuildingHovered = ( building ) => {
-            mOnHover?.Invoke( building );
-        };
 
         mBuffBuildings.mOnBuildingClicked = (building) =>
         {
             mOnBuildingClicked?.Invoke(building);
-        };
-        mBuffBuildings.mOnBuildingHovered = (building) =>
-        {
-            mOnHover?.Invoke(building);
         };
 
         mScrollArea.AddViewToContent( mProdBuildings );

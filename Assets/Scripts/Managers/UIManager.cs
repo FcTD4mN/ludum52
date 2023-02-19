@@ -455,18 +455,6 @@ public class UIManager : MonoBehaviour,
             GameManager.mRTSManager.BuildObjectAtLocation( building.ToString(), mObjectToBuildTo);
 
         };
-
-        mBuildMenu.mOnHover = (building) =>
-        {
-            if( building == null ) return;
-            ProductionBuilding prod = GameManager.mRTSManager.GetPrefabByType( (RTSManager.eBuildingList)building );
-
-            if (mHoveredObject == prod && mHoverButton != null) return;
-            if (mHoveredObject != prod) DeleteUIButton(mHoverButton);
-
-            mHoveredObject = prod.gameObject;
-            mInfoPanelDisplay = eInfoPanelDisplayType.kShowPrefabStats;
-        };
     }
 
     // ===================================

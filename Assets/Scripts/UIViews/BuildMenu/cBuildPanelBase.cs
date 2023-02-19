@@ -9,7 +9,9 @@ abstract class cBuildPanelBase :
 
     public List<(RTSManager.eBuildingList, cButton)> mButtons;
     public Action<RTSManager.eBuildingList> mOnBuildingClicked;
-    public Action<RTSManager.eBuildingList> mOnBuildingHovered;
+
+    private cToolTipPanel mHoverInfos;
+    private ProductionBuilding mHoveredObject;
 
     // UI variables
     public float mPadding = 32;
@@ -88,7 +90,23 @@ abstract class cBuildPanelBase :
             var hoverable = button.mGameObject.AddComponent<Hoverable>();
             hoverable.mOnHoverAction = () => {
 
-                mOnBuildingHovered?.Invoke(building);
+                if (mHoverInfos != null) return;
+                ProductionBuilding prod = GameManager.mRTSManager.GetPrefabByType((RTSManager.eBuildingList)building);
+                mHoveredObject = prod;
+
+                mHoverInfos = new cToolTipPanel( GameManager.mUIManager.mCanvas.gameObject, "tooltip", button );
+                mHoverInfos.mShowPosition = cToolTipPanel.ePosition.kRight;
+                mHoverInfos.mDistance = 20;
+
+            };
+
+            hoverable.mOnHoverEndedAction = () => {
+
+                if( mHoverInfos != null ) {
+                    GameObject.Destroy( mHoverInfos.mGameObject );
+                }
+                mHoverInfos = null;
+                mHoveredObject = null;
 
             };
 
@@ -121,6 +139,9 @@ abstract class cBuildPanelBase :
             ProductionBuilding productionBuilding = GameManager.mRTSManager.GetPrefabByType( pair.Item1 );
             button.mButton.interactable = mGameObject.activeSelf && productionBuilding.IsBuildable();
         }
+
+        mHoverInfos?.SetText( mHoveredObject.GetUIDescription(true) );
+
     }
 }
 

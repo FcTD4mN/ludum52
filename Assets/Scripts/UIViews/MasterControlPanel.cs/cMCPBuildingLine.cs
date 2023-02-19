@@ -13,8 +13,7 @@ class cBuildingLine :
 
     private WeakReference<cMasterControlPanel> mMaster;
 
-    private cPanel mHoverInfos;
-    private cLabel mHoverInfosText;
+    private cToolTipPanel mHoverInfos;
 
     private ProductionBuilding mAssociatedBuilding;
     private HarvestingBuilding  _mAssociatedBuildingHarvesterComp;  // Can be null, it's to avoid constant GetComponent calls
@@ -318,9 +317,7 @@ class cBuildingLine :
         mMaster.TryGetTarget(out master);
         if( master == null ) return;
 
-        mHoverInfos = new cPanel(master?.mGameObject, "hoverInfos");
-        mHoverInfosText = new cLabel(mHoverInfos.mGameObject, "text");
-        mHoverInfosText.mText.alignment = TMPro.TextAlignmentOptions.TopLeft;
+        mHoverInfos = new cToolTipPanel(master?.mGameObject, "hoverInfos", this );
     }
 
     private void HoverEnded()
@@ -349,9 +346,7 @@ class cBuildingLine :
             finalText += " " + resource.Key.ToString() + ": " + ((int)resource.Value).ToString() + "\n";
         }
 
-        mHoverInfosText.mText.text = finalText;
-
-        UpdateHoverInfosFrameToFit();
+        mHoverInfos.SetText(finalText);
     }
 
 
@@ -368,26 +363,7 @@ class cBuildingLine :
             finalText += " " + resource.Key.ToString() + ": " + ((int)resource.Value).ToString() + "\n";
         }
 
-        var text = mHoverInfos.mGameObject.transform.Find("text").GetComponent<TextMeshProUGUI>();
-        text.text = finalText;
-
-        UpdateHoverInfosFrameToFit();
-    }
-
-
-    private void UpdateHoverInfosFrameToFit()
-    {
-        cMasterControlPanel master;
-        mMaster.TryGetTarget(out master);
-        if (master == null) return;
-
-        var frame = GetFrameRelativeTo(master?.mGameObject);
-        mHoverInfosText.mText.ForceMeshUpdate();
-        var textWidth = mHoverInfosText.mText.textBounds.size.x;
-        var textHeight = mHoverInfosText.mText.textBounds.size.y;
-
-        mHoverInfos.SetFrame(new Rect(frame.xMin, frame.yMin + frame.height, textWidth + 20, textHeight + 20));
-        mHoverInfosText.SetFrame(new Rect(10, 10, textWidth, textHeight));
+        mHoverInfos.SetText(finalText);
     }
 }
 
