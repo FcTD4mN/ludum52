@@ -52,7 +52,7 @@ class cBuildingLine :
 
         mEmptyButton = new cButton( mGameObject, "emptyButton" );
         mEmptyButton.SetText( "<Empty>" );
-        mEmptyButton.SetColor( new Color( 0.5f,0.5f,0.5f,0.3f ) );
+        mEmptyButton.SetColor( new Color( 0.3f,0.3f,0.3f,0.3f ) );
         mEmptyButton.AddOnClickAction( ()=> {
             mOnClickEmptyEvent?.Invoke( this );
         });

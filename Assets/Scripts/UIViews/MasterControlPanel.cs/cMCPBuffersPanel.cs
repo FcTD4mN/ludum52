@@ -27,7 +27,7 @@ class cMCPBuffersPanel :
 
     override internal void ActionOnEmptyClick(cBuildingLine line, int spotIndex)
     {
-        var mBuildMenu = new cBuildMenu(GameManager.mUIManager.mCanvas.gameObject, "buildMenu");
+        mBuildMenu = new cBuildMenu(GameManager.mUIManager.mCanvas.gameObject, "buildMenu");
 
         mBuildMenu.mOnClose = () =>
         {
