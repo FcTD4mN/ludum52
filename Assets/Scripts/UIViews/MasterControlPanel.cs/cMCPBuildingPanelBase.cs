@@ -4,7 +4,8 @@ using System;
 
 
 abstract class cMCPBuildingPanelBase :
-    cPanel
+    cPanel,
+    pDelegateReceiver
 {
     private cLabel mTitle;
 
@@ -13,7 +14,8 @@ abstract class cMCPBuildingPanelBase :
     private cLabel mLabelColumnOutputs;
     private cLabel mLabelColumnEfficiency;
 
-    private cMasterControlPanel mMaster;
+    private WeakReference<cMasterControlPanel> mMaster;
+    internal cBuildMenu mBuildMenu; // Required to be member because it needs to be updated
 
 
     // UI variables
@@ -29,12 +31,12 @@ abstract class cMCPBuildingPanelBase :
     private int mLineHeight = 30;
     private int mLineSpacing = 5;
 
-    private List<cBuildingLine> mAllBuildingLines;
+    internal List<cBuildingLine> mAllBuildingLines;
 
 
     public cMCPBuildingPanelBase(GameObject parentView, string name, string panelName, cMasterControlPanel master ) : base(parentView, name)
     {
-        mMaster = master;
+        mMaster = new WeakReference<cMasterControlPanel>(master);
 
         mTitle = new cLabel(mGameObject, "title");
         mTitle.mText.text = panelName;
@@ -70,12 +72,13 @@ abstract class cMCPBuildingPanelBase :
         SetColor(Color.clear);
 
         mAllBuildingLines = new List<cBuildingLine>();
-        BuildBuildings();
+        BuildMissingBuildings();
     }
 
 
     public void Update()
     {
+        mBuildMenu?.UpdateBuildMenu();
         foreach (cBuildingLine line in mAllBuildingLines)
         {
             line.Update();
@@ -136,16 +139,90 @@ abstract class cMCPBuildingPanelBase :
     }
 
     abstract internal List<ProductionBuilding> GetBuildingList();
-    private void BuildBuildings()
+    abstract internal void ActionOnEmptyClick( cBuildingLine line, int spotIndex );
+    private void BuildMissingBuildings()
+    {
+        cMasterControlPanel master;
+        mMaster.TryGetTarget(out master);
+        if( master == null ) return;
+
+        var buildings = GetBuildingList();
+        var howManyBuildingLineToCreate = buildings.Count - mAllBuildingLines.Count;
+
+        for (int j = buildings.Count - howManyBuildingLineToCreate; j < buildings.Count; j++)
+        {
+            var building = buildings[j];
+            var newLine = new cBuildingLine(mGameObject, "buildingLine" + j, building, master);
+
+            int indexHere = j; // Copy to capture in Action
+            newLine.mOnClickEmptyEvent = (buildingLine) =>
+            {
+                ActionOnEmptyClick(buildingLine, indexHere);
+            };
+
+            mAllBuildingLines.Add(newLine);
+
+        }
+    }
+
+
+    private void BuildLevelUpLines()
     {
         var buildings = GetBuildingList();
 
-        int i = 0;
-        foreach (ProductionBuilding building in buildings)
+    }
+
+
+    // ===================================
+    // Delegate
+    // ===================================
+
+    abstract internal bool ShouldPerformAction( pDelegateSender sender );
+    virtual public void Action(pDelegateSender sender, object[] args)
+    {
+        if( !ShouldPerformAction( sender ) ) return;
+
+        var message = args[0];
+        switch (message)
         {
-            var newLine = new cBuildingLine(mGameObject, "buildingLine" + i, building, mMaster);
-            mAllBuildingLines.Add(newLine);
-            ++i;
+            case TowerBase.eTowerMessages.kBuildingAdded:
+                {
+                    var building = (ProductionBuilding)args[1];
+                    var index = (int)args[2];
+
+                    var line = mAllBuildingLines[index];
+                    line.BuildUIForBuilding(building);
+
+                    break;
+                }
+
+            case TowerBase.eTowerMessages.kBuildingRemoved:
+                {
+                    var index = (int)args[2];
+
+                    var line = mAllBuildingLines[index];
+
+                    // Test because this could be called on dead panel as garbage collector takes a long time to process
+                    if (line.mGameObject == null) return;
+
+                    line.BuildUIForBuilding(null);
+
+                    break;
+                }
+
+            case TowerBase.eTowerMessages.kLevelUp:
+                {
+                    cMasterControlPanel master;
+                    mMaster.TryGetTarget(out master);
+                    if (master == null) return;
+
+                    BuildMissingBuildings();
+                    master.LayoutSubviews();
+                    break;
+                }
+
+            default:
+                break;
         }
     }
 }

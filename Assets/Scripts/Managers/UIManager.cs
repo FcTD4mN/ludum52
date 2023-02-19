@@ -4,7 +4,8 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 
-public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviour,
+                        pDelegateReceiver
 {
     private ResourceManager mResourceManager;
     public Canvas mCanvas;
@@ -39,8 +40,9 @@ public class UIManager : MonoBehaviour
 
 
     public List<GameObject> mBuildableObjects;
-    private List<GameObject> mBuildButtons; // All UI buttons to click to build buildings
-    private List<GameObject> mAllUIFloatingButtons; // All UI buttons to click to open build menu
+
+                // UIButton, BuildableAssociated (could be null)
+    private List<(GameObject, GameObject)> mAllUIFloatingButtons; // All UI buttons to click to open build menu
 
 
     private enum eInfoPanelDisplayType
@@ -66,8 +68,8 @@ public class UIManager : MonoBehaviour
         mCanvas = GameObject.Find("UI-RTS")?.gameObject.GetComponent<Canvas>();
 
         mBuildableObjects = new List<GameObject>();
-        BuildBuildableList(GameManager.mRTSManager.mMainTower.mMainTowerNode);
-        BuildBuildableList(GameManager.mRTSManager.mBuffTower.mTowerBuffNode);
+        BuildBuildableList(GameManager.mRTSManager.mMainTower.mTowerNode);
+        BuildBuildableList(GameManager.mRTSManager.mBuffTower.mTowerNode);
 
         // Build Menu
         mBuildMenu = new cBuildMenu( mCanvas.gameObject, "BuildMenu" );
@@ -88,7 +90,9 @@ public class UIManager : MonoBehaviour
         mTooltipPanelText.text = "ok";
         mTooltipPanel.SetActive( false );
 
-        mAllUIFloatingButtons = new List<GameObject>();
+        mAllUIFloatingButtons = new List<(GameObject, GameObject)>();
+
+        ((pDelegateSender)GameManager.mRTSManager.mMainTower).AddDelegate( this );
     }
 
 
@@ -241,7 +245,7 @@ public class UIManager : MonoBehaviour
     public void CreateBuildButtonOverObject( GameObject obj )
     {
         GameObject newButton = CreateButtonOverObject( "ButtonBuild", obj );
-        mAllUIFloatingButtons.Add( newButton );
+        mAllUIFloatingButtons.Add( (newButton, obj ) );
         newButton.GetComponent<Button>().onClick.AddListener( () => {
 
             mObjectToBuildTo = obj;
@@ -257,11 +261,9 @@ public class UIManager : MonoBehaviour
         mHoverButton = CreateButtonOverObject( "ButtonPause", building );
         GameObject text = mHoverButton.transform.Find("text")?.gameObject;
 
-        bool isReceiver = false;
         ProductionBuilding prodBuilding = building.GetComponent<ProductionBuilding>();
         if( building.GetComponent<Receiver>() != null )
         {
-            isReceiver = true;
             prodBuilding = building.GetComponent<Receiver>().mAssociatedHarvester.GetComponent<ProductionBuilding>();
         }
 
@@ -270,18 +272,6 @@ public class UIManager : MonoBehaviour
         GameObject deleteButton = mHoverButton.transform.Find("Delete")?.gameObject;
         deleteButton.GetComponent<Button>().onClick.AddListener(() =>
         {
-
-            if( !isReceiver ) // We reactivate the buildable object + reshow a build button
-            {
-                foreach( GameObject obj in mBuildableObjects )
-                {
-                    if( obj.transform.position == prodBuilding.transform.position )
-                    {
-                        CreateBuildButtonOverObject( obj );
-                        break;
-                    }
-                }
-            }
             GameManager.mRTSManager.DestroyBuilding( building );
             DeleteUIButton( mHoverButton );
 
@@ -317,8 +307,9 @@ public class UIManager : MonoBehaviour
 
     public void DeleteAllUIFloatingButtons()
     {
-        foreach( GameObject button in mAllUIFloatingButtons )
+        foreach( var pair in mAllUIFloatingButtons )
         {
+            var button = pair.Item1;
             GameObject.Destroy( button );
         }
 
@@ -326,10 +317,71 @@ public class UIManager : MonoBehaviour
     }
 
 
-    public void DeleteUIButton( GameObject obj )
+    public void DeleteUIButton(GameObject uiButton)
     {
-        mAllUIFloatingButtons.Remove( obj );
-        GameObject.Destroy( obj );
+        mAllUIFloatingButtons.RemoveAll((pair) => { return pair.Item1 == uiButton; });
+        GameObject.Destroy(uiButton);
+    }
+
+    public void DeleteUIButtonAssociatedToBuildable(GameObject buildableObject)
+    {
+        var pair = mAllUIFloatingButtons.Find( (pair) => { return pair.Item2 == buildableObject; } );
+        DeleteUIButton( pair.Item1 );
+    }
+
+
+    // ===================================
+    // Delegate
+    // ===================================
+    public void Action( pDelegateSender sender, object[] args )
+    {
+        if( sender is TowerBase )
+        {
+            TowerMessage( args );
+        }
+    }
+
+
+    private void TowerMessage(object[] args)
+    {
+        var message = args[0];
+        switch (message)
+        {
+            case TowerBase.eTowerMessages.kBuildingAdded:
+                {
+                    var buildableObject = (GameObject)args[3];
+                    DeleteUIButtonAssociatedToBuildable( buildableObject );
+                    break;
+                }
+
+            case TowerBase.eTowerMessages.kBuildingRemoved:
+                {
+                    var building = (ProductionBuilding)args[1];
+                    if (building.GetComponent<Receiver>() == null)
+                    {
+                        // We reactivate the buildable object + reshow a build button
+                        foreach (GameObject obj in mBuildableObjects)
+                        {
+                            if (obj.transform.position == building.transform.position)
+                            {
+                                CreateBuildButtonOverObject(obj);
+                                break;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+            case TowerBase.eTowerMessages.kLevelUp:
+                {
+                    // Nothing
+                    break;
+                }
+
+            default:
+                break;
+        }
     }
 
 
@@ -389,7 +441,6 @@ public class UIManager : MonoBehaviour
 
             mBuildMenu.mGameObject.SetActive(false);
             GameManager.mRTSManager.BuildObjectAtLocation( building.ToString(), mObjectToBuildTo);
-            DeleteUIButton(mBuildButtonClicked);
 
         };
 
@@ -451,6 +502,7 @@ public class UIManager : MonoBehaviour
         {
             GameObject.Destroy( mMasterControlPanel.mGameObject );
             mMasterControlPanel = null;
+
             return;
         }
 

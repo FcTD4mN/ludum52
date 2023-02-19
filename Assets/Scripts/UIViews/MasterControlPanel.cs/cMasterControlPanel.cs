@@ -1,7 +1,5 @@
 using UnityEngine;
 using System;
-using UnityEngine.EventSystems;
-using System.Collections.Generic;
 
 class cMasterControlPanel :
     cPanel
@@ -24,6 +22,10 @@ class cMasterControlPanel :
     public Action mCloseAction;
 
 
+    ~cMasterControlPanel()
+    {
+        Debug.Log("cMasterControlPanel");
+    }
     public cMasterControlPanel(GameObject parentView, string name) : base(parentView, name)
     {
         mTitle = new cLabel(mGameObject, "title");

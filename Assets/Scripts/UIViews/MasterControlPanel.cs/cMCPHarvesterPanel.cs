@@ -16,4 +16,16 @@ class cMCPHarvesterPanel :
             return harvester.gameObject.GetComponent<ProductionBuilding>();
             }));
     }
+
+
+    override internal void ActionOnEmptyClick(cBuildingLine line, int spotIndex)
+    {
+        // Nothing to do here
+    }
+
+
+    override internal bool ShouldPerformAction(pDelegateSender sender)
+    {
+        return false;
+    }
 }

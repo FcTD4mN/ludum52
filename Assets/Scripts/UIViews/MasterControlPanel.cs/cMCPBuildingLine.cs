@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using System;
 
 class cBuildingLine :
     cPanel
@@ -8,8 +9,9 @@ class cBuildingLine :
     private cImage mDiode;
     private Material mDiodeMat;
     private cLabel mTitle;
+    private cButton mEmptyButton;
 
-    private cMasterControlPanel mMaster;
+    private WeakReference<cMasterControlPanel> mMaster;
 
     private cPanel mHoverInfos;
     private cLabel mHoverInfosText;
@@ -24,6 +26,8 @@ class cBuildingLine :
     private cLabel mLabelProdRate;
     private cButton mButtonPause;
 
+    public Action<cBuildingLine> mOnClickEmptyEvent;
+
     // Unity can't change material properties on UI elements, so we have to patch it by reinstancing a new material copy...
     // This is used to reduce the amount of material recreation
     private int mMaterialPatcher = -1;
@@ -37,7 +41,7 @@ class cBuildingLine :
 
     public cBuildingLine( GameObject parentView, string name, ProductionBuilding building, cMasterControlPanel master ) : base(parentView, name)
     {
-        mMaster = master;
+        mMaster = new WeakReference<cMasterControlPanel>(master);
 
         mTitle = new cLabel(mGameObject, "title");
         mTitle.mText.fontStyle = TMPro.FontStyles.Bold;
@@ -45,6 +49,13 @@ class cBuildingLine :
         var hoverable = mTitle.mGameObject.AddComponent<Hoverable>();
         hoverable.mOnHoverAction = Hover;
         hoverable.mOnHoverEndedAction = HoverEnded;
+
+        mEmptyButton = new cButton( mGameObject, "emptyButton" );
+        mEmptyButton.SetText( "<Empty>" );
+        mEmptyButton.SetColor( new Color( 0.5f,0.5f,0.5f,0.3f ) );
+        mEmptyButton.AddOnClickAction( ()=> {
+            mOnClickEmptyEvent?.Invoke( this );
+        });
 
         mLabelProdRate = new cLabel(mGameObject, "prodRate");
         mLabelProdRate.mText.fontStyle = TMPro.FontStyles.Bold;
@@ -89,6 +100,9 @@ class cBuildingLine :
         mLabelProdRate.mGameObject.SetActive( buildingIsNotNull );
         mDiode?.mGameObject.SetActive( buildingIsNotNull );
 
+        mTitle.mGameObject.SetActive( buildingIsNotNull );
+        mEmptyButton.mGameObject.SetActive( !buildingIsNotNull );
+
         mDiode = new cImage(mGameObject, "diode");
         mDiode.SetImageFromUnityResources("Knob");
 
@@ -99,6 +113,8 @@ class cBuildingLine :
 
         BuildInputs();
         BuildOutputs();
+
+        LayoutSubviews();
     }
 
 
@@ -123,11 +139,7 @@ class cBuildingLine :
                                     mBuildingLineNameWidth,
                                     frame.height);
         mTitle.SetFrame(titleFrame);
-
-
-
-        // Following views are only visible if there is a building associated
-        if( mAssociatedBuilding == null ) { return; }
+        mEmptyButton.SetFrame( titleFrame );
 
         var resourceWidth = 40f;
         var inputFrame = new Rect(  titleFrame.xMax + mBuildingLineSpacing,
@@ -302,7 +314,11 @@ class cBuildingLine :
         if( mAssociatedBuilding.GetComponent<HarvesterTower>() != null ) return;
         if (mHoverInfos != null) return;
 
-        mHoverInfos = new cPanel(mMaster.mGameObject, "hoverInfos");
+        cMasterControlPanel master;
+        mMaster.TryGetTarget(out master);
+        if( master == null ) return;
+
+        mHoverInfos = new cPanel(master?.mGameObject, "hoverInfos");
         mHoverInfosText = new cLabel(mHoverInfos.mGameObject, "text");
         mHoverInfosText.mText.alignment = TMPro.TextAlignmentOptions.TopLeft;
     }
@@ -361,22 +377,17 @@ class cBuildingLine :
 
     private void UpdateHoverInfosFrameToFit()
     {
-        var frame = GetFrameRelativeTo(mMaster.mGameObject);
+        cMasterControlPanel master;
+        mMaster.TryGetTarget(out master);
+        if (master == null) return;
+
+        var frame = GetFrameRelativeTo(master?.mGameObject);
         mHoverInfosText.mText.ForceMeshUpdate();
         var textWidth = mHoverInfosText.mText.textBounds.size.x;
         var textHeight = mHoverInfosText.mText.textBounds.size.y;
 
         mHoverInfos.SetFrame(new Rect(frame.xMin, frame.yMin + frame.height, textWidth + 20, textHeight + 20));
         mHoverInfosText.SetFrame(new Rect(10, 10, textWidth, textHeight));
-    }
-
-
-    private void EmptyLineButtonClicked()
-    {
-        var buildMenu = new cBuildMenu( mGameObject, "buildMenu" );
-        buildMenu.mOnBuildingClicked = (building)=>{
-
-        };
     }
 }
 

@@ -42,19 +42,19 @@ class cBuildMenu :
         mBuffBuildings = new cBuffBuildingPanel( mScrollArea.mGameObject, "BuffPanel" );
 
         mProdBuildings.mOnBuildingClicked = ( building ) => {
-            mOnBuildingClicked( building );
+            mOnBuildingClicked?.Invoke( building );
         };
         mProdBuildings.mOnBuildingHovered = ( building ) => {
-            mOnHover( building );
+            mOnHover?.Invoke( building );
         };
 
         mBuffBuildings.mOnBuildingClicked = (building) =>
         {
-            mOnBuildingClicked(building);
+            mOnBuildingClicked?.Invoke(building);
         };
         mBuffBuildings.mOnBuildingHovered = (building) =>
         {
-            mOnHover(building);
+            mOnHover?.Invoke(building);
         };
 
         mScrollArea.AddViewToContent( mProdBuildings );

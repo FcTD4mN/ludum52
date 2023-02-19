@@ -5,14 +5,12 @@ using UnityEngine;
 
 public class TowerBuff: TowerBase
 {
-    public GameObject mTowerBuffNode;
-
 
     override public void Initialize()
     {
         base.Initialize();
 
-        mTowerBuffNode = GameObject.Find("TowerBuff")?.gameObject;
+        mTowerNode = GameObject.Find("TowerBuff")?.gameObject;
         mFloors.Add(GameObject.Find("FloorBuff")?.gameObject);
     }
 
@@ -36,7 +34,7 @@ public class TowerBuff: TowerBase
         GameObject newTowerFloor = GameObject.Instantiate(  prefab,
                                                             lastTowerFloor.transform.position + upVector,
                                                             Quaternion.Euler(0, 0, 0));
-        newTowerFloor.transform.SetParent(mTowerBuffNode.transform);
+        newTowerFloor.transform.SetParent(mTowerNode.transform);
 
         foreach (Transform gg in newTowerFloor.transform)
         {

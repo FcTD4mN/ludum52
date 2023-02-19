@@ -9,6 +9,7 @@ class cMCPProductionPanel :
 {
     public cMCPProductionPanel(GameObject parentView, string name, cMasterControlPanel master) : base(parentView, name, "Main Tower Buildings", master)
     {
+        ((pDelegateSender)GameManager.mRTSManager.mMainTower).AddDelegate(this);
     }
 
     internal override List<ProductionBuilding> GetBuildingList()
@@ -24,13 +25,32 @@ class cMCPProductionPanel :
     }
 
 
-    // TODO
-    public void OnClick( GameObject buttonClicked )
+    override internal void ActionOnEmptyClick( cBuildingLine line, int spotIndex )
     {
-        var buildMenu = new cBuildMenu(mGameObject, "buildMenu");
-        buildMenu.mOnBuildingClicked = (building) =>
-        {
+        mBuildMenu = new cBuildMenu( GameManager.mUIManager.mCanvas.gameObject, "buildMenu" );
 
+        mBuildMenu.mOnClose = ()=> {
+            GameObject.Destroy(mBuildMenu.mGameObject);
+            mBuildMenu = null;
         };
+
+        mBuildMenu.mOnBuildingClicked = (building) =>
+        {
+            GameManager.mRTSManager.mMainTower.BuildAtIndex( building.ToString(), spotIndex );
+            GameObject.Destroy( mBuildMenu.mGameObject );
+            mBuildMenu = null;
+        };
+
+        Rect screenRect = Camera.main.pixelRect;
+        mBuildMenu.SetFrame(new Rect(0, 0, 500, 500));
+        mBuildMenu.SetCenter(screenRect.center);
+
+        mBuildMenu.ShowProdBuildingPanel();
+    }
+
+
+    override internal bool ShouldPerformAction(pDelegateSender sender)
+    {
+        return sender is TowerMain;
     }
 }

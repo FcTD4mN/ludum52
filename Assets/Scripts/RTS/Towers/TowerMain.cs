@@ -6,7 +6,6 @@ using UnityEngine;
 public class TowerMain : TowerBase
 {
     public int mReceiverCountPerLevel = 2;
-    public GameObject mMainTowerNode;
 
     // Receivers
     public List<Receiver> mAllReceivers;
@@ -17,7 +16,7 @@ public class TowerMain : TowerBase
         base.Initialize();
         mAllReceivers = new List<Receiver>();
 
-        mMainTowerNode = GameObject.Find("TowerMain")?.gameObject;
+        mTowerNode = GameObject.Find("TowerMain")?.gameObject;
 
         mFloors.Add(GameObject.Find("FloorMain")?.gameObject);
         mFloors[0].AddComponent(typeof(HarvesterTower));
@@ -101,7 +100,7 @@ public class TowerMain : TowerBase
         GameObject newTowerFloor = GameObject.Instantiate(  prefab,
                                                             lastTowerFloor.transform.position + upVector,
                                                             Quaternion.Euler(0, 0, 0));
-        newTowerFloor.transform.SetParent(mMainTowerNode.transform);
+        newTowerFloor.transform.SetParent(mTowerNode.transform);
 
         foreach (Transform gg in newTowerFloor.transform)
         {
