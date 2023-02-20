@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class cStatsDescriptor
 {
-    public static List<string> mAllStatsName;
     public enum eStatsNames
     {
         RunSpeed,
@@ -19,81 +18,76 @@ public class cStatsDescriptor
         MaxHealth
     }
 
-    public static void BuildStatsList()
-    {
-        mAllStatsName = new List<string>();
-
-        foreach (string name in Enum.GetNames(typeof(eStatsNames)))
-        {
-            mAllStatsName.Add(name);
-        }
-    }
-
 
     public Dictionary<string, float> mStatValues;
 
     public cStatsDescriptor()
     {
         mStatValues = new Dictionary<string, float>();
-
-        if (mAllStatsName == null)
-        {
-            BuildStatsList();
-        }
-
-        foreach (string statName in mAllStatsName)
-        {
-            mStatValues[statName] = 0f;
-        }
     }
 
     public cStatsDescriptor( cStatsDescriptor other )
     {
         mStatValues = new Dictionary<string, float>();
 
-        if (mAllStatsName == null) {
-            BuildStatsList();
-        }
-
-        foreach (string statName in mAllStatsName)
+        foreach (var pair in other.mStatValues)
         {
-            mStatValues[statName] = other.mStatValues[statName];
+            mStatValues[pair.Key] = pair.Value;
         }
     }
 
 
-        // ===================================
-        // Manipulation
-        // ===================================
-        public void CombineByAddition( cStatsDescriptor rhs )
+    // ===================================
+    // Manipulation
+    // ===================================
+    public void CombineByAddition( cStatsDescriptor rhs )
     {
-        foreach (string statName in mAllStatsName)
+        foreach (eStatsNames stat in Enum.GetValues(typeof(eStatsNames)))
         {
-            mStatValues[statName] += rhs.mStatValues[statName];
+            var statName = stat.ToString();
+            if( !mStatValues.ContainsKey(statName) && !rhs.mStatValues.ContainsKey(statName) ) continue;
+            else if( mStatValues.ContainsKey(statName) && !rhs.mStatValues.ContainsKey(statName) ) continue;
+            else if( !mStatValues.ContainsKey(statName) && rhs.mStatValues.ContainsKey(statName) ) mStatValues[statName] = rhs.mStatValues[statName];
+            else mStatValues[statName] += rhs.mStatValues[statName];
         }
     }
 
     public void CombineByMultiplication( cStatsDescriptor rhs )
     {
-        foreach (string statName in mAllStatsName)
+        foreach (eStatsNames stat in Enum.GetValues(typeof(eStatsNames)))
         {
-            mStatValues[statName] *= rhs.mStatValues[statName];
+            var statName = stat.ToString();
+            if (mStatValues.ContainsKey(statName) && rhs.mStatValues.ContainsKey(statName)) mStatValues[statName] += rhs.mStatValues[statName];
         }
     }
 
-    public void ApplyOnEveryStat( Func<float, float> action )
+    public void ApplyOnEveryStat(Func<float, float> action)
     {
-        foreach (string statName in mAllStatsName)
+        foreach (eStatsNames stat in Enum.GetValues(typeof(eStatsNames)))
         {
-            mStatValues[statName] = action( mStatValues[statName] );
+            var statName = stat.ToString();
+
+            mStatValues[statName] = action( mStatValues.ContainsKey(statName) ? mStatValues[statName] : 0f );
+        }
+    }
+
+    public void ApplyOnEveryPresentStat(Func<float, float> action)
+    {
+        foreach (eStatsNames stat in Enum.GetValues(typeof(eStatsNames)))
+        {
+            var statName = stat.ToString();
+            if (!mStatValues.ContainsKey(statName)) continue;
+
+            mStatValues[statName] = action(mStatValues[statName]);
         }
     }
 
 
     public void DEBUGLog()
     {
-        foreach (string statName in mAllStatsName)
+        foreach (eStatsNames stat in Enum.GetValues(typeof(eStatsNames)))
         {
+            var statName = stat.ToString();
             Debug.Log( statName + ": " + mStatValues[statName] );
         }
 

@@ -5,8 +5,10 @@ using UnityEngine;
 public class RTSManager : MonoBehaviour
 {
     public GameObject mRTSWorld;
+    public List<TowerBase> mAllTowers;
     public TowerMain mMainTower;
     public TowerBuff mBuffTower;
+    public TowerWeapon mTowerWeapon;
 
     // All Buildings
     public List<HarvestingBuilding> mAllHarvesters;
@@ -73,6 +75,13 @@ public class RTSManager : MonoBehaviour
         mMainTower.Initialize();
         mBuffTower = new TowerBuff();
         mBuffTower.Initialize();
+        mTowerWeapon = new TowerWeapon();
+        mTowerWeapon.Initialize();
+
+        mAllTowers = new List<TowerBase>();
+        mAllTowers.Add( mMainTower );
+        mAllTowers.Add( mBuffTower );
+        mAllTowers.Add( mTowerWeapon );
     }
 
 
@@ -160,8 +169,9 @@ public class RTSManager : MonoBehaviour
 
     public void LevelUp()
     {
-        mMainTower.LevelUp();
-        mBuffTower.LevelUp();
+        mAllTowers.ForEach( (tower) => {
+            tower.LevelUp();
+        });
     }
 
 
@@ -183,8 +193,10 @@ public class RTSManager : MonoBehaviour
 
     public TowerBase GetTowerByFloor( GameObject floor )
     {
-        if( mMainTower.mFloors.Contains( floor ) ) return  mMainTower;
-        if( mBuffTower.mFloors.Contains( floor ) ) return  mBuffTower;
+        foreach( var tower in mAllTowers )
+        {
+            if( tower.mFloors.Contains( floor ) ) return  tower;
+        }
 
         return  null;
     }

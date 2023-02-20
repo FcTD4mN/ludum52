@@ -70,6 +70,7 @@ public class HasStats : MonoBehaviour
         if (!mHasBeenInitialized) {
             Initialize();
         }
+        if( !mStatsFinalCached.mStatValues.ContainsKey(type.ToString())) return  0f;
 
         return  mStatsFinalCached.mStatValues[ type.ToString() ];
     }
@@ -80,6 +81,7 @@ public class HasStats : MonoBehaviour
         if (!mHasBeenInitialized) {
             Initialize();
         }
+        if( !mStatsBase.mStatValues.ContainsKey(type.ToString())) return  0f;
 
         return mStatsBase.mStatValues[type.ToString()];
     }

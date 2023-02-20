@@ -68,8 +68,11 @@ public class UIManager : MonoBehaviour,
         mCanvas = GameObject.Find("UI-RTS")?.gameObject.GetComponent<Canvas>();
 
         mBuildableObjects = new List<GameObject>();
-        BuildBuildableList(GameManager.mRTSManager.mMainTower.mTowerNode);
-        BuildBuildableList(GameManager.mRTSManager.mBuffTower.mTowerNode);
+        foreach( var tower in GameManager.mRTSManager.mAllTowers )
+        {
+            BuildBuildableList( tower.mTowerNode );
+            ((pDelegateSender)tower).AddDelegate(this);
+        }
 
         // Build Menu
         mBuildMenu = new cBuildMenu( mCanvas.gameObject, "BuildMenu" );
@@ -92,8 +95,6 @@ public class UIManager : MonoBehaviour,
 
         mAllUIFloatingButtons = new List<(GameObject, GameObject)>();
 
-        ((pDelegateSender)GameManager.mRTSManager.mMainTower).AddDelegate( this );
-        ((pDelegateSender)GameManager.mRTSManager.mBuffTower).AddDelegate( this );
     }
 
 
@@ -432,9 +433,12 @@ public class UIManager : MonoBehaviour,
     {
         bool isLocationOnTower = GameManager.mRTSManager.mMainTower.mFloors.Contains(mObjectToBuildTo.transform.parent.gameObject);
         bool isLocationOnBuffTower = GameManager.mRTSManager.mBuffTower.mFloors.Contains(mObjectToBuildTo.transform.parent.gameObject);
+        bool isLocationOnWeaponTower = GameManager.mRTSManager.mTowerWeapon.mFloors.Contains(mObjectToBuildTo.transform.parent.gameObject);
 
         if( isLocationOnTower ) mBuildMenu.ShowProdBuildingPanel();
         if( isLocationOnBuffTower ) mBuildMenu.ShowBuffBuildingPanel();
+        if (isLocationOnWeaponTower) mBuildMenu.ShowWeaponBuildingPanel();
+
         mBuildMenu.UpdateBuildMenu();
         mBuildMenu.mGameObject.transform.SetAsLastSibling();
         mBuildMenu.mGameObject.SetActive( true );

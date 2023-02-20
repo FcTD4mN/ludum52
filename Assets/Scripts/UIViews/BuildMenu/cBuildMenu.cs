@@ -15,6 +15,7 @@ class cBuildMenu :
     private cScrollView mScrollArea;
     private cProductionBuildingPanel mProdBuildings;
     private cBuffBuildingPanel mBuffBuildings;
+    private cWeaponBuildingPanel mWeaponBuildings;
 
 
     private int mPadding = 24;
@@ -39,6 +40,7 @@ class cBuildMenu :
 
         mProdBuildings = new cProductionBuildingPanel( mScrollArea.mGameObject, "ProdPanel" );
         mBuffBuildings = new cBuffBuildingPanel( mScrollArea.mGameObject, "BuffPanel" );
+        mWeaponBuildings = new cWeaponBuildingPanel( mScrollArea.mGameObject, "WeaponPanel" );
 
         mProdBuildings.mOnBuildingClicked = ( building ) => {
             mOnBuildingClicked?.Invoke( building );
@@ -49,11 +51,18 @@ class cBuildMenu :
             mOnBuildingClicked?.Invoke(building);
         };
 
+        mWeaponBuildings.mOnBuildingClicked = (building) =>
+        {
+            mOnBuildingClicked?.Invoke(building);
+        };
+
         mScrollArea.AddViewToContent( mProdBuildings );
-        mScrollArea.AddViewToContent( mBuffBuildings );
+        mScrollArea.AddViewToContent(mBuffBuildings);
+        mScrollArea.AddViewToContent(mWeaponBuildings);
 
         mProdBuildings.mGameObject.SetActive( false );
         mBuffBuildings.mGameObject.SetActive( false );
+        mWeaponBuildings.mGameObject.SetActive(false);
     }
 
 
@@ -81,8 +90,11 @@ class cBuildMenu :
         float prodPanelHeight = mProdBuildings.RequiredHeightForWidth( frame.width );
         mProdBuildings.SetFrame( new Rect(0, 0, frame.width, prodPanelHeight) );
 
-        float buffPanelHeight = mBuffBuildings.RequiredHeightForWidth( frame.width );
-        mBuffBuildings.SetFrame( new Rect(0, 0, frame.width, buffPanelHeight) );
+        float buffPanelHeight = mBuffBuildings.RequiredHeightForWidth(frame.width);
+        mBuffBuildings.SetFrame(new Rect(0, 0, frame.width, buffPanelHeight));
+
+        float weaponPanelHeight = mWeaponBuildings.RequiredHeightForWidth(frame.width);
+        mWeaponBuildings.SetFrame(new Rect(0, 0, frame.width, weaponPanelHeight));
     }
 
 
@@ -90,6 +102,7 @@ class cBuildMenu :
     {
         mProdBuildings.mGameObject.SetActive( true );
         mBuffBuildings.mGameObject.SetActive( false );
+        mWeaponBuildings.mGameObject.SetActive(false);
 
         // If content doesn't care about horizontal scroll, set width to 0
         // If you try to put the logical width, then if unity adds a vScroll, it'll reduce viewport, meaning content is too large
@@ -102,6 +115,7 @@ class cBuildMenu :
     {
         mProdBuildings.mGameObject.SetActive( false );
         mBuffBuildings.mGameObject.SetActive( true );
+        mWeaponBuildings.mGameObject.SetActive(false);
 
         // If content doesn't care about horizontal scroll, set width to 0
         // If you try to put the logical width, then if unity adds a vScroll, it'll reduce viewport, meaning content is too large
@@ -109,17 +123,27 @@ class cBuildMenu :
         // Hello hScroll, what are you doing here ? Even if you set horizontal to false, it doesn't actually do anything...
         mScrollArea.SetContentSize(new Vector2(0, mBuffBuildings.GetFrame().height));
     }
+    public void ShowWeaponBuildingPanel()
+    {
+        mProdBuildings.mGameObject.SetActive(false);
+        mBuffBuildings.mGameObject.SetActive(false);
+        mWeaponBuildings.mGameObject.SetActive(true);
+
+        // If content doesn't care about horizontal scroll, set width to 0
+        // If you try to put the logical width, then if unity adds a vScroll, it'll reduce viewport, meaning content is too large
+        // And then
+        // Hello hScroll, what are you doing here ? Even if you set horizontal to false, it doesn't actually do anything...
+        mScrollArea.SetContentSize(new Vector2(0, mWeaponBuildings.GetFrame().height));
+    }
 
 
     public void UpdateBuildMenu()
     {
         if( !mGameObject.activeSelf ) return;
 
-        bool isLocationOnTower = mProdBuildings.mGameObject.activeSelf;
-        bool isLocationOnBuffTower = mBuffBuildings.mGameObject.activeSelf;
-
         mProdBuildings.UpdateButtons();
         mBuffBuildings.UpdateButtons();
+        mWeaponBuildings.UpdateButtons();
     }
 }
 

@@ -189,8 +189,9 @@ public abstract class BuffBuilding : ProductionBuilding
         outputString += "\n";
         outputString += "Buffs: \n";
         atLeastOne = false;
-        foreach (string statName in cStatsDescriptor.mAllStatsName)
+        foreach (cStatsDescriptor.eStatsNames stat in Enum.GetValues(typeof(cStatsDescriptor.eStatsNames)))
         {
+            var statName = stat.ToString();
             if (statsDescriptor.mStatValues[statName] == 0) { continue; }
             atLeastOne = true;
 
