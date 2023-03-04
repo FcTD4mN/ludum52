@@ -4,18 +4,33 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    public float destroyAfterDistance = 10f;
+    private cWeapon mOriginalWeapon;
+
     private float startingPos;
+    private uint mSpawnTime = 0;
+    private int mPierceRemaining = 0;
+
+    public void SetWeapon(cWeapon weapon)
+    {
+        mOriginalWeapon = weapon;
+        mPierceRemaining = (int)weapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponPierceAmount);
+    }
 
     void OnEnable()
     {
         startingPos = transform.position.x;
+        mSpawnTime = Utilities.GetCurrentTimeEpochInMS();
     }
 
     void FixedUpdate()
     {
+        if (mOriginalWeapon == null) return;
+
         // Destroy arrow after certain distance if not hitting anything
-        if (Mathf.Abs(transform.position.x - startingPos) > destroyAfterDistance)
+        if (Mathf.Abs(transform.position.x - startingPos) > mOriginalWeapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponRange))
+            Die();
+
+        if (Utilities.GetCurrentTimeEpochInMS() >= mSpawnTime + (uint)(mOriginalWeapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponLifeTime) * 1000))
             Die();
     }
 
@@ -34,13 +49,14 @@ public class Projectile : MonoBehaviour
 
         // Hit the target
         HitTarget(hitable);
+        --mPierceRemaining;
+
+        if (mPierceRemaining < 0) Die();
     }
 
     protected void HitTarget(Hitable target)
     {
-        // Todo: read damage from weaponStatManager
-        target.Hit(30);
-        Die();
+        target.Hit(mOriginalWeapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponDamage));
     }
 
     public virtual void Die()

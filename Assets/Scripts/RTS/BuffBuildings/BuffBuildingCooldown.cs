@@ -19,7 +19,7 @@ public class BuffBuildingCooldown : BuffBuilding
     {
         cStatsDescriptor output = new cStatsDescriptor();
 
-        output.mStatValues[cStatsDescriptor.eStatsNames.CoolDownAttack.ToString()] = -0.1f;
+        output.mStatValues[cStatsDescriptor.eStatsNames.WeaponCooldown.ToString()] = -0.1f;
 
         return output;
     }

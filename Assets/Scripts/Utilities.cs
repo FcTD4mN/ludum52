@@ -11,6 +11,13 @@ public class Utilities
     //========================================
 
 
+    public static uint GetCurrentTimeEpochInMS()
+    {
+        System.DateTime epochStart = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
+        return  (uint)(System.DateTime.UtcNow - epochStart).TotalMilliseconds;
+    }
+
+
     public static IEnumerator ExecuteAfter(float time, Action onFinish)
     {
         yield return new WaitForSeconds(time);

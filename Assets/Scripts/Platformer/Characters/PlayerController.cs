@@ -12,13 +12,13 @@ public class PlayerController : MonoBehaviour
     // Char Stats
     public HasStats mStats;
 
-    private float lastAttack;
     private float lastDash;
 
     // References to GameObject or Scripts
     GameObject aimAssist;
     GameObject rotationPoint;
-    WeaponLauncher bow;
+    // WeaponLauncher bow;
+    public HasWeapon mWeaponComponent;
 
     [HideInInspector]
     public Interactable currentInteractable;
@@ -146,10 +146,9 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         touchingDirections = GetComponent<TouchingDirections>();
-        bow = GetComponent<WeaponLauncher>();
+        mWeaponComponent = GetComponent<HasWeapon>();
         aimAssist = GameObject.Find("AimAssist");
         rotationPoint = GameObject.Find("RotationPoint");
-        lastAttack = -10f;
         lastDash = -10f;
 
         // Stats
@@ -226,13 +225,6 @@ public class PlayerController : MonoBehaviour
 
     public void OnAttack(InputAction.CallbackContext context)
     {
-        // Check cooldown
-        if (Time.time - lastAttack < mStats.GetFinalStat(eStatsNames.CoolDownAttack) ||
-                (int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows) <= 0)
-        {
-            return;
-        }
-
         if (touchingDirections.IsGrounded)
         {
             if (context.started)
@@ -243,13 +235,13 @@ public class PlayerController : MonoBehaviour
                 {
                     SwapDirection();
                 }
-
+                mWeaponComponent.mWeapon.mAutoFire = true;
                 animator.SetTrigger("HoldAttack");
             }
             else if (context.canceled)
             {
                 // Release click
-                lastAttack = Time.time;
+                mWeaponComponent.mWeapon.mAutoFire = false;
                 animator.SetTrigger("Attack");
             }
         }
@@ -262,6 +254,13 @@ public class PlayerController : MonoBehaviour
                 {
                     SwapDirection();
                 }
+                mWeaponComponent.mWeapon.mAutoFire = true;
+                animator.SetTrigger("HoldAttack");
+            }
+            else if (context.canceled)
+            {
+                // Release click
+                mWeaponComponent.mWeapon.mAutoFire = false;
                 animator.SetTrigger("Attack");
             }
         }
@@ -271,8 +270,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            bow.SwitchArrowType();
-            Debug.Log("We switch arrow type : " + bow.CurrentArrowType().ToString());
+            // No longer have we different types of arrow, it's all related to building you have activated
         }
     }
 
@@ -280,10 +278,7 @@ public class PlayerController : MonoBehaviour
     {
         if (context.started)
         {
-            if ((int)GameManager.mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs) > 0)
-            {
-                bow.LaunchBomb(IsFacingRight ? true : false);
-            }
+            // Same here, unless we allow primary and secondary attacks
         }
     }
 
@@ -324,7 +319,6 @@ public class PlayerController : MonoBehaviour
         baseValues.mStatValues[eStatsNames.AirWallSpeed.ToString()] = 4f;
         baseValues.mStatValues[eStatsNames.DashSpeed.ToString()] = 6f;
         baseValues.mStatValues[eStatsNames.JumpImpulse.ToString()] = 7f;
-        baseValues.mStatValues[eStatsNames.CoolDownAttack.ToString()] = 0.5f;
         baseValues.mStatValues[eStatsNames.CoolDownDash.ToString()] = 2f;
         baseValues.mStatValues[eStatsNames.Health.ToString()] = 100f;
         baseValues.mStatValues[eStatsNames.MaxHealth.ToString()] = 100f;

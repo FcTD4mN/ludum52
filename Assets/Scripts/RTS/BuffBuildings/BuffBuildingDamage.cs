@@ -19,7 +19,7 @@ public class BuffBuildingDamage : BuffBuilding
     {
         cStatsDescriptor output = new cStatsDescriptor();
 
-        output.mStatValues[cStatsDescriptor.eStatsNames.Damage.ToString()] = 10;
+        output.mStatValues[cStatsDescriptor.eStatsNames.WeaponDamage.ToString()] = 10;
 
         return output;
     }

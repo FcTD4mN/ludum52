@@ -16,7 +16,7 @@ public class HitableLock : Hitable
         // Nothing
     }
 
-    public override void Hit(int damage)
+    public override void Hit(float damage)
     {
         InteractableDoor door = transform.parent.gameObject.GetComponent<InteractableDoor>();
         door.Interact();

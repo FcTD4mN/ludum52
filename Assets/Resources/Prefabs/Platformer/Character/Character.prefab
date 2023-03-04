@@ -176,7 +176,7 @@ GameObject:
   - component: {fileID: 8986150717280332384}
   - component: {fileID: 8986150717280332387}
   - component: {fileID: 8986150717280332386}
-  - component: {fileID: 3561193817193138336}
+  - component: {fileID: 1166322282947398170}
   - component: {fileID: 1127810768080280749}
   - component: {fileID: 2230036051973603813}
   m_Layer: 8
@@ -515,6 +515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mStats: {fileID: 0}
+  mWeaponComponent: {fileID: 0}
   currentInteractable: {fileID: 0}
   _isFacingRight: 1
 --- !u!114 &8986150717280332386
@@ -549,7 +550,7 @@ MonoBehaviour:
   _isGrounded: 0
   _isOnWall: 0
   _isOnCeiling: 0
---- !u!114 &3561193817193138336
+--- !u!114 &1166322282947398170
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -558,20 +559,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 8986150717280332394}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1c8019832753a6b4eb1da113caa44055, type: 3}
+  m_Script: {fileID: 11500000, guid: e9ac95d9746195c419cf51cd633ddc98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  arrowDamage: 10
-  arrowSpeed: 15
-  availableArrowType: 
-  bombDamage: 10
-  bombSpeed: 5
-  bombPushForce: 4
-  traj: {fileID: 0}
-  arrowPrefab: {fileID: 6270920307405493096, guid: c2c0c5a4baa5ca74896b1ff2d5bd006b, type: 3}
-  bombPrefab: {fileID: 277352446469954537, guid: 29f3a366c4c8fde4abab7c18678798a0, type: 3}
-  launchPoint: {fileID: 3721850691752255772}
-  launchOffset: {x: 0.1, y: 0.1, z: 0.1}
+  WeaponCooldown: 0.2
+  WeaponDamage: 10
+  WeaponLifeTime: 2
+  WeaponRange: 10
+  WeaponSize: 1
+  WeaponSpeed: 5
+  WeaponPierceAmount: 1
 --- !u!114 &1127810768080280749
 MonoBehaviour:
   m_ObjectHideFlags: 0

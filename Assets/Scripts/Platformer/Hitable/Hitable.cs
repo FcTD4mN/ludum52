@@ -73,7 +73,7 @@ public class Hitable : MonoBehaviour
         }
     }
 
-    public virtual void Hit(int damage)
+    public virtual void Hit(float damage)
     {
         if (IsAlive && !isInvincible)
         {

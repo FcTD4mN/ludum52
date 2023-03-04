@@ -10,7 +10,7 @@ public abstract class BuffBuilding : ProductionBuilding
 
     internal bool mAdds = true;
     private bool mStatsAreApplied = false;
-
+    protected cCompleteStats mObjectToApplyStatsTo;
 
     abstract public cStatsDescriptor GetStatsDescriptor();
 
@@ -39,6 +39,7 @@ public abstract class BuffBuilding : ProductionBuilding
         base.Initialize();
         mResourceDescriptor = GetNewResourceDescriptor();
         mStatsModifiers = GetStatsDescriptor();
+        mObjectToApplyStatsTo = GameManager.mInstance.playerCtrler?.GetComponent<HasStats>()?.mStats;
     }
 
     public override void SetPause( bool state )
@@ -59,14 +60,13 @@ public abstract class BuffBuilding : ProductionBuilding
         if( mStatsAreApplied ) { return; }
         mStatsAreApplied = true;
 
-        if (GameManager.mInstance.playerCtrler == null) { return; }
-        HasStats playerStats = GameManager.mInstance.playerCtrler.GetComponent<HasStats>();
+        if (mObjectToApplyStatsTo == null) { return; }
 
         if( mAdds ) {
-            playerStats.AddStatsAddition(mStatsModifiers);
+            mObjectToApplyStatsTo.AddStatsAddition(mStatsModifiers);
         }
         else{
-            playerStats.AddStatsMultipliers(mStatsModifiers);
+            mObjectToApplyStatsTo.AddStatsMultipliers(mStatsModifiers);
         }
     }
     internal void RetractStats()
@@ -74,17 +74,16 @@ public abstract class BuffBuilding : ProductionBuilding
         if (!mStatsAreApplied) { return; }
         mStatsAreApplied = false;
 
-        if( GameManager.mInstance.playerCtrler == null ) { return; }
-        HasStats playerStats = GameManager.mInstance.playerCtrler.GetComponent<HasStats>();
+        if( mObjectToApplyStatsTo == null ) { return; }
 
         cStatsDescriptor inverse = new cStatsDescriptor(mStatsModifiers);
         inverse.ApplyOnEveryStat(val => -val);
 
         if (mAdds) {
-            playerStats.AddStatsAddition(inverse);
+            mObjectToApplyStatsTo.AddStatsAddition(inverse);
         }
         else {
-            playerStats.AddStatsMultipliers(inverse);
+            mObjectToApplyStatsTo.AddStatsMultipliers(inverse);
         }
     }
 
@@ -108,7 +107,7 @@ public abstract class BuffBuilding : ProductionBuilding
 
     public new string GetUIDescription( bool isAllowed )
     {
-        string name = "Cooldown Reduction";
+        string name = GetDisplayName();
         string description = GetDescription();
 
         RTSManager.eBuildingErrors error = GetBuildingError();
