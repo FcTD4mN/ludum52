@@ -13,7 +13,10 @@ public class HasWeapon : MonoBehaviour
     public float WeaponRange = 10f;
     public float WeaponSize = 1f;
     public float WeaponSpeed = 1f;
+    public float WeaponProjectileCount = 1f;
     public float WeaponPierceAmount = 0f;
+    public float WeaponHomingDistance = 2f;
+    public float WeaponHomingForce = 0f;
 
     void OnEnable()
     {
@@ -24,7 +27,10 @@ public class HasWeapon : MonoBehaviour
         mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponRange, WeaponRange );
         mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponSize,WeaponSize );
         mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponSpeed, WeaponSpeed );
+        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponProjectileCount, WeaponProjectileCount );
         mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponPierceAmount, WeaponPierceAmount );
+        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponHomingDistance, WeaponHomingDistance );
+        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponHomingForce, WeaponHomingForce );
     }
 
 

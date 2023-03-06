@@ -184,6 +184,11 @@ abstract class cMCPBuildingPanelBase :
         // so obviously would we get there when we shouldn't
         if( !ShouldPerformAction( sender ) ) return;
 
+        // Check if ogbjects are null, because even if objects are auto deleted when no longer existing (weak in delegate list), garbage
+        // collection takes like 10 sec between each sweep, so in the mean time, you could still call delegate functions
+        // Checking if actual gameobject still exists or not to ensure of that
+        if( mGameObject == null ) return;
+
         var message = args[0];
         switch (message)
         {

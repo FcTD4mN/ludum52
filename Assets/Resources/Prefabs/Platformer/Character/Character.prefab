@@ -562,12 +562,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9ac95d9746195c419cf51cd633ddc98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WeaponCooldown: 0.2
+  WeaponCooldown: 0.1
   WeaponDamage: 10
   WeaponLifeTime: 2
   WeaponRange: 10
   WeaponSize: 1
   WeaponSpeed: 5
+  WeaponProjectileCount: 1
   WeaponPierceAmount: 1
 --- !u!114 &1127810768080280749
 MonoBehaviour:

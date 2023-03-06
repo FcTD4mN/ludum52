@@ -23,6 +23,9 @@ public class cStatsDescriptor
         WeaponLifeTime,
         WeaponRange,
         WeaponSize,
+        WeaponHomingForce, // Strength of homing correction towards ennemies, 0 = no homing
+        WeaponHomingDistance, // How far should the ennemy be before homing toward it
+        WeaponProjectileCount,
         WeaponPierceAmount
     }
 

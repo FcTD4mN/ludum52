@@ -8,6 +8,7 @@ class cMCPContentPanel :
     private cMCPHarvesterPanel mHarvesterPanel;
     private cMCPProductionPanel mProducerPanel;
     private cMCPBuffersPanel mBuffersPanel;
+    private cMCPWeaponPanel mWeaponsPanel;
 
 
 
@@ -20,6 +21,7 @@ class cMCPContentPanel :
         mHarvesterPanel = new cMCPHarvesterPanel(mGameObject, "harvesterPanel", master);
         mProducerPanel = new cMCPProductionPanel(mGameObject, "producerPanel", master);
         mBuffersPanel = new cMCPBuffersPanel(mGameObject, "bufferPanel", master);
+        mWeaponsPanel = new cMCPWeaponPanel(mGameObject, "weaponPanel", master);
         SetColor(Color.clear);
     }
 
@@ -29,6 +31,7 @@ class cMCPContentPanel :
         mHarvesterPanel.Update();
         mProducerPanel.Update();
         mBuffersPanel.Update();
+        mWeaponsPanel.Update();
     }
 
 
@@ -56,6 +59,13 @@ class cMCPContentPanel :
                                         frame.width - mPadding * 2,
                                         buffPanelHeight );
         mBuffersPanel.SetFrame(buffPanelFrame);
+
+        var weaponPanelHeight = mWeaponsPanel.RequiredHeightForWidth( frame.width - mPadding * 2 );
+        Rect weaponPanelFrame = new Rect( mPadding,
+                                        buffPanelFrame.yMax + mSpacing,
+                                        frame.width - mPadding * 2,
+                                        weaponPanelHeight );
+        mWeaponsPanel.SetFrame(weaponPanelFrame);
     }
 
 
@@ -65,6 +75,7 @@ class cMCPContentPanel :
         float harvesterHeight = mHarvesterPanel.RequiredHeightForWidth(frame.width - mPadding * 2);
         float producerHeight = mProducerPanel.RequiredHeightForWidth(frame.width - mPadding * 2);
         float buffHeight = mBuffersPanel.RequiredHeightForWidth(frame.width - mPadding * 2);
-        return  mPadding + harvesterHeight + mSpacing + producerHeight + mSpacing + buffHeight + mPadding;
+        float weaponHeight = mWeaponsPanel.RequiredHeightForWidth(frame.width - mPadding * 2);
+        return  mPadding + harvesterHeight + mSpacing + producerHeight + mSpacing + buffHeight + mSpacing + weaponHeight + mPadding;
     }
 }
