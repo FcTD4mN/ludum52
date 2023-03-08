@@ -10,6 +10,6 @@ public abstract class WeaponBuilding : BuffBuilding
     override internal void Initialize()
     {
         base.Initialize();
-        mObjectToApplyStatsTo = GameManager.mInstance.playerCtrler.mWeaponComponent.mWeapon.mStats;
+        mObjectToApplyStatsTo = GameManager.mInstance.playerCtrler.mWeaponComponent.mWeapon.mProjectileStats;
     }
 }

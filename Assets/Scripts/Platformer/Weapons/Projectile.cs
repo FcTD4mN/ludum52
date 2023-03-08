@@ -4,40 +4,70 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    private cWeapon mOriginalWeapon;
+    protected cCompleteStats mOriginalWeaponProjectileStats;
+    protected cCompleteStats mOriginalWeaponResolutionStats;
 
-    private float startingPos;
-    private uint mSpawnTime = 0;
-    private int mPierceRemaining = 0;
+    protected float startingPos;
+    protected uint mSpawnTime = 0;
+    protected int mPierceRemaining = 0;
+    protected cWeapon.eProjectileResolutionType mResolutionType;
 
-    public void SetWeapon(cWeapon weapon)
+
+    // ===================================
+    // Building
+    // ===================================
+    void OnEnable()
     {
-        mOriginalWeapon = weapon;
-        mPierceRemaining = (int)weapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponPierceAmount);
+        Initialize();
     }
 
-    void OnEnable()
+
+    protected virtual void Initialize()
     {
         startingPos = transform.position.x;
         mSpawnTime = Utilities.GetCurrentTimeEpochInMS();
     }
 
+
+    // ===================================
+    // Setters
+    // ===================================
+    public void SetWeapon(cWeapon weapon)
+    {
+        SetWeaponStats(weapon.mProjectileStats, weapon.mResolutionStats);
+        mResolutionType = weapon.mProjectileResolutionType;
+    }
+    virtual public void SetWeaponStats( cCompleteStats projectile, cCompleteStats resolution )
+    {
+        mOriginalWeaponProjectileStats = new cCompleteStats(projectile);
+        mOriginalWeaponResolutionStats = new cCompleteStats(resolution);
+        mPierceRemaining = (int)projectile.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponPierceAmount);
+    }
+
+
+    // ===================================
+    // GameLoops
+    // ===================================
     void FixedUpdate()
     {
         var deltaTime = Time.fixedDeltaTime;
-        if (mOriginalWeapon == null) return;
+        if (mOriginalWeaponProjectileStats == null) return;
 
         // Destroy arrow after certain distance if not hitting anything
-        if (Mathf.Abs(transform.position.x - startingPos) > mOriginalWeapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponRange))
+        if (Mathf.Abs(transform.position.x - startingPos) > mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponRange))
             Die();
 
-        if (Utilities.GetCurrentTimeEpochInMS() >= mSpawnTime + (uint)(mOriginalWeapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponLifeTime) * 1000))
+        if (Utilities.GetCurrentTimeEpochInMS() >= mSpawnTime + (uint)(mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponLifeTime) * 1000))
             Die();
 
         PerformHoming( deltaTime );
     }
 
-    private void OnTriggerEnter2D(Collider2D coll)
+
+    // ===================================
+    // Physics
+    // ===================================
+    virtual protected void OnTriggerEnter2D(Collider2D coll)
     {
         if (coll.tag == "Blocking")
         {
@@ -55,15 +85,17 @@ public class Projectile : MonoBehaviour
         --mPierceRemaining;
 
         if (mPierceRemaining < 0) Die();
+        else { Resolve(); } // So that every hit will resolve
     }
 
     protected void HitTarget(Hitable target)
     {
-        target.Hit(mOriginalWeapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponDamage));
+        target.Hit(mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponDamage));
     }
 
     public virtual void Die()
     {
+        Resolve();
         DestroySelf();
     }
 
@@ -73,12 +105,53 @@ public class Projectile : MonoBehaviour
     }
 
 
+    private void Resolve()
+    {
+        switch (mResolutionType)
+        {
+            case cWeapon.eProjectileResolutionType.kNone:
+                break;
+            case cWeapon.eProjectileResolutionType.kExplosion:
+                CreateExplosion();
+                break;
+            case cWeapon.eProjectileResolutionType.kDamagingAreas:
+                CreateDamagingArea();
+                break;
 
-    private void PerformHoming( float deltaTime )
+            default:
+                break;
+        }
+    }
+
+
+    private void CreateExplosion()
+    {
+        if( mOriginalWeaponProjectileStats == null ) return;
+
+        // Instantiate explosion
+        GameObject explosionPrefab = Resources.Load<GameObject>("Prefabs/Platformer/Projectiles/ExplosionA");
+        GameObject obj = GameObject.Instantiate(explosionPrefab, transform.position, explosionPrefab.transform.rotation);
+
+        var objectSize = mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponSize);
+        obj.transform.localScale = new Vector3(obj.transform.localScale.x * objectSize, obj.transform.localScale.y * objectSize, 1);
+        obj.GetComponent<Explosive>()?.SetWeaponStats( mOriginalWeaponProjectileStats, mOriginalWeaponResolutionStats );
+    }
+
+
+    private void CreateDamagingArea()
+    {
+
+    }
+
+
+    // ===================================
+    // Behaviour logics
+    // ===================================
+    protected virtual void PerformHoming( float deltaTime )
     {
         if( gameObject == null ) return;
 
-        var homingForce = mOriginalWeapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponHomingForce);
+        var homingForce = mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponHomingForce);
         if( homingForce <= 0 )  return;
 
         var ennemyToGoTo = GetClosestEnnemy();
@@ -87,7 +160,7 @@ public class Projectile : MonoBehaviour
         Rigidbody2D rb = GetComponent<Rigidbody2D>();
 
         Vector2 vectorToEnnemy = ennemyToGoTo.transform.position - transform.position;
-        var desiredVector = vectorToEnnemy.normalized * mOriginalWeapon.mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponSpeed);
+        var desiredVector = vectorToEnnemy.normalized * mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponSpeed);
 
         Vector2 correctedVector = Vector2.Lerp( rb.velocity, desiredVector, deltaTime * homingForce );
         rb.velocity = correctedVector;
@@ -98,7 +171,7 @@ public class Projectile : MonoBehaviour
     {
         float closest = -1;
         GameObject closestEnnemy = null;
-        float threshold = mOriginalWeapon.mStats.GetFinalStat( cStatsDescriptor.eStatsNames.WeaponHomingDistance );
+        float threshold = mOriginalWeaponProjectileStats.GetFinalStat( cStatsDescriptor.eStatsNames.WeaponHomingDistance );
         threshold *= threshold; // Square it to compare with squared distances
 
         var pfWorld = GameObject.Find("PlateFormeWorld/AllEnnemies").gameObject;

@@ -21,16 +21,16 @@ public class HasWeapon : MonoBehaviour
     void OnEnable()
     {
         mWeapon = new cWeapon( gameObject );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponCooldown, WeaponCooldown );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponDamage, WeaponDamage );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponLifeTime, WeaponLifeTime );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponRange, WeaponRange );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponSize,WeaponSize );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponSpeed, WeaponSpeed );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponProjectileCount, WeaponProjectileCount );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponPierceAmount, WeaponPierceAmount );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponHomingDistance, WeaponHomingDistance );
-        mWeapon.mStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponHomingForce, WeaponHomingForce );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponCooldown, WeaponCooldown );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponDamage, WeaponDamage );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponLifeTime, WeaponLifeTime );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponRange, WeaponRange );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponSize,WeaponSize );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponSpeed, WeaponSpeed );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponProjectileCount, WeaponProjectileCount );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponPierceAmount, WeaponPierceAmount );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponHomingDistance, WeaponHomingDistance );
+        mWeapon.mProjectileStats.SetBaseStat( cStatsDescriptor.eStatsNames.WeaponHomingForce, WeaponHomingForce );
     }
 
 

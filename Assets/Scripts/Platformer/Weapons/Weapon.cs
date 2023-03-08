@@ -4,10 +4,29 @@ using UnityEngine;
 public class cWeapon
 {
     public GameObject mWeaponOwner;
-    public cCompleteStats mStats;
+    public cCompleteStats mProjectileStats;
+    public cCompleteStats mResolutionStats;
 
     private uint mLastShootTime = 0;
     public bool mAutoFire = false;
+
+
+
+    public enum eProjectileType
+    {
+        kBasic
+    };
+
+    public enum eProjectileResolutionType
+    {
+        kNone,
+        kExplosion,
+        kDamagingAreas
+    };
+
+    public eProjectileType mProjectileType                          = eProjectileType.kBasic;
+    public eProjectileResolutionType mProjectileResolutionType      = eProjectileResolutionType.kExplosion;
+
 
     public cWeapon(GameObject owner)
     {
@@ -24,8 +43,10 @@ public class cWeapon
         baseValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponHomingForce.ToString()] = 0f;
         baseValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponHomingDistance.ToString()] = 2f;
 
-        mStats = new cCompleteStats();
-        mStats.SetBaseStats(baseValues);
+        mProjectileStats = new cCompleteStats();
+        mProjectileStats.SetBaseStats(baseValues);
+
+        mResolutionStats = new cCompleteStats( mProjectileStats );
     }
 
 
@@ -51,7 +72,7 @@ public class cWeapon
         // Check time
 
         uint cur_time = Utilities.GetCurrentTimeEpochInMS();
-        var weaponCoolDownInSec = mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponCooldown);
+        var weaponCoolDownInSec = mProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponCooldown);
         var timeWhenShootIsAvailable = mLastShootTime + (uint)(weaponCoolDownInSec * 1000f);
 
         return timeWhenShootIsAvailable <= cur_time;
@@ -68,7 +89,7 @@ public class cWeapon
         // Instantiate arrow
         GameObject arrowPrefab = Resources.Load<GameObject>("Prefabs/Platformer/Character/Arrow");
 
-        int projectileCount = (int)mStats.GetFinalStat( cStatsDescriptor.eStatsNames.WeaponProjectileCount );
+        int projectileCount = (int)mProjectileStats.GetFinalStat( cStatsDescriptor.eStatsNames.WeaponProjectileCount );
 
         // Compute target point and distance from originPoint
         Vector2 mouseToCharVector = mousePos - originNoZ;
@@ -89,7 +110,7 @@ public class cWeapon
         {
             GameObject arrow = GameObject.Instantiate(arrowPrefab, originPoint, arrowPrefab.transform.rotation);
 
-            var projectileSize = mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponSize);
+            var projectileSize = mProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponSize);
             arrow.transform.localScale = new Vector3(arrow.transform.localScale.x * projectileSize, arrow.transform.localScale.y * projectileSize, 1);
 
             Vector2 subTarget = splitTargets[i];
@@ -99,7 +120,7 @@ public class cWeapon
             // Move towards next WP
             float distance = Vector2.Distance(subTarget, originPoint);
             Rigidbody2D rbArrow = arrow.GetComponent<Rigidbody2D>();
-            rbArrow.velocity = direction * mStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponSpeed);
+            rbArrow.velocity = direction * mProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponSpeed);
 
             var projectile = arrow.GetComponent<Projectile>();
             if (projectile != null)

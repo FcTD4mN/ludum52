@@ -114,12 +114,27 @@ public class cCompleteStats
     private cStatsDescriptor mStatsBonusMult;   // Changing requires to update finalStatsCached
     private cStatsDescriptor mStatsFinalCached;
 
-    private bool mHasBeenInitialized = false;
+    public cCompleteStats()
+    {
+        mStatsBase = new cStatsDescriptor();
+        mStatsBonusAdd = new cStatsDescriptor();
+        mStatsBonusMult = new cStatsDescriptor();
+
+        Initialize();
+    }
+
+    public cCompleteStats( cCompleteStats other )
+    {
+        mStatsBase = new cStatsDescriptor( other.mStatsBase );
+        mStatsBonusAdd = new cStatsDescriptor( other.mStatsBonusAdd );
+        mStatsBonusMult = new cStatsDescriptor( other.mStatsBonusMult );
+
+        Initialize();
+    }
 
     private void Initialize()
     {
         BuildStats();
-        mHasBeenInitialized = true;
     }
 
 
@@ -128,21 +143,11 @@ public class cCompleteStats
     // ===================================
     public void SetBaseStats(cStatsDescriptor stats)
     {
-        if (!mHasBeenInitialized)
-        {
-            Initialize();
-        }
-
         mStatsBase = stats;
         UpdateStats();
     }
     public void SetBaseStat(eStatsNames type, float value)
     {
-        if (!mHasBeenInitialized)
-        {
-            Initialize();
-        }
-
         mStatsBase.mStatValues[type.ToString()] = value;
         UpdateStats();
     }
@@ -150,11 +155,6 @@ public class cCompleteStats
     // Adds values in stats into mStatsBonusAdd
     public void AddStatsAddition(cStatsDescriptor stats)
     {
-        if (!mHasBeenInitialized)
-        {
-            Initialize();
-        }
-
         mStatsBonusAdd.CombineByAddition(stats);
         UpdateStats();
     }
@@ -162,11 +162,6 @@ public class cCompleteStats
     // Adds values in stats into mStatsBonusMult
     public void AddStatsMultipliers(cStatsDescriptor stats)
     {
-        if (!mHasBeenInitialized)
-        {
-            Initialize();
-        }
-
         mStatsBonusMult.CombineByAddition(stats);
         UpdateStats();
     }
@@ -174,10 +169,6 @@ public class cCompleteStats
 
     public float GetFinalStat(eStatsNames type)
     {
-        if (!mHasBeenInitialized)
-        {
-            Initialize();
-        }
         if (!mStatsFinalCached.mStatValues.ContainsKey(type.ToString())) return 0f;
 
         return mStatsFinalCached.mStatValues[type.ToString()];
@@ -186,10 +177,6 @@ public class cCompleteStats
 
     public float GetBaseStat(eStatsNames type)
     {
-        if (!mHasBeenInitialized)
-        {
-            Initialize();
-        }
         if (!mStatsBase.mStatValues.ContainsKey(type.ToString())) return 0f;
 
         return mStatsBase.mStatValues[type.ToString()];
@@ -198,10 +185,6 @@ public class cCompleteStats
 
     private void BuildStats()
     {
-        mStatsBase = new cStatsDescriptor();
-        mStatsBonusAdd = new cStatsDescriptor();
-        mStatsBonusMult = new cStatsDescriptor();
-
         mStatsBonusAdd.ApplyOnEveryStat(val => 0); // (val) => {return  0}. Sets all values to 0
         mStatsBonusMult.ApplyOnEveryStat(val => 1); // All to 1
 
