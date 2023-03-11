@@ -40,13 +40,29 @@ public class cWeapon
         baseValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponSpeed.ToString()] = 1f;
         baseValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponProjectileCount.ToString()] = 1f;
         baseValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponPierceAmount.ToString()] = 0f;
-        baseValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponHomingForce.ToString()] = 0f;
+        baseValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponHomingForce.ToString()] = 1f;
         baseValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponHomingDistance.ToString()] = 2f;
 
         mProjectileStats = new cCompleteStats();
         mProjectileStats.SetBaseStats(baseValues);
 
-        mResolutionStats = new cCompleteStats( mProjectileStats );
+
+        // mResolutionStats = new cCompleteStats( mProjectileStats );
+
+        cStatsDescriptor resolutionValues = new cStatsDescriptor();
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponCooldown.ToString()] = 0.2f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponDamage.ToString()] = 10f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponLifeTime.ToString()] = 5f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponRange.ToString()] = 10f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponSize.ToString()] = 10f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponSpeed.ToString()] = 0.2f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponProjectileCount.ToString()] = 1f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponPierceAmount.ToString()] = 0f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponHomingForce.ToString()] = 0f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponHomingDistance.ToString()] = 0f;
+        mResolutionStats = new cCompleteStats();
+        mResolutionStats.SetBaseStats(resolutionValues);
+
     }
 
 

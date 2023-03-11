@@ -9,6 +9,7 @@ public class Projectile : MonoBehaviour
 
     protected float startingPos;
     protected uint mSpawnTime = 0;
+    protected uint mDieTime = 0;
     protected int mPierceRemaining = 0;
     protected cWeapon.eProjectileResolutionType mResolutionType;
 
@@ -42,6 +43,7 @@ public class Projectile : MonoBehaviour
         mOriginalWeaponProjectileStats = new cCompleteStats(projectile);
         mOriginalWeaponResolutionStats = new cCompleteStats(resolution);
         mPierceRemaining = (int)projectile.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponPierceAmount);
+        mDieTime = mSpawnTime + (uint)(mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponLifeTime) * 1000);
     }
 
 
@@ -57,7 +59,7 @@ public class Projectile : MonoBehaviour
         if (Mathf.Abs(transform.position.x - startingPos) > mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponRange))
             Die();
 
-        if (Utilities.GetCurrentTimeEpochInMS() >= mSpawnTime + (uint)(mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponLifeTime) * 1000))
+        if( Utilities.GetCurrentTimeEpochInMS() >= mDieTime )
             Die();
 
         PerformHoming( deltaTime );
@@ -88,7 +90,12 @@ public class Projectile : MonoBehaviour
         else { Resolve(); } // So that every hit will resolve
     }
 
-    protected void HitTarget(Hitable target)
+    virtual protected void OnTriggerExit2D(Collider2D coll)
+    {
+        // Nothing here
+    }
+
+    virtual protected void HitTarget(Hitable target)
     {
         target.Hit(mOriginalWeaponProjectileStats.GetFinalStat(cStatsDescriptor.eStatsNames.WeaponDamage));
     }
@@ -140,14 +147,15 @@ public class Projectile : MonoBehaviour
 
     private void CreateDamagingArea()
     {
-
+        var daCreator = new cDamagingAreaCreator( mOriginalWeaponProjectileStats, mOriginalWeaponResolutionStats );
+        daCreator.GenerateAtLocation( transform.position );
     }
 
 
     // ===================================
     // Behaviour logics
     // ===================================
-    protected virtual void PerformHoming( float deltaTime )
+    protected void PerformHoming( float deltaTime )
     {
         if( gameObject == null ) return;
 
