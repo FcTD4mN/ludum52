@@ -3,11 +3,11 @@ using System;
 using UnityEngine;
 using TMPro;
 
-public class Animation
+public class cAnimation
 {
     public static bool mFloatingTextsEnabled = true;
     public MonoBehaviour mParent;
-    public Animation(MonoBehaviour parent)
+    public cAnimation(MonoBehaviour parent)
     {
         mParent = parent;
     }

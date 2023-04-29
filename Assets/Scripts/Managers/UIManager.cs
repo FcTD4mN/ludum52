@@ -540,7 +540,7 @@ public class UIManager : MonoBehaviour,
 
     public void FloatingMessage( string message, Color color, Vector3 position )
     {
-        Animation anim = new Animation( this );
+        cAnimation anim = new cAnimation( this );
         anim.DisplayAnimatedText( position, message, color, 2, 30, mCanvas.transform );
     }
 

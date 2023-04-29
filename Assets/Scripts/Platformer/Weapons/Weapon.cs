@@ -25,7 +25,7 @@ public class cWeapon
     };
 
     public eProjectileType mProjectileType                          = eProjectileType.kBasic;
-    public eProjectileResolutionType mProjectileResolutionType      = eProjectileResolutionType.kExplosion;
+    public eProjectileResolutionType mProjectileResolutionType      = eProjectileResolutionType.kDamagingAreas;
 
 
     public cWeapon(GameObject owner)
@@ -54,8 +54,8 @@ public class cWeapon
         resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponDamage.ToString()] = 10f;
         resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponLifeTime.ToString()] = 5f;
         resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponRange.ToString()] = 10f;
-        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponSize.ToString()] = 10f;
-        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponSpeed.ToString()] = 0.2f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponSize.ToString()] = 2f;
+        resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponSpeed.ToString()] = 3f;
         resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponProjectileCount.ToString()] = 1f;
         resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponPierceAmount.ToString()] = 0f;
         resolutionValues.mStatValues[cStatsDescriptor.eStatsNames.WeaponHomingForce.ToString()] = 0f;

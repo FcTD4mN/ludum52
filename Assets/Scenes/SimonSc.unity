@@ -4082,7 +4082,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1942599265261257720, guid: 1a825eb28c2de284399891cd61544018, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.00004563672
+      value: 0.00005465001
       objectReference: {fileID: 0}
     - target: {fileID: 1942599265354592898, guid: 1a825eb28c2de284399891cd61544018, type: 3}
       propertyPath: m_AnchorMax.x
@@ -5888,7 +5888,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1166322282947398170, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
       propertyPath: WeaponProjectileCount
-      value: 10
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3561193817193138336, guid: 4e0a30f573c85244cb85182fc41deca6, type: 3}
       propertyPath: traj

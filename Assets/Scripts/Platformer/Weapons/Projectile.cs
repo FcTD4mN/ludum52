@@ -147,7 +147,8 @@ public class Projectile : MonoBehaviour
 
     private void CreateDamagingArea()
     {
-        var daCreator = new cDamagingAreaCreator( mOriginalWeaponProjectileStats, mOriginalWeaponResolutionStats );
+        var daCreator = new cDamagingAreaCreatorStatic( mOriginalWeaponProjectileStats, mOriginalWeaponResolutionStats );
+        // var daCreator = new cDamagingAreaCreatorFalling( mOriginalWeaponProjectileStats, mOriginalWeaponResolutionStats );
         daCreator.GenerateAtLocation( transform.position );
     }
 
