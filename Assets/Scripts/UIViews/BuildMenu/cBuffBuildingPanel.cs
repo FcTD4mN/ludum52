@@ -1,10 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-class cBuffBuildingPanel :
-    cBuildPanelBase
+
+class cBuffBuildingPanelIMGUI :
+    cBuildPanelBaseIMGUI
 {
-    public cBuffBuildingPanel(GameObject parentView, string name) : base(parentView, name)
+    public cBuffBuildingPanelIMGUI(string name) : base(name)
     {
     }
 
@@ -20,4 +21,3 @@ class cBuffBuildingPanel :
         return towerBuildings;
     }
 }
-

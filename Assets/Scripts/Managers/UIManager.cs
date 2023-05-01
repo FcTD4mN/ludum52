@@ -17,14 +17,14 @@ public class UIManager : MonoBehaviour,
     private TextMeshProUGUI mLabelBombs;
 
     // BuildMenu
-    private cBuildMenu mBuildMenu;
+    private cBuildMenuIMGUI mBuildMenu;
 
     // Info panel
     private GameObject mInfoPanel;
     private TextMeshProUGUI mInfoPanelText;
 
     // Master Control Panel
-    private cMasterControlPanel mMasterControlPanel;
+    private cMasterControlPanelIMGUI mMasterControlPanel;
 
     // Tooltip panel
     private GameObject mTooltipPanel;
@@ -32,9 +32,9 @@ public class UIManager : MonoBehaviour,
     private Coroutine mTooltipCloseCoroutine;
 
     private GameObject mObjectToBuildTo;
-    private GameObject mBuildButtonClicked;
-    private GameObject mHoverButton; // Button being visible due to hovering
-    private Hoverable mHoverUIView; // Button being visible due to hovering
+    private cFloatingButton mBuildButtonClicked;
+    private cFloatingButton mHoverButton; // Button being visible due to hovering
+    // private Hoverable mHoverUIView; // Button being visible due to hovering
     private GameObject mHoveredObject; // The object the mouse is currently hovering
     private bool mDidFindHoveredButton = false;
 
@@ -42,7 +42,7 @@ public class UIManager : MonoBehaviour,
     public List<GameObject> mBuildableObjects;
 
                 // UIButton, BuildableAssociated (could be null)
-    private List<(GameObject, GameObject)> mAllUIFloatingButtons; // All UI buttons to click to open build menu
+    private List<(cFloatingButton, GameObject)> mAllUIFloatingButtons; // All UI buttons to click to open build menu
 
 
     private enum eInfoPanelDisplayType
@@ -75,12 +75,13 @@ public class UIManager : MonoBehaviour,
         }
 
         // Build Menu
-        mBuildMenu = new cBuildMenu( mCanvas.gameObject, "BuildMenu" );
         Rect screenRect = Camera.main.pixelRect;
-        mBuildMenu.SetFrame(new Rect(0, 0, 500, 500));
-        mBuildMenu.SetCenter(screenRect.center);
-        mBuildMenu.mGameObject.SetActive( false );
+        mBuildMenu = new cBuildMenuIMGUI( "BuildMenu", new Rect(screenRect.center.x - 250, screenRect.center.y - 250, 500, 500) );
+        mBuildMenu.mIsOpen = false;
         BuildBuildMenu();
+
+        mMasterControlPanel = new cMasterControlPanelIMGUI("MCP", new Rect(screenRect.center.x - 800, screenRect.center.y - 400, 1600, 800));
+        mMasterControlPanel.mIsOpen = false;
 
         // Info Panel
         mInfoPanel = mCanvas.transform.Find("InfoPanel")?.gameObject;
@@ -93,7 +94,7 @@ public class UIManager : MonoBehaviour,
         mTooltipPanelText.text = "ok";
         mTooltipPanel.SetActive( false );
 
-        mAllUIFloatingButtons = new List<(GameObject, GameObject)>();
+        mAllUIFloatingButtons = new List<(cFloatingButton, GameObject)>();
 
     }
 
@@ -131,8 +132,6 @@ public class UIManager : MonoBehaviour,
         mLabelArrows.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Arrows)).ToString();
         mLabelBombs.text = ((int)mResourceManager.GetRessource(cResourceDescriptor.eResourceNames.Bombs)).ToString();
 
-        mBuildMenu?.UpdateBuildMenu();
-        mMasterControlPanel?.Update();
         UpdateHovering();
     }
 
@@ -142,34 +141,8 @@ public class UIManager : MonoBehaviour,
         GameObject previousHovered = mHoveredObject;
         mDidFindHoveredButton = false;
 
-        // If nothing is under the pointer, just clear everything and refresh infoPanel
-        // if (!EventSystem.current.IsPointerOverGameObject()) // Can't use that to optimize, because you want to hover over WORLD objects as well
-        //                                                                      And this only looks at UI elements
-
-        // General UI hover tests
-        var raycasts = RaycastMouse();
-        var previousHoveredUI = mHoverUIView;
-        foreach (var result in raycasts)
-        {
-            var hoverable = result.gameObject.GetComponent<Hoverable>();
-            if (hoverable != null)
-            {
-                mHoverUIView = hoverable;
-                hoverable.mOnHoverAction();
-                mDidFindHoveredButton = true;
-                break;
-            }
-        }
-
-        // We didn't find any view in UI, so if there was a hoveredUIView, we call hoverEnded then null the pointer
-        if( !mDidFindHoveredButton || previousHoveredUI != mHoverUIView )
-        {
-            previousHoveredUI?.mOnHoverEndedAction?.Invoke();
-            if( !mDidFindHoveredButton ) mHoverUIView = null;
-        }
-
         // Test to prevent hovering on elements while UI windows are open
-        if( !mBuildMenu.mGameObject.activeSelf && mMasterControlPanel == null )
+        if( !mBuildMenu.mIsOpen && !mMasterControlPanel.mIsOpen )
         {
             Vector3 mousePosScreen = Input.mousePosition;
             Vector3 mousePosWorld;
@@ -226,7 +199,7 @@ public class UIManager : MonoBehaviour,
     public void ClearUIForSwitchingView()
     {
         DeleteAllUIFloatingButtons();
-        mBuildMenu.mGameObject.SetActive(false);
+        mBuildMenu.mIsOpen = false;
         mInfoPanel.SetActive(false);
 
         if (mHoverButton != null) DeleteUIButton(mHoverButton);
@@ -246,64 +219,60 @@ public class UIManager : MonoBehaviour,
 
     public void CreateBuildButtonOverObject( GameObject obj )
     {
-        GameObject newButton = CreateButtonOverObject( "ButtonBuild", obj );
+        cFloatingButton newButton = CreateButtonOverObject( "Build", obj );
         mAllUIFloatingButtons.Add( (newButton, obj ) );
-        newButton.GetComponent<Button>().onClick.AddListener( () => {
-
-            mObjectToBuildTo = obj;
-            mBuildButtonClicked = newButton;
-            ShowBuildMenu();
-
-        });
     }
 
 
     private void CreatePauseButtonOverBuilding( GameObject building )
     {
-        mHoverButton = CreateButtonOverObject( "ButtonPause", building );
-        GameObject text = mHoverButton.transform.Find("text")?.gameObject;
-
         ProductionBuilding prodBuilding = building.GetComponent<ProductionBuilding>();
-        if( building.GetComponent<Receiver>() != null )
+        if (building.GetComponent<Receiver>() != null)
         {
             prodBuilding = building.GetComponent<Receiver>().mAssociatedHarvester.GetComponent<ProductionBuilding>();
         }
 
-        text.GetComponent<TextMeshProUGUI>().text = prodBuilding.IsPaused() ? "Resume" : "Pause";
+        Rect objectBBox = Utilities.GetBBoxFromTransform(building);
+        Rect screenOjbBBox = Utilities.WorldToScreenRect(objectBBox);
+        screenOjbBBox.position = new Vector2(screenOjbBBox.x, Camera.main.pixelHeight - screenOjbBBox.y - screenOjbBBox.height);
 
-        GameObject deleteButton = mHoverButton.transform.Find("Delete")?.gameObject;
-        deleteButton.GetComponent<Button>().onClick.AddListener(() =>
-        {
+        var newButton = new cFloatingButtonPauseResume( "Pause", screenOjbBBox);
+        newButton.mButtonLabel = prodBuilding.IsPaused() ? "Resume" : "Pause";
+        newButton.mHoverText = prodBuilding.IsPaused() ? "Paused" : prodBuilding.mResourceDescriptor.PrintProductionRates();
+
+        newButton.mOnButtonClicked = () => {
+            prodBuilding.SetPause(!prodBuilding.IsPaused());
+            newButton.mButtonLabel = prodBuilding.IsPaused() ? "Resume" : "Pause";
+            newButton.mHoverText = prodBuilding.IsPaused() ? "Paused" : prodBuilding.mResourceDescriptor.PrintProductionRates();
+        };
+        newButton.mOnDeleteClicked = () => {
             GameManager.mRTSManager.DestroyBuilding( building );
             DeleteUIButton( mHoverButton );
-
-        });
-
-        mHoverButton.GetComponent<Button>().onClick.AddListener( () => {
-
-            prodBuilding.SetPause( !prodBuilding.IsPaused() );
+        };
+        newButton.mOnHover = () =>
+        {
+            mInfoPanelDisplay = eInfoPanelDisplayType.kShowStatsOfExistingBuilding;
             UpdateInfoPanel();
-            text.GetComponent<TextMeshProUGUI>().text = prodBuilding.IsPaused() ? "Resume" : "Pause";
+        };
 
-        });
+        mHoverButton = newButton;
     }
 
 
-    private GameObject CreateButtonOverObject( string prefabName, GameObject obj )
+    private cFloatingButton CreateButtonOverObject( string buttonLabel, GameObject obj )
     {
-        GameObject buttonPrefab = Resources.Load<GameObject>("Prefabs/RTS/UI/" + prefabName);
-
         Rect objectBBox = Utilities.GetBBoxFromTransform(obj);
         Rect screenOjbBBox = Utilities.WorldToScreenRect( objectBBox );
+        screenOjbBBox.position = new Vector2( screenOjbBBox.x, Camera.main.pixelHeight - screenOjbBBox.y - screenOjbBBox.height ) ;
 
-        GameObject newButton = Instantiate( buttonPrefab,
-                                            new Vector3( screenOjbBBox.center.x, screenOjbBBox.center.y, 0 ),
-                                            Quaternion.Euler(0, 0, 0) );
-        newButton.transform.SetParent( mCanvas.transform );
-        float buttongPadding = 10;
-        newButton.GetComponent<RectTransform>().sizeDelta = new Vector2( screenOjbBBox.width - buttongPadding, screenOjbBBox.height - buttongPadding );
+        var button = new cFloatingButton( buttonLabel, screenOjbBBox );
+        button.mOnButtonClicked = () => {
+            mObjectToBuildTo = obj;
+            mBuildButtonClicked = button;
+            ShowBuildMenu();
+        };
 
-        return  newButton;
+        return  button;
     }
 
 
@@ -312,17 +281,17 @@ public class UIManager : MonoBehaviour,
         foreach( var pair in mAllUIFloatingButtons )
         {
             var button = pair.Item1;
-            GameObject.Destroy( button );
+            button.DestroyWindow();
         }
 
         mAllUIFloatingButtons.Clear();
     }
 
 
-    public void DeleteUIButton(GameObject uiButton)
+    public void DeleteUIButton(cFloatingButton uiButton)
     {
         mAllUIFloatingButtons.RemoveAll((pair) => { return pair.Item1 == uiButton; });
-        GameObject.Destroy(uiButton);
+        uiButton?.DestroyWindow();
     }
 
     public void DeleteUIButtonAssociatedToBuildable(GameObject buildableObject)
@@ -383,12 +352,6 @@ public class UIManager : MonoBehaviour,
                         mBuildableObjects.Add(gg.gameObject);
                         CreateBuildButtonOverObject(gg.gameObject);
                     }
-
-                    // If mcp is opened, put it front, because we just created new UIbuttons, they will be over mcp if it is open
-                    if( mMasterControlPanel != null )
-                    {
-                        mMasterControlPanel.mGameObject.transform.SetAsLastSibling();
-                    }
                     break;
                 }
 
@@ -435,27 +398,19 @@ public class UIManager : MonoBehaviour,
         bool isLocationOnBuffTower = GameManager.mRTSManager.mBuffTower.mFloors.Contains(mObjectToBuildTo.transform.parent.gameObject);
         bool isLocationOnWeaponTower = GameManager.mRTSManager.mTowerWeapon.mFloors.Contains(mObjectToBuildTo.transform.parent.gameObject);
 
-        if( isLocationOnTower ) mBuildMenu.ShowProdBuildingPanel();
-        if( isLocationOnBuffTower ) mBuildMenu.ShowBuffBuildingPanel();
-        if (isLocationOnWeaponTower) mBuildMenu.ShowWeaponBuildingPanel();
+        mBuildMenu.mIsOpen = true;
 
-        mBuildMenu.UpdateBuildMenu();
-        mBuildMenu.mGameObject.transform.SetAsLastSibling();
-        mBuildMenu.mGameObject.SetActive( true );
+        if( isLocationOnTower ) mBuildMenu.mVisiblePanel = cBuildMenuIMGUI.eVisiblePanel.kProd;
+        if( isLocationOnBuffTower ) mBuildMenu.mVisiblePanel = cBuildMenuIMGUI.eVisiblePanel.kBuff;
+        if (isLocationOnWeaponTower) mBuildMenu.mVisiblePanel = cBuildMenuIMGUI.eVisiblePanel.kWeapon;
     }
 
 
     private void BuildBuildMenu()
     {
-        mBuildMenu.mOnClose = () =>
-        {
-            mBuildMenu.mGameObject.SetActive(false);
-        };
-
-
         mBuildMenu.mOnBuildingClicked = (building)=> {
 
-            mBuildMenu.mGameObject.SetActive(false);
+            mBuildMenu.mIsOpen = false;
             GameManager.mRTSManager.BuildObjectAtLocation( building.ToString(), mObjectToBuildTo);
 
         };
@@ -501,24 +456,7 @@ public class UIManager : MonoBehaviour,
     // ===================================
     public void BuildControlPanel()
     {
-        // Hitting P when panel is open
-        if( mMasterControlPanel != null )
-        {
-            GameObject.Destroy( mMasterControlPanel.mGameObject );
-            mMasterControlPanel = null;
-
-            return;
-        }
-
-        mMasterControlPanel = new cMasterControlPanel( mCanvas.gameObject, "MCP" );
-        mMasterControlPanel.mCloseAction = () => {
-            GameObject.Destroy(mMasterControlPanel.mGameObject);
-            mMasterControlPanel = null;
-        };
-        var screenRect = Camera.main.pixelRect;
-
-        mMasterControlPanel.SetFrame( new Rect(0, 0, 1600, 800));
-        mMasterControlPanel.SetCenter( screenRect.center );
+        mMasterControlPanel.mIsOpen = !mMasterControlPanel.mIsOpen;
     }
 
 

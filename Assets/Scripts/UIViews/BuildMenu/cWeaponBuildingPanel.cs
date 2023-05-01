@@ -1,10 +1,10 @@
-using UnityEngine;
 using System.Collections.Generic;
 
-class cWeaponBuildingPanel :
-    cBuildPanelBase
+
+class cWeaponBuildingPanelIMGUI :
+    cBuildPanelBaseIMGUI
 {
-    public cWeaponBuildingPanel(GameObject parentView, string name) : base(parentView, name)
+    public cWeaponBuildingPanelIMGUI(string name) : base(name)
     {
     }
 
@@ -15,4 +15,3 @@ class cWeaponBuildingPanel :
         return towerBuildings;
     }
 }
-

@@ -540,7 +540,8 @@ PlayerSettings:
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
   webGLPowerPreference: 2
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    WebGL: IMGUI_FEATURE_CUSTOM_ASSERT;IMGUI_FEATURE_FREETYPE
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

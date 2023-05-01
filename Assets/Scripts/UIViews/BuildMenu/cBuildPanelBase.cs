@@ -1,147 +1,107 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using ImGuiNET;
 
-abstract class cBuildPanelBase :
-    cPanel
+
+abstract class cBuildPanelBaseIMGUI :
+    cViewIMGUI
 {
     private List<RTSManager.eBuildingList> mBuildingToShow;
 
-    public List<(RTSManager.eBuildingList, cButton)> mButtons;
     public Action<RTSManager.eBuildingList> mOnBuildingClicked;
 
-    private cToolTipPanel mHoverInfos;
-    private ProductionBuilding mHoveredObject;
-
     // UI variables
-    public float mPadding = 32;
+    public float mPadding = 8;
     public float mButtonSize = 128;
-    public float mSpacing = 12;
+    public float mMinSpacing = 16;
+
+    public string mListName = "";
 
 
-    public cBuildPanelBase(GameObject parentView, string name) : base(parentView, name)
+    public cBuildPanelBaseIMGUI( string name ): base()
     {
-        mButtons = new List<(RTSManager.eBuildingList, cButton)>();
         mBuildingToShow = GetBuildingToShowList();
-        SetColor(Color.clear);
-        BuildButtons();
+        mListName = name;
     }
 
 
     abstract internal List<RTSManager.eBuildingList> GetBuildingToShowList();
-
-
-    override public void LayoutSubviews()
+    public override void Render()
     {
-        Rect frame = GetFrame();
+        float listWidth = ImGui.GetWindowContentRegionWidth();
+        // ImGui.GetStyle().WindowPadding = new Vector2 (mPadding, mPadding);
+        ImGui.Text(mListName + ":");
 
-        int numberOfButtonPerRow = (int)((frame.width - mPadding * 2) / (float)(mButtonSize + mSpacing));
-        if (numberOfButtonPerRow == 0) numberOfButtonPerRow = 1;
+        int numberOfButtonPerRow = (int)((listWidth) / (float)(mButtonSize + mMinSpacing));
 
-        float rowWidth = (float)numberOfButtonPerRow * mButtonSize + ((float)numberOfButtonPerRow - 1f) * mSpacing;
+        ImGui.BeginChild( "test" + mListName );
+        ImGui.Columns( numberOfButtonPerRow, "column"+mListName, false );
 
         int i = 0;
-        Rect buttonFrame = new Rect(    (frame.width - rowWidth) / 2f,
-                                        mPadding,
-                                        mButtonSize,
-                                        mButtonSize);
-        foreach ((RTSManager.eBuildingList, cButton) pair in mButtons)
-        {
-            int rowIndex = i % numberOfButtonPerRow;
-            int columnIndex = i / numberOfButtonPerRow;
-            Vector2 offset = new Vector2(rowIndex * (mButtonSize + mSpacing),
-                                          columnIndex * (mButtonSize + mSpacing));
-
-            cButton button = pair.Item2;
-            button.SetFrame(Utilities.OffsetRectBy(buttonFrame, offset));
-
-            i++;
-        }
-    }
-
-
-    public float RequiredHeightForWidth(float forWidth)
-    {
-        int numberOfButtonPerRow = (int)((forWidth - mPadding * 2) / (mButtonSize + mSpacing));
-        if (numberOfButtonPerRow == 0) numberOfButtonPerRow = 1;
-        int totalButtonCount = mButtons.Count;
-
-        int numberOfRows = Mathf.CeilToInt((float)totalButtonCount / (float)numberOfButtonPerRow);
-        float contentSize = numberOfRows * mButtonSize + (numberOfRows - 1) * mSpacing;
-
-        return mPadding + contentSize + mPadding;
-    }
-
-
-    private void BuildButtons()
-    {
         foreach (RTSManager.eBuildingList building in mBuildingToShow)
         {
             string buildingName = building.ToString();
-            cButton button = new cButton(mGameObject, buildingName);
-            button.SetText(buildingName);
-            button.AddOnClickAction(() =>
+
+            int rowIndex = i / numberOfButtonPerRow;
+            int columnIndex = i % numberOfButtonPerRow;
+
+            ProductionBuilding productionBuilding = GameManager.mRTSManager.GetPrefabByType(building);
+            if (productionBuilding.IsBuildable())
             {
-
-                mOnBuildingClicked?.Invoke(building);
-
-            });
-
-            var hoverable = button.mGameObject.AddComponent<Hoverable>();
-            hoverable.mOnHoverAction = () => {
-
-                if (mHoverInfos != null) return;
-                ProductionBuilding prod = GameManager.mRTSManager.GetPrefabByType((RTSManager.eBuildingList)building);
-                mHoveredObject = prod;
-
-                mHoverInfos = new cToolTipPanel( GameManager.mUIManager.mCanvas.gameObject, "tooltip", button );
-                mHoverInfos.mShowPosition = cToolTipPanel.ePosition.kRight;
-                mHoverInfos.mDistance = 20;
-
-            };
-
-            hoverable.mOnHoverEndedAction = () => {
-
-                if( mHoverInfos != null ) {
-                    GameObject.Destroy( mHoverInfos.mGameObject );
+                // Temporary bg color before png images of buildings
+                switch (building)
+                {
+                    case RTSManager.eBuildingList.Forge:
+                        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.63f, 0.38f, 0.65f, 1f));
+                        break;
+                    case RTSManager.eBuildingList.BombFactory:
+                        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.65f, 0.38f, 0.38f, 1f));
+                        break;
+                    case RTSManager.eBuildingList.Workshop:
+                        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.38f, 0.39f, 0.65f, 1f));
+                        break;
+                    default:
+                        ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.38f, 0.39f, 0.01f, 1f));
+                        break;
                 }
-                mHoverInfos = null;
-                mHoveredObject = null;
 
-            };
+                if (ImGui.Button(buildingName, new Vector2(mButtonSize, mButtonSize)))
+                {
+                    mOnBuildingClicked?.Invoke(building);
+                }
 
-            mButtons.Add((building, button));
-
-            // Temporary bg color before png images of buildings
-            switch (building)
-            {
-                case RTSManager.eBuildingList.Forge:
-                    button.SetColor(new Color(0.63f, 0.38f, 0.65f, 1f));
-                    break;
-                case RTSManager.eBuildingList.BombFactory:
-                    button.SetColor(new Color(0.65f, 0.38f, 0.38f, 1f));
-                    break;
-                case RTSManager.eBuildingList.Workshop:
-                    button.SetColor(new Color(0.38f, 0.39f, 0.65f, 1f));
-                    break;
+                if (ImGui.IsItemHovered())
+                {
+                    ProductionBuilding prod = GameManager.mRTSManager.GetPrefabByType((RTSManager.eBuildingList)building);
+                    ImGui.BeginTooltip();
+                    ImGui.PushTextWrapPos(450.0f);
+                    ImGui.Text(prod.GetUIDescription(true));
+                    ImGui.PopTextWrapPos();
+                    ImGui.EndTooltip();
+                }
             }
+            else
+            {
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(0.38f, 0.38f, 0.38f, 0.5f));
+                ImGui.Button(buildingName, new Vector2(mButtonSize, mButtonSize));
+
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.BeginTooltip();
+                    ImGui.PushTextWrapPos(450.0f);
+                    ImGui.Text("Unavailable");
+                    ImGui.PopTextWrapPos();
+                    ImGui.EndTooltip();
+                }
+            }
+
+            ImGui.NextColumn();
+            ImGui.PopStyleColor();
+            ++i;
         }
 
-        LayoutSubviews();
-    }
-
-
-    public void UpdateButtons()
-    {
-        foreach ((RTSManager.eBuildingList, cButton) pair in mButtons)
-        {
-            cButton button = pair.Item2;
-            ProductionBuilding productionBuilding = GameManager.mRTSManager.GetPrefabByType( pair.Item1 );
-            button.mButton.interactable = mGameObject.activeSelf && productionBuilding.IsBuildable();
-        }
-
-        mHoverInfos?.SetText( mHoveredObject.GetUIDescription(true) );
-
+        ImGui.Columns( 1 );
+        ImGui.EndChild();
     }
 }
-

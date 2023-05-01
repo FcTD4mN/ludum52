@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public static ResourceManager mResourceManager;
     public static UIManager mUIManager;
     public static RTSManager mRTSManager;
+    public static DearImGuiMain mDearImGui;
     public PortalManager mPortalManager;
 
     private bool mIsInRTSMode = false;
@@ -51,6 +52,10 @@ public class GameManager : MonoBehaviour
         if (GameManager.mInstance != null) { return; }
 
         mInstance = this;
+        mDearImGui = GameObject.Find("DearImGui")?.gameObject.GetComponent<DearImGuiMain>();
+        if (mDearImGui != null)
+            mDearImGui.Initialize();
+
         mResourceManager = GameObject.Find("ResourceManager")?.gameObject.GetComponent<ResourceManager>();
         if (mResourceManager != null)
             mResourceManager.Initialize();
@@ -66,6 +71,7 @@ public class GameManager : MonoBehaviour
         mPortalManager = GameObject.Find("PortalManager")?.gameObject.GetComponent<PortalManager>();
         if (mPortalManager != null)
             mPortalManager.Initialize();
+
 
         playerCtrler = GameObject.Find("Character")?.gameObject.GetComponent<PlayerController>();
 

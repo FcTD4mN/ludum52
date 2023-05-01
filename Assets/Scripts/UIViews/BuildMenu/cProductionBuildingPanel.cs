@@ -1,10 +1,10 @@
-using UnityEngine;
 using System.Collections.Generic;
 
-class cProductionBuildingPanel:
-    cBuildPanelBase
+
+class cProductionBuildingPanelIMGUI :
+    cBuildPanelBaseIMGUI
 {
-    public cProductionBuildingPanel(GameObject parentView, string name) : base(parentView, name)
+    public cProductionBuildingPanelIMGUI( string name ): base( name )
     {
     }
 
@@ -12,11 +12,10 @@ class cProductionBuildingPanel:
     {
         List<RTSManager.eBuildingList> towerBuildings = new List<RTSManager.eBuildingList>();
 
-        towerBuildings.Add( RTSManager.eBuildingList.Forge );
-        towerBuildings.Add( RTSManager.eBuildingList.BombFactory );
-        towerBuildings.Add( RTSManager.eBuildingList.Workshop );
+        towerBuildings.Add(RTSManager.eBuildingList.Forge);
+        towerBuildings.Add(RTSManager.eBuildingList.BombFactory);
+        towerBuildings.Add(RTSManager.eBuildingList.Workshop);
 
-        return  towerBuildings;
+        return towerBuildings;
     }
 }
-
