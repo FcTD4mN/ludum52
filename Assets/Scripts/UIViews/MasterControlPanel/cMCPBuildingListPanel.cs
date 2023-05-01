@@ -32,11 +32,11 @@ abstract class cMCPBuildingListPanelIMGUI :
 
         ImGui.Columns( 5, "colums" + title, true );
 
-        ImGui.Text( "Name" ); ImGui.NextColumn();
-        ImGui.Text( "Inputs" ); ImGui.NextColumn();
-        ImGui.Text( "Outputs" ); ImGui.NextColumn();
+        ImGui.Text( "Name" );       ImGui.NextColumn();
+        ImGui.Text( "Inputs" );     ImGui.NextColumn();
+        ImGui.Text( "Outputs" );    ImGui.NextColumn();
         ImGui.Text( "Efficiency" ); ImGui.NextColumn();
-        ImGui.Text( "" ); ImGui.NextColumn();
+        ImGui.Text( "" );           ImGui.NextColumn();
 
         ImGui.NewLine();ImGui.NextColumn();
         ImGui.NewLine();ImGui.NextColumn();
