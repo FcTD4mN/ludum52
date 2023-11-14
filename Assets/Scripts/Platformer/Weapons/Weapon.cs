@@ -172,3 +172,67 @@ public class cWeapon
         return  output;
     }
 }
+
+
+/*
+
+WeaponBUildings:
+    Add two members in cWeapon:
+        mProjectileBuilding
+        mResolverBuilding
+
+    when shooting:
+        {
+            cCompleteStats projectileStats = mProjectileBuilding.ProduceStats();
+            cCompleteStats resolverStats = mResolverBuilding.ProduceStats();
+
+            if projectileStats != nil {
+                Spawn projectile
+                give projectileStats and resolverStats to projectile, no copy unlike now
+            }
+        }
+
+    when projectile dies:
+        if resolverStats != nil => Resolve();
+
+
+Classes:
+    cWeaponBuilding: ProductionBuilding
+        mBaseStats: cCompleteStats <= the stats of either the projectile, resolver or the buff that will be applied
+
+    cWeaponCoreBuilding: cWeaponBuilding
+    {
+        mAssociatedBuffBuildings: [cWeaponBuffBuilding]
+        ProduceStats()
+        {
+            Produce(); <= from ProductionBuilding
+            if mProdRatio == 0 { return  nil } <= Not enough resources
+
+            var stats = new cCompleteStats( mBaseStats ) <= Copy base stats
+            stats = stats * mProdRatio; <= Computed in Produce(), this will lower the stats if resources are lacking
+
+            for buff in mAssociatedBuffBuildings <= Order matters ofc
+            {
+                buff.ApplyBuffOnStats( stats );
+            }
+
+            return  stats
+        }
+    }
+
+    cWeaponBuffBuilding: cWeaponBuilding
+    {
+        mType: eStatsType (.kAdd or .kMultiply)
+
+        ApplyBuffOnStats( cCompleteStats& statsToChange )
+        {
+            Produce(); <= from ProductionBuilding
+            if mProdRatio == 0 { return } <= Not enough resources
+
+            if mType == .kAdd
+                statsToChange += mBaseStats*mProdRatio
+            else if mType == .kMultiply
+                statsToChange *= mBaseStats*mProdRatio
+        }
+    }
+*/
